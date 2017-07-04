@@ -1,0 +1,14 @@
+<teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:noNamespaceSchemaLocation="urn:shemas-jetbrains-com:teamcity-plugin-v1-xml">
+    <info>
+        <name>aws-ecs-plugin</name>
+        <display-name>AWS ECS</display-name>
+        <version>@Plugin_Version@</version>
+        <description>Allows to run TeamCity build agents on AWS ECS cluster</description>
+        <vendor>
+            <name>JetBrains, s.r.o.</name>
+            <url>http://www.jetbrains.com</url>
+        </vendor>
+    </info>
+    <deployment use-separate-classloader="true"/>
+</teamcity-plugin>

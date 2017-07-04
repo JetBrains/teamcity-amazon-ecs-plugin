@@ -1,0 +1,25 @@
+plugins {
+    id 'com.github.rodm.teamcity-server' version "0.9.1"
+}
+
+teamcity {
+    version = teamcityVersion
+
+    server {
+        descriptor = project.file('teamcity-plugin.xml')
+        tokens = [Plugin_Version: project.version]
+    }
+}
+
+dependencies {
+    compile project(':aws-ecs-common')
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    agent project(path: ':aws-ecs-agent', configuration: 'plugin')
+}
+
+serverPlugin.version = null
+
+tasks.withType(JavaCompile) {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
+}

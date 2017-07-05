@@ -1,16 +1,18 @@
 package jetbrains.buildServer.clouds.ecs
 
-import jetbrains.buildServer.clouds.CloudClientEx
-import jetbrains.buildServer.clouds.CloudClientFactory
-import jetbrains.buildServer.clouds.CloudClientParameters
-import jetbrains.buildServer.clouds.CloudState
+import jetbrains.buildServer.clouds.*
 import jetbrains.buildServer.serverSide.AgentDescription
 import jetbrains.buildServer.serverSide.PropertiesProcessor
 
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 05.07.17.
  */
-class EcsCloudClientFactory : CloudClientFactory {
+class EcsCloudClientFactory(cloudRegister: CloudRegistrar) : CloudClientFactory {
+    init {
+        cloudRegister.registerCloudFactory(this)
+    }
+
+
     override fun getInitialParameterValues(): MutableMap<String, String> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

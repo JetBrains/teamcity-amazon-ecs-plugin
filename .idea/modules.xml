@@ -2,6 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/aws-ecs-agent/aws-ecs-agent.iml" filepath="$PROJECT_DIR$/aws-ecs-agent/aws-ecs-agent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aws-ecs-common/aws-ecs-common.iml" filepath="$PROJECT_DIR$/aws-ecs-common/aws-ecs-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/aws-ecs-server/aws-ecs-server.iml" filepath="$PROJECT_DIR$/aws-ecs-server/aws-ecs-server.iml" />
       <module fileurl="file://$PROJECT_DIR$/teamcity-amazon-ecs-plugin.iml" filepath="$PROJECT_DIR$/teamcity-amazon-ecs-plugin.iml" />
     </modules>
   </component>

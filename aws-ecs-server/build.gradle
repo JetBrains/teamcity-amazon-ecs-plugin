@@ -2,11 +2,15 @@ plugins {
     id 'com.github.rodm.teamcity-server' version "0.9.1"
 }
 
+repositories {
+    maven { url "http://jcenter.bintray.com" }
+}
+
 teamcity {
     version = teamcityVersion
 
     server {
-        descriptor = project.file('teamcity-plugin.xml')
+        descriptor = rootProject.file('teamcity-plugin.xml')
         tokens = [Plugin_Version: project.version]
     }
 }
@@ -18,8 +22,15 @@ dependencies {
 }
 
 serverPlugin.version = null
+serverPlugin.baseName = 'aws-ecs'
 
 tasks.withType(JavaCompile) {
     sourceCompatibility = "1.8"
     targetCompatibility = "1.8"
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = 1.8
+    }
 }

@@ -1,0 +1,5 @@
+rootProject.name = 'teamcity-amazon-ecs-plugin'
+
+include 'aws-ecs-agent'
+include 'aws-ecs-common'
+include 'aws-ecs-server'

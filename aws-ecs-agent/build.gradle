@@ -16,7 +16,19 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     testCompile 'org.testng:testng:6.8'
     testCompile 'org.jmock:jmock:2.5.1'
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
 agentPlugin.version = null
 agentPlugin.baseName = 'teamcity-aws-ecs'
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.6"
+    }
+}
+
+apply plugin: 'kotlin'
+repositories {
+    mavenCentral()
+}

@@ -4,8 +4,14 @@ plugins{
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
 teamcity {
     version = teamcityVersion
+}
+
+apply plugin: 'kotlin'
+repositories {
+    mavenCentral()
 }

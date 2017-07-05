@@ -4,6 +4,7 @@ plugins {
 
 repositories {
     maven { url "http://jcenter.bintray.com" }
+    mavenCentral()
 }
 
 teamcity {
@@ -19,6 +20,12 @@ dependencies {
     compile project(':aws-ecs-common')
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     agent project(path: ':aws-ecs-agent', configuration: 'plugin')
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+
+    provided "org.jetbrains.teamcity:cloud-interface:$teamcityVersion"
+    provided "org.jetbrains.teamcity:cloud-shared:$teamcityVersion"
+    provided "org.jetbrains.teamcity.internal:server:$teamcityVersion"
 }
 
 serverPlugin.version = null
@@ -31,6 +38,13 @@ tasks.withType(JavaCompile) {
 
 compileKotlin {
     kotlinOptions {
-        jvmTarget = 1.8
+        jvmTarget = "1.8"
+    }
+}
+
+apply plugin: 'kotlin'
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 }

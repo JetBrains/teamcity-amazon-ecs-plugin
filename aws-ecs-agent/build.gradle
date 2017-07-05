@@ -13,10 +13,9 @@ teamcity {
 
 dependencies {
     compile project(':aws-ecs-common')
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     testCompile 'org.testng:testng:6.8'
     testCompile 'org.jmock:jmock:2.5.1'
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
 agentPlugin.version = null

@@ -18,7 +18,7 @@ teamcity {
 
 dependencies {
     compile project(':aws-ecs-common')
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     agent project(path: ':aws-ecs-agent', configuration: 'plugin')
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"

@@ -7,6 +7,12 @@ repositories {
     mavenCentral()
 }
 
+dependencyManagement {
+    imports {
+        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.10.77'
+    }
+}
+
 teamcity {
     version = teamcityVersion
 
@@ -36,6 +42,8 @@ dependencies {
     provided "org.jetbrains.teamcity:cloud-interface:$teamcityVersion"
     provided "org.jetbrains.teamcity:cloud-shared:$teamcityVersion"
     provided "org.jetbrains.teamcity.internal:server:$teamcityVersion"
+
+    compile 'com.amazonaws:aws-java-sdk-ecs:1.9.40'
 }
 
 serverPlugin.version = null

@@ -1,0 +1,16 @@
+.section-header {
+    margin: 13px 0 13px 8px;
+}
+
+.imagesOuterWrapper {
+    padding-left: 8px;
+}
+
+.imagesTableWrapper {
+    margin-bottom: 0.5em;
+}
+
+textarea .podTemplateContent {
+    width: 100%;
+    height: 30em;
+}

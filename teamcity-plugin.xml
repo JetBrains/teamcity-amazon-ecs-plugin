@@ -2,9 +2,9 @@
                  xsi:noNamespaceSchemaLocation="urn:shemas-jetbrains-com:teamcity-plugin-v1-xml">
     <info>
         <name>aws-ecs-plugin</name>
-        <display-name>AWS ECS</display-name>
+        <display-name>Amazon EC2 Container Service Support</display-name>
         <version>@Plugin_Version@</version>
-        <description>Allows to run TeamCity build agents on AWS ECS cluster</description>
+        <description>Allows to run TeamCity build agents on Amazon EC2 Container Service</description>
         <vendor>
             <name>JetBrains, s.r.o.</name>
             <url>http://www.jetbrains.com</url>

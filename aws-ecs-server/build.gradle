@@ -16,7 +16,7 @@ teamcity {
     }
 
     environments {
-        tc20171 {
+        Tc20171 {
             version = '2017.1'
             homeDir = file("/home/lodkin/teamcity/trunk/buildserver/.idea_artifacts/dist-teamcity-tomcat")
             dataDir = file("$rootDir/teamcity/data/2017.1")

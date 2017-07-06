@@ -42,7 +42,7 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar, pluginDescriptor: Plu
     }
 
     override fun getPropertiesProcessor(): PropertiesProcessor {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return EcsPropertiesProcessor()
     }
 }
 

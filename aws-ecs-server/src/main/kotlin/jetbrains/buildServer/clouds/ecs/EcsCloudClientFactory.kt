@@ -21,7 +21,7 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar, pluginDescriptor: Plu
     }
 
     override fun getDisplayName(): String {
-        return "AWS ECS"
+        return "Amazon EC2 Container Service"
     }
 
     override fun getEditProfileUrl(): String? {

@@ -42,7 +42,9 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar, pluginDescriptor: Plu
     }
 
     override fun getPropertiesProcessor(): PropertiesProcessor {
-        return EcsPropertiesProcessor()
+        return PropertiesProcessor {
+            props -> emptyList()
+        }
     }
 }
 

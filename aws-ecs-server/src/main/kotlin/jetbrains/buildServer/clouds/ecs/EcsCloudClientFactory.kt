@@ -34,7 +34,7 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar, pluginDescriptor: Plu
     }
 
     override fun createNewClient(state: CloudState, params: CloudClientParameters): CloudClientEx {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return EcsCloudClient()
     }
 
     override fun getInitialParameterValues(): MutableMap<String, String> {

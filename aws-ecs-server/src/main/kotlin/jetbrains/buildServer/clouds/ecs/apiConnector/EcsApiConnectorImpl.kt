@@ -2,11 +2,13 @@ package jetbrains.buildServer.clouds.ecs.apiConnector
 
 import com.amazonaws.services.ecs.AmazonECSClient
 import com.amazonaws.services.ecs.model.*
+import jetbrains.buildServer.clouds.ecs.EcsCloudClientParameters
 
-class EcsApiConnectorImpl : EcsApiConnector {
+class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector {
     private val apiClient: AmazonECSClient
 
     init {
+        //TODO: provide configuration
         apiClient = AmazonECSClient()
     }
 

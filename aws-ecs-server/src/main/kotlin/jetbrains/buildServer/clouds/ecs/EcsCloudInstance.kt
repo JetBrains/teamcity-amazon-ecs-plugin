@@ -1,5 +1,7 @@
 package jetbrains.buildServer.clouds.ecs
 
-interface EcsCloudInstance {
+import jetbrains.buildServer.clouds.CloudInstance
+
+interface EcsCloudInstance : CloudInstance {
     fun terminate()
 }

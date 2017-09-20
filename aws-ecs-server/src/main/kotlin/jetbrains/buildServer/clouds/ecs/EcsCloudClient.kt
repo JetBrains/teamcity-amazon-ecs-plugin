@@ -8,7 +8,7 @@ import jetbrains.buildServer.serverSide.AgentDescription
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class EcsCloudClient(images: List<EcsCloudImage>, apiConnector: EcsApiConnector) : CloudClientEx {
+class EcsCloudClient(images: List<EcsCloudImage>, val apiConnector: EcsApiConnector) : CloudClientEx {
     private val LOG = Logger.getInstance(EcsCloudClient::class.java.getName())
 
     private var myCurrentlyRunningInstancesCount: Int = 0
@@ -40,7 +40,11 @@ class EcsCloudClient(images: List<EcsCloudImage>, apiConnector: EcsApiConnector)
     }
 
     override fun startNewInstance(image: CloudImage, tag: CloudInstanceUserData): CloudInstance {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val ecsImage = image as EcsCloudImage
+        val tasks = apiConnector.runTask(ecsImage.taskDefinition, ecsImage.cluster, ecsImage.taskGroup)
+        myCurrentError = null
+        myCurrentlyRunningInstancesCount++
+        return EcsCloudInstanceImpl(ecsImage, tasks[0], apiConnector)
     }
 
     override fun terminateInstance(instance: CloudInstance) {
@@ -68,6 +72,4 @@ class EcsCloudClient(images: List<EcsCloudImage>, apiConnector: EcsApiConnector)
     override fun findInstanceByAgent(agent: AgentDescription): CloudInstance? {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
 }
-

@@ -5,13 +5,16 @@ import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnectorImpl
 import jetbrains.buildServer.clouds.ecs.web.EDIT_ECS_HTML
 import jetbrains.buildServer.serverSide.AgentDescription
 import jetbrains.buildServer.serverSide.PropertiesProcessor
+import jetbrains.buildServer.serverSide.ServerSettings
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 import java.util.*
 
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 05.07.17.
  */
-class EcsCloudClientFactory(cloudRegister: CloudRegistrar, pluginDescriptor: PluginDescriptor) : CloudClientFactory {
+class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
+                            pluginDescriptor: PluginDescriptor,
+                            private val serverSettings: ServerSettings) : CloudClientFactory {
     val editUrl = pluginDescriptor.getPluginResourcesPath(EDIT_ECS_HTML)
 
     init {
@@ -31,7 +34,11 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar, pluginDescriptor: Plu
     }
 
     override fun canBeAgentOfType(description: AgentDescription): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val map = description.getAvailableParameters()
+        return map.containsKey(SERVER_UUID_AGENT_PROP) &&
+                map.containsKey(PROFILE_ID_AGENT_PROP) &&
+                map.containsKey(IMAGE_NAME_AGENT_PROP) &&
+                map.containsKey(INSTANCE_NAME_AGENT_PROP)
     }
 
     override fun createNewClient(state: CloudState, params: CloudClientParameters): CloudClientEx {
@@ -42,7 +49,7 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar, pluginDescriptor: Plu
             image.populateInstances()
             image
         }
-        return EcsCloudClient(images, apiConnector, ecsParams)
+        return EcsCloudClient(images, apiConnector, ecsParams, serverSettings.getServerUUID()!!, state.getProfileId())
     }
 
     override fun getInitialParameterValues(): MutableMap<String, String> {
@@ -51,7 +58,7 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar, pluginDescriptor: Plu
 
     override fun getPropertiesProcessor(): PropertiesProcessor {
         return PropertiesProcessor {
-            props -> emptyList()
+            emptyList()
         }
     }
 }

@@ -8,7 +8,11 @@ import jetbrains.buildServer.serverSide.AgentDescription
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class EcsCloudClient(images: List<EcsCloudImage>, val apiConnector: EcsApiConnector, val ecsClientParams: EcsCloudClientParameters) : CloudClientEx {
+class EcsCloudClient(images: List<EcsCloudImage>,
+                     val apiConnector: EcsApiConnector,
+                     val ecsClientParams: EcsCloudClientParameters,
+                     private val serverUuid: String,
+                     private val cloudProfileId: String) : CloudClientEx {
     private val LOG = Logger.getInstance(EcsCloudClient::class.java.getName())
 
     private var myCurrentlyRunningInstancesCount: Int = 0
@@ -69,7 +73,7 @@ class EcsCloudClient(images: List<EcsCloudImage>, val apiConnector: EcsApiConnec
     }
 
     override fun generateAgentName(agent: AgentDescription): String? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return agent.getAvailableParameters().get(INSTANCE_NAME_AGENT_PROP)
     }
 
     override fun getImages(): MutableCollection<out CloudImage> {
@@ -81,6 +85,19 @@ class EcsCloudClient(images: List<EcsCloudImage>, val apiConnector: EcsApiConnec
     }
 
     override fun findInstanceByAgent(agent: AgentDescription): CloudInstance? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val agentParameters = agent.getAvailableParameters()
+
+        if (serverUuid != agentParameters.get(SERVER_UUID_AGENT_PROP) || cloudProfileId != agentParameters.get(PROFILE_ID_AGENT_PROP))
+            return null
+
+        val imageName = agentParameters.get(IMAGE_NAME_AGENT_PROP)
+        val instanceName = agentParameters.get(INSTANCE_NAME_AGENT_PROP)
+        if (imageName != null && instanceName != null) {
+            val cloudImage = myImageNameToImageMap[imageName]
+            if (cloudImage != null) {
+                return cloudImage.findInstanceById(instanceName)
+            }
+        }
+        return null
     }
 }

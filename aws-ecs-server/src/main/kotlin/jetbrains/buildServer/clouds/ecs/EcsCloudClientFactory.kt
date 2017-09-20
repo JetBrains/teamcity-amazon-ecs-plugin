@@ -1,6 +1,7 @@
 package jetbrains.buildServer.clouds.ecs
 
 import jetbrains.buildServer.clouds.*
+import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnectorImpl
 import jetbrains.buildServer.clouds.ecs.web.EDIT_ECS_HTML
 import jetbrains.buildServer.serverSide.AgentDescription
 import jetbrains.buildServer.serverSide.PropertiesProcessor
@@ -34,7 +35,14 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar, pluginDescriptor: Plu
     }
 
     override fun createNewClient(state: CloudState, params: CloudClientParameters): CloudClientEx {
-        return EcsCloudClient()
+        val ecsParams = params.toEcsParams()
+        val apiConnector = EcsApiConnectorImpl(ecsParams)
+        val images = ecsParams.imagesData.map{
+            val image = it.toImage(apiConnector)
+            image.populateInstances()
+            image
+        }
+        return EcsCloudClient(images, apiConnector)
     }
 
     override fun getInitialParameterValues(): MutableMap<String, String> {
@@ -47,4 +55,3 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar, pluginDescriptor: Plu
         }
     }
 }
-

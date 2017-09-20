@@ -6,4 +6,6 @@ interface EcsCloudImage : CloudImage {
     val taskDefinition: String
     val cluster: String?
     val taskGroup: String?
+
+    fun populateInstances()
 }

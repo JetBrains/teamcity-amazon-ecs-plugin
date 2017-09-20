@@ -4,9 +4,10 @@ import jetbrains.buildServer.clouds.CloudErrorInfo
 import jetbrains.buildServer.clouds.CloudInstance
 
 class EcsCloudImageImpl : EcsCloudImage {
-    override fun populateInstances() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override val instanceLimit: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val instanceCount: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
     override val taskDefinition: String
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
@@ -36,6 +37,10 @@ class EcsCloudImageImpl : EcsCloudImage {
     }
 
     override fun findInstanceById(id: String): CloudInstance? {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun populateInstances() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

@@ -42,7 +42,7 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar, pluginDescriptor: Plu
             image.populateInstances()
             image
         }
-        return EcsCloudClient(images, apiConnector)
+        return EcsCloudClient(images, apiConnector, ecsParams)
     }
 
     override fun getInitialParameterValues(): MutableMap<String, String> {

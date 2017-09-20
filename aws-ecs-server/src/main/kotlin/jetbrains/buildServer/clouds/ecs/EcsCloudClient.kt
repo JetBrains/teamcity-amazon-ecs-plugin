@@ -8,7 +8,7 @@ import jetbrains.buildServer.serverSide.AgentDescription
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-class EcsCloudClient(images: List<EcsCloudImage>, val apiConnector: EcsApiConnector) : CloudClientEx {
+class EcsCloudClient(images: List<EcsCloudImage>, val apiConnector: EcsApiConnector, val ecsClientParams: EcsCloudClientParameters) : CloudClientEx {
     private val LOG = Logger.getInstance(EcsCloudClient::class.java.getName())
 
     private var myCurrentlyRunningInstancesCount: Int = 0
@@ -36,7 +36,18 @@ class EcsCloudClient(images: List<EcsCloudImage>, val apiConnector: EcsApiConnec
     }
 
     override fun canStartNewInstance(image: CloudImage): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val kubeCloudImage = image as EcsCloudImage
+        val kubeCloudImageId = kubeCloudImage.getId()
+        if (!myImageIdToImageMap.containsKey(kubeCloudImageId)) {
+            LOG.debug("Can't start instance of unknown cloud image with id " + kubeCloudImageId)
+            return false
+        }
+        val profileInstanceLimit = ecsClientParams.instanceLimit
+        if (profileInstanceLimit > 0 && myCurrentlyRunningInstancesCount >= profileInstanceLimit)
+            return false
+
+        val imageLimit = kubeCloudImage.instanceLimit
+        return imageLimit <= 0 || kubeCloudImage.instanceCount < imageLimit
     }
 
     override fun startNewInstance(image: CloudImage, tag: CloudInstanceUserData): CloudInstance {

@@ -5,5 +5,6 @@ package jetbrains.buildServer.clouds.ecs
  */
 interface EcsCloudClientParameters {
     val imagesData: List<EcsCloudImageData>
+    val instanceLimit: Int
 }
 

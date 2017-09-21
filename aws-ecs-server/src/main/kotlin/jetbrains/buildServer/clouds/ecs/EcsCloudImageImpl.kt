@@ -7,6 +7,7 @@ import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 class EcsCloudImageImpl(private val imageData: EcsCloudImageData, private val apiConnector: EcsApiConnector) : EcsCloudImage {
     override val instanceLimit: Int
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+
     override val instanceCount: Int
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
@@ -42,6 +43,10 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData, private val ap
     }
 
     override fun populateInstances() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun deleteInstance(instance: EcsCloudInstance) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

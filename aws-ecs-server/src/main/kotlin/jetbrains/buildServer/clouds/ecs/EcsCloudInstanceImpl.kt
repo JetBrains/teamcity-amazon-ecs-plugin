@@ -12,15 +12,36 @@ class EcsCloudInstanceImpl(val cloudImage: EcsCloudImage, val ecsTask: EcsTask, 
     private var myCurrentError: CloudErrorInfo? = null
 
     override fun getStatus(): InstanceStatus {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val task = apiConnector.describeTask(ecsTask.arn)
+        if(task == null) return InstanceStatus.UNKNOWN
+        val lastStatus = task.lastStatus
+        val desiredStatus = task.desiredStatus
+        when (desiredStatus) {
+            "RUNNING" -> {
+                when(lastStatus){
+                    "PENDING" -> return InstanceStatus.STARTING
+                    "RUNNING" -> return InstanceStatus.RUNNING
+                    else -> return InstanceStatus.RUNNING
+                }
+            }
+            "STOPPED" -> {
+                when(lastStatus){
+                    "RUNNING" -> return InstanceStatus.STOPPING
+                    "PENDING" -> return InstanceStatus.STOPPED
+                    "STOPPED" -> return InstanceStatus.STOPPED
+                    else -> return InstanceStatus.STOPPED
+                }
+            }
+            else -> return InstanceStatus.UNKNOWN
+        }
     }
 
     override fun getInstanceId(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return ecsTask.arn
     }
 
     override fun getName(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return ecsTask.arn
     }
 
     override fun getStartedTime(): Date {
@@ -28,7 +49,8 @@ class EcsCloudInstanceImpl(val cloudImage: EcsCloudImage, val ecsTask: EcsTask, 
     }
 
     override fun getNetworkIdentity(): String? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //TODO: provide identity
+        return null
     }
 
     override fun getImage(): CloudImage {
@@ -44,10 +66,13 @@ class EcsCloudInstanceImpl(val cloudImage: EcsCloudImage, val ecsTask: EcsTask, 
     }
 
     override fun containsAgent(agent: AgentDescription): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return name == agent.configurationParameters.get(INSTANCE_NAME_AGENT_PROP)
     }
 
     override fun terminate() {
+        //TODO: provide cluster
         apiConnector.stopTask(ecsTask.arn, null, "Terminated by TeamCity server")
+        myCurrentError = null
+        cloudImage.deleteInstance(this)
     }
 }

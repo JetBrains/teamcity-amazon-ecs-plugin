@@ -10,4 +10,5 @@ interface EcsCloudImage : CloudImage {
     val instanceCount: Int
 
     fun populateInstances()
+    fun deleteInstance(instance: EcsCloudInstance)
 }

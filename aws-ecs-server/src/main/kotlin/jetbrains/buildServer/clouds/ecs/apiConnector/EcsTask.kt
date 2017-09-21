@@ -7,9 +7,15 @@ import com.amazonaws.services.ecs.model.Task
  */
 interface EcsTask {
     val arn: String
+    val lastStatus: String
+    val desiredStatus: String
 }
 
 fun Task.wrap(): EcsTask = object : EcsTask{
+    override val desiredStatus: String
+        get() = this@wrap.desiredStatus
+    override val lastStatus: String
+        get() = this@wrap.lastStatus
     override val arn: String
-        get() = this.arn
+        get() = this@wrap.taskArn
 }

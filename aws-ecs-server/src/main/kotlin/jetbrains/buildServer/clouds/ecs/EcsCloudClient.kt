@@ -57,9 +57,11 @@ class EcsCloudClient(images: List<EcsCloudImage>,
     override fun startNewInstance(image: CloudImage, tag: CloudInstanceUserData): CloudInstance {
         val ecsImage = image as EcsCloudImage
         val tasks = apiConnector.runTask(ecsImage.taskDefinition, ecsImage.cluster, ecsImage.taskGroup)
+        val newInstance = EcsCloudInstanceImpl(ecsImage, tasks[0], apiConnector)
+        ecsImage.addInstance(newInstance)
         myCurrentError = null
         myCurrentlyRunningInstancesCount++
-        return EcsCloudInstanceImpl(ecsImage, tasks[0], apiConnector)
+        return newInstance
     }
 
     override fun terminateInstance(instance: CloudInstance) {

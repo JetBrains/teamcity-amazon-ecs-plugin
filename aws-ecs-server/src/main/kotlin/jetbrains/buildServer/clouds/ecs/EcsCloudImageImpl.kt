@@ -13,40 +13,42 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData, private val ap
     private var myCurrentError: CloudErrorInfo? = null
 
     override val instanceLimit: Int
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        get() = imageData.instanceLimit
 
     override val instanceCount: Int
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        get() = myIdToInstanceMap.size
 
     override val taskDefinition: String
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        get() = imageData.taskDefinition
+
     override val cluster: String?
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        get() = imageData.cluster
+
     override val taskGroup: String?
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+        get() = imageData.taskGroup
 
     override fun getAgentPoolId(): Int? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return imageData.agentPoolId
     }
 
     override fun getName(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return taskDefinition
     }
 
     override fun getId(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return imageData.id
     }
 
     override fun getInstances(): MutableCollection<out CloudInstance> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return myIdToInstanceMap.values
     }
 
     override fun getErrorInfo(): CloudErrorInfo? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return myCurrentError
     }
 
     override fun findInstanceById(id: String): CloudInstance? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return myIdToInstanceMap[id]
     }
 
     override fun populateInstances() {

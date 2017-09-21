@@ -21,7 +21,7 @@ class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector
     }
 
     override fun listTaskDefinitions(): List<String> {
-        val taskDefArns:List<String> = ArrayList()
+        val taskDefArns:List<String> = ArrayList<String>()
         var nextToken: String? = null;
         do{
             val taskDefsResult = apiClient.listTaskDefinitions().withNextToken(nextToken)

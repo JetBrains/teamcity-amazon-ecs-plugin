@@ -2,8 +2,9 @@ package jetbrains.buildServer.clouds.ecs
 
 import jetbrains.buildServer.clouds.CloudErrorInfo
 import jetbrains.buildServer.clouds.CloudInstance
+import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 
-class EcsCloudImageImpl : EcsCloudImage {
+class EcsCloudImageImpl(private val imageData: EcsCloudImageData, private val apiConnector: EcsApiConnector) : EcsCloudImage {
     override val instanceLimit: Int
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
     override val instanceCount: Int

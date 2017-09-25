@@ -8,6 +8,8 @@
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 
+<jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
+
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}ecsSettings.css'/>");
 </script>
@@ -21,6 +23,26 @@
 </table>
 
 <h2 class="noBorder section-header">Agent images</h2>
+
+<div class="buttonsWrapper">
+    <div class="imagesTableWrapper hidden">
+        <table id="ecsImagesTable" class="settings imagesTable hidden">
+            <tbody>
+            <tr>
+                <th class="name">Task Definition</th>
+                <th class="name">Cluster</th>
+                <th class="name">Task Group</th>
+                <th class="name">Max # of instances</th>
+                <th class="name" colspan="2"></th>
+            </tr>
+            </tbody>
+        </table>
+        <c:set var="sourceImagesJson" value="${propertiesBean.properties['source_images_json']}"/>
+        <input type="hidden" class="jsonParam" name="prop:source_images_json" id="source_images_json" value="<c:out value='${sourceImagesJson}'/>"/>
+        <input type="hidden" id="initial_images_list"/>
+    </div>
+    <forms:addButton title="Add image" id="showAddImageDialogButton">Add image</forms:addButton>
+</div>
 
 <script type="text/javascript">
     $j.ajax({

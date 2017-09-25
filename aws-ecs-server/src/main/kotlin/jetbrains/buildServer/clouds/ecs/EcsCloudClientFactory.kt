@@ -6,6 +6,7 @@ import jetbrains.buildServer.clouds.ecs.web.EDIT_ECS_HTML
 import jetbrains.buildServer.serverSide.AgentDescription
 import jetbrains.buildServer.serverSide.PropertiesProcessor
 import jetbrains.buildServer.serverSide.ServerSettings
+import jetbrains.buildServer.util.amazon.AWSCommonParams
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 import java.util.*
 
@@ -53,7 +54,9 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
     }
 
     override fun getInitialParameterValues(): MutableMap<String, String> {
-        return Collections.emptyMap()
+        val result = HashMap<String, String>()
+        result.putAll(AWSCommonParams.getDefaults(serverSettings.getServerUUID()))
+        return result
     }
 
     override fun getPropertiesProcessor(): PropertiesProcessor {

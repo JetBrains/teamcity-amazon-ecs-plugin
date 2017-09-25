@@ -34,12 +34,14 @@ teamcity {
 
 dependencies {
     compile 'com.amazonaws:aws-java-sdk-ecs:1.11.199'
-    compile project(':aws-ecs-common')
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    agent project(path: ':aws-ecs-agent', configuration: 'plugin')
 
+    compile project(':aws-ecs-common')
+    agent project(path: ':aws-ecs-agent', configuration: 'plugin')
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
 
+
+    compile 'jetbrains.buildServer.util:amazon-util:11'
     provided "org.jetbrains.teamcity:cloud-interface:$teamcityVersion"
     provided "org.jetbrains.teamcity:cloud-shared:$teamcityVersion"
     provided "org.jetbrains.teamcity.internal:server:$teamcityVersion"

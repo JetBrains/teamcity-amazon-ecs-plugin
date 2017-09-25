@@ -45,7 +45,11 @@ class EcsCloudInstanceImpl(val cloudImage: EcsCloudImage, val ecsTask: EcsTask, 
     }
 
     override fun getStartedTime(): Date {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val startedAt = ecsTask.startedAt
+        when {
+            startedAt != null -> return startedAt
+            else -> return ecsTask.cratedAt
+        }
     }
 
     override fun getNetworkIdentity(): String? {

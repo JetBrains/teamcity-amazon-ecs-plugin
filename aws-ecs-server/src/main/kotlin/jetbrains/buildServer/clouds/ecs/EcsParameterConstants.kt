@@ -5,6 +5,7 @@ package jetbrains.buildServer.clouds.ecs
  */
 
 val PROFILE_INSTANCE_LIMIT_PARAM = "profileInstanceLimit"
+val PROFILE_REGION = "profileInstanceLimit"
 val IMAGE_INSTANCE_LIMIT_PARAM = "imageInstanceLimit"
 val TASK_DEFINITION_PARAM = "ecsTaskDefinition"
 val TASK_GROUP_PARAM = "ecsTaskGroup"

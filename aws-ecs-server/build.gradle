@@ -1,6 +1,5 @@
 plugins {
     id 'com.github.rodm.teamcity-server' version "1.0"
-    id "io.spring.dependency-management" version "1.0.3.RELEASE"
 }
 
 repositories {
@@ -10,7 +9,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.10.77'
+        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.11.199'
     }
 }
 
@@ -34,6 +33,7 @@ teamcity {
 }
 
 dependencies {
+    compile 'com.amazonaws:aws-java-sdk-ecs:1.11.199'
     compile project(':aws-ecs-common')
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     agent project(path: ':aws-ecs-agent', configuration: 'plugin')
@@ -43,8 +43,6 @@ dependencies {
     provided "org.jetbrains.teamcity:cloud-interface:$teamcityVersion"
     provided "org.jetbrains.teamcity:cloud-shared:$teamcityVersion"
     provided "org.jetbrains.teamcity.internal:server:$teamcityVersion"
-
-    compile 'com.amazonaws:aws-java-sdk-ecs:1.11.200'
 }
 
 serverPlugin.version = null

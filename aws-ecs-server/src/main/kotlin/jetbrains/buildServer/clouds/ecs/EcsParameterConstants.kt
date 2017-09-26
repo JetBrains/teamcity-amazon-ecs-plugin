@@ -10,3 +10,10 @@ val IMAGE_INSTANCE_LIMIT_PARAM = "imageInstanceLimit"
 val TASK_DEFINITION_PARAM = "ecsTaskDefinition"
 val TASK_GROUP_PARAM = "ecsTaskGroup"
 val CLUSTER_PARAM = "ecsCluster"
+
+class EcsParameterConstants{
+    val maxInstances: String
+        get() {
+            return IMAGE_INSTANCE_LIMIT_PARAM
+        }
+}

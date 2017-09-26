@@ -9,7 +9,7 @@
 <%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
-<jsp:useBean id="cons" class="jetbrains.buildServer.clouds.ecs.EcsParameterConstantsKt"/>
+<jsp:useBean id="cons" class="jetbrains.buildServer.clouds.ecs.EcsParameterConstants"/>
 
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}ecsSettings.css'/>");

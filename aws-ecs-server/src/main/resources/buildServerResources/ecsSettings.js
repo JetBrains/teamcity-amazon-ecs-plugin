@@ -21,6 +21,15 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         imagesTableRow: '.imagesTableRow'
     },
 
+    _errors: {
+        badParam: 'Bad parameter',
+        required: 'This field cannot be blank',
+        notSeleted: 'Something should be seleted',
+        nonNegative: 'Must be non-negative number'
+    },
+
+    _displayedErrors: {},
+
     initialize: function(){
         this.$imagesTable = $j('#ecsImagesTable');
         this.$imagesTableWrapper = $j('.imagesTableWrapper');
@@ -30,6 +39,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         //add / edit image dialog
         this.$addImageButton = $j('#ecsAddImageButton');
         this.$cancelAddImageButton = $j('#ecsCancelAddImageButton');
+        this.$maxInstances = $j('#maxInstances');
 
         this.$imagesDataElem = $j('#' + 'source_images_json');
 
@@ -139,14 +149,106 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
     _resetDataAndDialog: function () {
         this._image = {};
 
-        // this.$podSpecModeSelector.trigger('change', 'notSelected');
-        // this.$dockerImage.trigger('change', '');
-        // this.$imagePullPolicy.trigger('change', 'IfNotPresent');
-        // this.$dockerCommand.trigger('change', '');
-        // this.$dockerArgs.trigger('change', '');
-        // this.$deploymentName.trigger('change', '');
-        // this.$customPodTemplate.trigger('change', '');
-        // this.$maxInstances.trigger('change', '');
+        this.$maxInstances.trigger('change', '');
+    },
+
+    validateOptions: function (options){
+        var isValid = true;
+
+        var validators = {
+
+            maxInstances: function () {
+                var maxInstances = this._image['maxInstances'];
+                if (maxInstances && (!$j.isNumeric(maxInstances) || maxInstances < 0 )) {
+                    this.addOptionError('nonNegative', 'maxInstances');
+                    isValid = false;
+                }
+            }.bind(this)
+        };
+
+        if (options && ! $j.isArray(options)) {
+            options = [options];
+        }
+
+        this.clearOptionsErrors(options);
+
+        (options || this._dataKeys).forEach(function(option) {
+            if(validators[option]) validators[option]();
+        });
+
+        return isValid;
+    },
+
+    addOptionError: function (errorKey, optionName) {
+        var html;
+
+        if (errorKey && optionName) {
+            this._displayedErrors[optionName] = this._displayedErrors[optionName] || [];
+
+            if (typeof errorKey !== 'string') {
+                html = this._errors[errorKey.key];
+                Object.keys(errorKey.props).forEach(function(key) {
+                    html = html.replace('%%'+key+'%%', errorKey.props[key]);
+                });
+                errorKey = errorKey.key;
+            } else {
+                html = this._errors[errorKey];
+            }
+
+            if (this._displayedErrors[optionName].indexOf(errorKey) === -1) {
+                this._displayedErrors[optionName].push(errorKey);
+                this.addError(html, $j('.option-error_' + optionName));
+            }
+        }
+    },
+
+    addError: function (errorHTML, target) {
+        target.append($j('<div>').html(errorHTML));
+    },
+
+    clearOptionsErrors: function (options) {
+        (options || this._dataKeys).forEach(function (optionName) {
+            this.clearErrors(optionName);
+        }.bind(this));
+    },
+
+    clearErrors: function (errorId) {
+        var target = $j('.option-error_' + errorId);
+        if (errorId) {
+            delete this._displayedErrors[errorId];
+        }
+        target.empty();
+    },
+
+    addImage: function () {
+        var newImageId = this._lastImageId++,
+            newImage = this._image;
+        newImage['source-id'] = newImageId;
+        this._renderImageRow(newImage, newImageId);
+        this.imagesData[newImageId] = newImage;
+        this._imagesDataLength += 1;
+        this.saveImagesData();
+        this._toggleImagesTable();
+    },
+
+    editImage: function (id) {
+        this._image['source-id'] = id;
+        this.imagesData[id] = this._image;
+        this.saveImagesData();
+        this.$imagesTable.find(this.selectors.imagesTableRow).remove();
+        this._renderImagesTable();
+    },
+
+    saveImagesData: function () {
+        var imageData = Object.keys(this.imagesData).reduce(function (accumulator, id) {
+            var _val = $j.extend({}, this.imagesData[id]);
+
+            delete _val.$image;
+            accumulator.push(_val);
+
+            return accumulator;
+        }.bind(this), []);
+        this.$imagesDataElem.val(JSON.stringify(imageData));
     }
 });
 

@@ -9,6 +9,7 @@
 <%@ taglib prefix="admin" tagdir="/WEB-INF/tags/admin" %>
 
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
+<jsp:useBean id="cons" class="jetbrains.buildServer.clouds.ecs.EcsParameterConstantsKt"/>
 
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}ecsSettings.css'/>");
@@ -48,7 +49,15 @@
            dialogClass="EcsImageDialog" titleId="EcsImageDialogTitle">
 
     <table class="runnerFormTable paramsTable">
-
+        <tr>
+            <th>Max number of instances:</th>
+            <td>
+                <div>
+                    <input type="text" id="${cons.maxInstances}" value="" class="longField" data-id="${cons.maxInstances}" data-err-id="${cons.maxInstances}"/>
+                </div>
+                <span class="error option-error option-error_${cons.maxInstances}"></span>
+            </td>
+        </tr>
     </table>
 
     <div class="popupSaveButtonsBlock">

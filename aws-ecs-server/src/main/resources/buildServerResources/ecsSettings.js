@@ -70,6 +70,24 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$showAddImageDialogButton.on('click', this._showDialogClickHandler.bind(this));
         this.$addImageButton.on('click', this._submitDialogClickHandler.bind(this));
         this.$cancelAddImageButton.on('click', this._cancelDialogClickHandler.bind(this));
+
+        var editDelegates = this.selectors.imagesTableRow + ' .highlight, ' + this.selectors.editImageLink;
+        var that = this;
+        this.$imagesTable.on('click', editDelegates, function () {
+            if (!that.$addImageButton.prop('disabled')) {
+                self.showEditImageDialog($j(this));
+            }
+            return false;
+        });
+
+        this.$maxInstances.on('change', function (e, value) {
+            if (arguments.length === 1) {
+                this._image['maxInstances'] = this.$maxInstances.val();
+            } else {
+                this.$maxInstances.val(value);
+            }
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
     },
 
     _renderImagesTable: function () {
@@ -142,6 +160,26 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$addImageButton.val('Add').data('image-id', 'undefined');
 
         this._image = {};
+
+        BS.Ecs.ImageDialog.showCentered();
+    },
+
+    showEditImageDialog: function ($elem) {
+        var imageId = $elem.parents(this.selectors.imagesTableRow).data('image-id');
+
+        $j('#EcsImageDialogTitle').text('Edit Amazon EC2 Container Service Cloud Image');
+
+        BS.Hider.addHideFunction('EcsImageDialog', this._resetDataAndDialog.bind(this));
+
+        typeof imageId !== 'undefined' && (this._image = $j.extend({}, this.imagesData[imageId]));
+        this.$addImageButton.val('Edit').data('image-id', imageId);
+        if (imageId === 'undefined'){
+            this.$addImageButton.removeData('image-id');
+        }
+
+        var image = this._image;
+
+        this.$maxInstances.trigger('change', image['maxInstances'] || '');
 
         BS.Ecs.ImageDialog.showCentered();
     },

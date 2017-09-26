@@ -71,6 +71,17 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$addImageButton.on('click', this._submitDialogClickHandler.bind(this));
         this.$cancelAddImageButton.on('click', this._cancelDialogClickHandler.bind(this));
 
+        this.$imagesTable.on('click', this.selectors.rmImageLink, function () {
+            var $this = $j(this),
+                id = $this.data('image-id'),
+                name = self.imagesData[id].dockerImage;
+
+            if (confirm('Are you sure you want to remove the image "' + name + '"?')) {
+                self.removeImage($this);
+            }
+            return false;
+        });
+
         var editDelegates = this.selectors.imagesTableRow + ' .highlight, ' + this.selectors.editImageLink;
         var that = this;
         this.$imagesTable.on('click', editDelegates, function () {
@@ -275,6 +286,14 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.saveImagesData();
         this.$imagesTable.find(this.selectors.imagesTableRow).remove();
         this._renderImagesTable();
+    },
+
+    removeImage: function ($elem) {
+        delete this.imagesData[$elem.data('image-id')];
+        this._imagesDataLength -= 1;
+        $elem.parents(this.selectors.imagesTableRow).remove();
+        this.saveImagesData();
+        this._toggleImagesTable();
     },
 
     saveImagesData: function () {

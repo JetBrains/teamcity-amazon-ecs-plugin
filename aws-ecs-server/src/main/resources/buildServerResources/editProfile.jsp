@@ -10,6 +10,7 @@
 
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="cons" class="jetbrains.buildServer.clouds.ecs.EcsParameterConstants"/>
+<jsp:useBean id="agentPools" scope="request" type="java.util.Collection<jetbrains.buildServer.serverSide.agentPools.AgentPool>"/>
 
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}ecsSettings.css'/>");
@@ -50,12 +51,54 @@
 
     <table class="runnerFormTable paramsTable">
         <tr>
+            <th>Task Definition:&nbsp;<l:star/></th>
+            <td>
+                <div>
+                    <input type="text" id="${cons.taskDefinition}" value="" class="longField" data-id="${cons.taskDefinition}" data-err-id="${cons.taskDefinition}"/>
+                    <div class="smallNoteAttention">Task definition to use.</div>
+                    <span class="error option-error option-error_${cons.taskDefinition}"></span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th>Cluster:</th>
+            <td>
+                <div>
+                    <input type="text" id="${cons.cluster}" value="" class="longField" data-id="${cons.cluster}" data-err-id="${cons.cluster}"/>
+                    <div class="smallNoteAttention">Cluster where to run tasks.</div>
+                    <span class="error option-error option-error_${cons.cluster}"></span>
+                </div>
+            </td>
+        </tr>
+        <tr class="advancedSetting">
+            <th>Task Group:</th>
+            <td>
+                <div>
+                    <input type="text" id="${cons.taskGroup}" value="" class="longField" data-id="${cons.taskGroup}" data-err-id="${cons.taskGroup}"/>
+                    <div class="smallNoteAttention">Group for started tasks.</div>
+                    <span class="error option-error option-error_${cons.taskGroup}"></span>
+                </div>
+            </td>
+        </tr>
+        <tr>
             <th>Max number of instances:</th>
             <td>
                 <div>
                     <input type="text" id="${cons.maxInstances}" value="" class="longField" data-id="${cons.maxInstances}" data-err-id="${cons.maxInstances}"/>
                 </div>
                 <span class="error option-error option-error_${cons.maxInstances}"></span>
+            </td>
+        </tr>
+        <tr class="advancedSetting">
+            <th><label for="${cons.agentPoolIdField}">Agent pool:</label></th>
+            <td>
+                <select id="${cons.agentPoolIdField}" data-id="${cons.agentPoolIdField}" class="longField configParam">
+                    <props:option value=""><c:out value="<Please select agent pool>"/></props:option>
+                    <c:forEach var="ap" items="${agentPools}">
+                        <props:option value="${ap.agentPoolId}"><c:out value="${ap.name}"/></props:option>
+                    </c:forEach>
+                </select>
+                <span id="error_${cons.agentPoolIdField}" class="error"></span>
             </td>
         </tr>
     </table>

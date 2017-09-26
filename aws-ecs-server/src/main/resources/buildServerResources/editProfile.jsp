@@ -44,13 +44,26 @@
     <forms:addButton title="Add image" id="showAddImageDialogButton">Add image</forms:addButton>
 </div>
 
+<bs:dialog dialogId="EcsImageDialog" title="Add Amazon EC2 Container Service Cloud Image" closeCommand="BS.Ecs.ImageDialog.close()"
+           dialogClass="EcsImageDialog" titleId="EcsImageDialogTitle">
+
+    <table class="runnerFormTable paramsTable">
+
+    </table>
+
+    <div class="popupSaveButtonsBlock">
+        <forms:submit label="Add" type="button" id="ecsAddImageButton"/>
+        <forms:button title="Cancel" id="ecsCancelAddImageButton">Cancel</forms:button>
+    </div>
+</bs:dialog>
+
 <script type="text/javascript">
     $j.ajax({
         url: "<c:url value="${teamcityPluginResourcesPath}ecsSettings.js"/>",
         dataType: "script",
         cache: true,
         success: function () {
-            BS.ECS.ProfileSettingsForm.initialize();
+            BS.Ecs.ProfileSettingsForm.initialize();
         }
     });
 </script>

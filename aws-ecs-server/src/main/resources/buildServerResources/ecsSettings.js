@@ -1,7 +1,7 @@
 if (!BS) BS = {};
-if (!BS.ECS) BS.ECS = {};
+if (!BS.Ecs) BS.Ecs = {};
 
-if(!BS.ECS.ProfileSettingsForm) BS.ECS.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
+if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
 
     _dataKeys: [ 'taskDefiniton', 'cluster', 'taskGroup', 'maxInstances' ],
 
@@ -26,6 +26,10 @@ if(!BS.ECS.ProfileSettingsForm) BS.ECS.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$imagesTableWrapper = $j('.imagesTableWrapper');
         this.$emptyImagesListMessage = $j('.emptyImagesListMessage'); //TODO: implement
         this.$showAddImageDialogButton = $j('#showAddImageDialogButton');
+
+        //add / edit image dialog
+        this.$addImageButton = $j('#ecsAddImageButton');
+        this.$cancelAddImageButton = $j('#ecsCancelAddImageButton');
 
         this.$imagesDataElem = $j('#' + 'source_images_json');
 
@@ -52,6 +56,10 @@ if(!BS.ECS.ProfileSettingsForm) BS.ECS.ProfileSettingsForm = OO.extend(BS.Plugin
 
     _bindHandlers: function () {
         var self = this;
+
+        this.$showAddImageDialogButton.on('click', this._showDialogClickHandler.bind(this));
+        this.$addImageButton.on('click', this._submitDialogClickHandler.bind(this));
+        this.$cancelAddImageButton.on('click', this._cancelDialogClickHandler.bind(this));
     },
 
     _renderImagesTable: function () {
@@ -91,5 +99,59 @@ if(!BS.ECS.ProfileSettingsForm) BS.ECS.ProfileSettingsForm = OO.extend(BS.Plugin
         $row.find(this.selectors.rmImageLink).data('image-id', id);
         $row.find(this.selectors.editImageLink).data('image-id', id);
         this.$imagesTable.append($row);
+    },
+
+    _showDialogClickHandler: function () {
+        if (! this.$showAddImageDialogButton.attr('disabled')) {
+            this.showAddImageDialog();
+        }
+        return false;
+    },
+
+    _submitDialogClickHandler: function() {
+        if (this.validateOptions()) {
+            if (this.$addImageButton.val().toLowerCase() === 'edit') {
+                this.editImage(this.$addImageButton.data('image-id'));
+            } else {
+                this.addImage();
+            }
+            BS.Ecs.ImageDialog.close();
+        }
+        return false;
+    },
+
+    _cancelDialogClickHandler: function () {
+        BS.Ecs.ImageDialog.close();
+        return false;
+    },
+
+    showAddImageDialog: function () {
+        $j('#EcsImageDialogTitle').text('Add Amazon EC2 Container Service Cloud Image');
+
+        BS.Hider.addHideFunction('EcsImageDialog', this._resetDataAndDialog.bind(this));
+        this.$addImageButton.val('Add').data('image-id', 'undefined');
+
+        this._image = {};
+
+        BS.Ecs.ImageDialog.showCentered();
+    },
+
+    _resetDataAndDialog: function () {
+        this._image = {};
+
+        // this.$podSpecModeSelector.trigger('change', 'notSelected');
+        // this.$dockerImage.trigger('change', '');
+        // this.$imagePullPolicy.trigger('change', 'IfNotPresent');
+        // this.$dockerCommand.trigger('change', '');
+        // this.$dockerArgs.trigger('change', '');
+        // this.$deploymentName.trigger('change', '');
+        // this.$customPodTemplate.trigger('change', '');
+        // this.$maxInstances.trigger('change', '');
+    }
+});
+
+if(!BS.Ecs.ImageDialog) BS.Ecs.ImageDialog = OO.extend(BS.AbstractModalDialog, {
+    getContainer: function() {
+        return $('EcsImageDialog');
     }
 });

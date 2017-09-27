@@ -3,11 +3,11 @@ if (!BS.Ecs) BS.Ecs = {};
 
 if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
 
-    _dataKeys: [ 'taskDefiniton', 'cluster', 'taskGroup', 'maxInstances' ],
+    _dataKeys: [ 'taskDefinition', 'cluster', 'taskGroup', 'maxInstances' ],
 
     templates: {
         imagesTableRow: $j('<tr class="imagesTableRow">\
-<td class="taskDefiniton highlight"></td>\
+<td class="taskDefinition highlight"></td>\
 <td class="cluster highlight"></td>\
 <td class="taskGroup highlight"></td>\
 <td class="maxInstances highlight"></td>\
@@ -39,6 +39,9 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         //add / edit image dialog
         this.$addImageButton = $j('#ecsAddImageButton');
         this.$cancelAddImageButton = $j('#ecsCancelAddImageButton');
+        this.$taskDefinition = $j('#taskDefinition');
+        this.$taskGroup = $j('#taskGroup');
+        this.$cluster = $j('#cluster');
         this.$maxInstances = $j('#maxInstances');
 
         this.$imagesDataElem = $j('#' + 'source_images_json');
@@ -90,6 +93,33 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
             }
             return false;
         });
+
+        this.$taskDefinition.on('change', function (e, value) {
+            if (arguments.length === 1) {
+                this._image['taskDefinition'] = this.$taskDefinition.val();
+            } else {
+                this.$taskDefinition.val(value);
+            }
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
+
+        this.$cluster.on('change', function (e, value) {
+            if (arguments.length === 1) {
+                this._image['cluster'] = this.$cluster.val();
+            } else {
+                this.$cluster.val(value);
+            }
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
+
+        this.$taskGroup.on('change', function (e, value) {
+            if (arguments.length === 1) {
+                this._image['taskGroup'] = this.$taskGroup.val();
+            } else {
+                this.$taskGroup.val(value);
+            }
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
 
         this.$maxInstances.on('change', function (e, value) {
             if (arguments.length === 1) {
@@ -190,6 +220,9 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
 
         var image = this._image;
 
+        this.$taskDefinition.trigger('change', image['taskDefinition'] || '');
+        this.$taskGroup.trigger('change', image['taskGroup'] || '');
+        this.$cluster.trigger('change', image['cluster'] || '');
         this.$maxInstances.trigger('change', image['maxInstances'] || '');
 
         BS.Ecs.ImageDialog.showCentered();
@@ -198,6 +231,9 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
     _resetDataAndDialog: function () {
         this._image = {};
 
+        this.$taskDefinition.trigger('change', '');
+        this.$taskGroup.trigger('change', '');
+        this.$cluster.trigger('change', '');
         this.$maxInstances.trigger('change', '');
     },
 
@@ -205,6 +241,13 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         var isValid = true;
 
         var validators = {
+
+            taskDefinition : function () {
+                if (!this._image['taskDefinition']) {
+                    this.addOptionError('required', 'taskDefinition');
+                    isValid = false;
+                }
+            }.bind(this),
 
             maxInstances: function () {
                 var maxInstances = this._image['maxInstances'];

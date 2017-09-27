@@ -77,9 +77,9 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$imagesTable.on('click', this.selectors.rmImageLink, function () {
             var $this = $j(this),
                 id = $this.data('image-id'),
-                name = self.imagesData[id].dockerImage;
+                imageName = self.imagesData[id].taskDefinition;
 
-            if (confirm('Are you sure you want to remove the image "' + name + '"?')) {
+            if (confirm('Are you sure you want to remove the image "' + imageName + '"?')) {
                 self.removeImage($this);
             }
             return false;

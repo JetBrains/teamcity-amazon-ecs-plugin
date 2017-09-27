@@ -162,7 +162,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         var $row = this.templates.imagesTableRow.clone().attr('data-image-id', id);
 
         this._dataKeys.forEach(function (className) {
-            $row.find('.' + className).text(props[className]);
+            $row.find('.' + className).text(props[className] || '<Default>');
         });
 
         $row.find(this.selectors.rmImageLink).data('image-id', id);

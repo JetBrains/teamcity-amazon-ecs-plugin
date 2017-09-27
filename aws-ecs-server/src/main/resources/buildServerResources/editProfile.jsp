@@ -65,7 +65,7 @@
             <td>
                 <div>
                     <input type="text" id="${cons.cluster}" value="" class="longField" data-id="${cons.cluster}" data-err-id="${cons.cluster}"/>
-                    <div class="smallNoteAttention">The short name or full Amazon Resource Name (ARN) of the cluster on which to run your task. Leave blank to use the default cluster.</div>
+                    <div class="smallNoteAttention">The short name or full Amazon Resource Name (ARN) of the cluster on which to run cloud agents. Leave blank to use the default cluster.</div>
                     <span class="error option-error option-error_${cons.cluster}"></span>
                 </div>
             </td>
@@ -75,7 +75,7 @@
             <td>
                 <div>
                     <input type="text" id="${cons.taskGroup}" value="" class="longField" data-id="${cons.taskGroup}" data-err-id="${cons.taskGroup}"/>
-                    <div class="smallNoteAttention">The name of the task group to associate with the task. Leave blank to use the family name of the task definition.</div>
+                    <div class="smallNoteAttention">The name of the task group to associate with the cloud agent tasks. Leave blank to use the family name of the task definition.</div>
                     <span class="error option-error option-error_${cons.taskGroup}"></span>
                 </div>
             </td>

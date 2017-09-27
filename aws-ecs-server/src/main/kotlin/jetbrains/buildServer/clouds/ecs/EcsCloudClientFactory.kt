@@ -23,7 +23,7 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
     }
 
     override fun getCloudCode(): String {
-        return "aws-ecs"
+        return "awsecs"
     }
 
     override fun getDisplayName(): String {

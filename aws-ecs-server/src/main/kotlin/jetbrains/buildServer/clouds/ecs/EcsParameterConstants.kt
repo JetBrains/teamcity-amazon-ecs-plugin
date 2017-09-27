@@ -7,7 +7,6 @@ import jetbrains.buildServer.clouds.CloudImageParameters
  */
 
 val PROFILE_INSTANCE_LIMIT_PARAM = "profileInstanceLimit"
-val PROFILE_REGION = "region"
 val IMAGE_INSTANCE_LIMIT_PARAM = "maxInstances"
 val TASK_DEFINITION_PARAM = "taskDefinition"
 val TASK_GROUP_PARAM = "taskGroup"

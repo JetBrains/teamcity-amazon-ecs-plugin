@@ -1,15 +1,35 @@
 package jetbrains.buildServer.clouds.ecs.apiConnector
 
-import com.amazonaws.services.ecs.AmazonECSClient
+import com.amazonaws.ClientConfiguration
+import com.amazonaws.auth.AWSCredentials
+import com.amazonaws.auth.AWSCredentialsProvider
+import com.amazonaws.services.ecs.AmazonECS
+import com.amazonaws.services.ecs.AmazonECSClientBuilder
 import com.amazonaws.services.ecs.model.*
 import jetbrains.buildServer.clouds.ecs.EcsCloudClientParameters
+import jetbrains.buildServer.version.ServerVersionHolder
 
 class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector {
-    private val apiClient: AmazonECSClient
+    private val apiClient: AmazonECS
 
     init {
-        //TODO: provide configuration
-        apiClient = AmazonECSClient()
+        val awsCredentials = ecsParams.awsCredentials
+        val builder = AmazonECSClientBuilder
+                .standard()
+                .withClientConfiguration(ClientConfiguration().withUserAgentPrefix("JetBrains TeamCity " + ServerVersionHolder.getVersion().displayVersion))
+                .withRegion(ecsParams.region)
+        if(awsCredentials != null){
+            builder.withCredentials(object: AWSCredentialsProvider{
+                override fun getCredentials(): AWSCredentials {
+                    return awsCredentials
+                }
+
+                override fun refresh() {
+                    //no-op
+                }
+            })
+        }
+        apiClient = builder.build()
     }
 
     override fun runTask(taskDefinition: String, cluster: String?, taskGroup: String?): List<EcsTask> {
@@ -62,7 +82,7 @@ class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector
 
     override fun listClusters(): List<String> {
         val clusterArns:List<String> = ArrayList()
-        var nextToken: String? = null;
+        var nextToken: String?;
         do{
             val tasksResult = apiClient.listClusters()
             clusterArns.plus(tasksResult.clusterArns)
@@ -80,4 +100,3 @@ class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector
         return describeClustersResult.clusters[0]?.wrap()
     }
 }
-

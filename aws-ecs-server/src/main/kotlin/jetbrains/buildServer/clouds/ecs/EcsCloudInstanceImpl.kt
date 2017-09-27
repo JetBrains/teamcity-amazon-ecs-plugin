@@ -3,6 +3,7 @@ package jetbrains.buildServer.clouds.ecs
 import jetbrains.buildServer.clouds.CloudErrorInfo
 import jetbrains.buildServer.clouds.CloudImage
 import jetbrains.buildServer.clouds.InstanceStatus
+import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiCallFailureException
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsTask
 import jetbrains.buildServer.serverSide.AgentDescription
@@ -12,7 +13,12 @@ class EcsCloudInstanceImpl(val cloudImage: EcsCloudImage, val ecsTask: EcsTask, 
     private var myCurrentError: CloudErrorInfo? = null
 
     override fun getStatus(): InstanceStatus {
-        val task = apiConnector.describeTask(ecsTask.arn)
+        val task: EcsTask?
+        try{
+            task = apiConnector.describeTask(ecsTask.arn)
+        } catch (ex: EcsApiCallFailureException){
+            return InstanceStatus.UNKNOWN
+        }
         if(task == null) return InstanceStatus.UNKNOWN
         val lastStatus = task.lastStatus
         val desiredStatus = task.desiredStatus

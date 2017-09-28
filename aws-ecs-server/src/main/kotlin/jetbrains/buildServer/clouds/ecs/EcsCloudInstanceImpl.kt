@@ -76,7 +76,7 @@ class EcsCloudInstanceImpl(val cloudImage: EcsCloudImage, val ecsTask: EcsTask, 
     }
 
     override fun containsAgent(agent: AgentDescription): Boolean {
-        return name == agent.configurationParameters.get(INSTANCE_NAME_AGENT_PROP)
+        return instanceId == agent.configurationParameters.get(INSTANCE_ID_AGENT_PROP)
     }
 
     override fun terminate() {

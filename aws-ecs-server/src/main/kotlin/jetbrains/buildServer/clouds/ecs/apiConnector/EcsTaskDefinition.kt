@@ -7,10 +7,13 @@ import com.amazonaws.services.ecs.model.TaskDefinition
  */
 interface EcsTaskDefinition {
     val arn: String
+    val family: String
     val containers: Collection<String>
 }
 
 fun TaskDefinition.wrap(): EcsTaskDefinition = object : EcsTaskDefinition{
+    override val family: String
+        get() = this@wrap.family
     override val containers: Collection<String>
         get() = this@wrap.containerDefinitions.map { containerDef -> containerDef.name }
     override val arn: String

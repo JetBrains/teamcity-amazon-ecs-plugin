@@ -6,5 +6,5 @@ package jetbrains.buildServer.clouds.ecs
 
 val SERVER_UUID_AGENT_PROP = "teamcity.ecs.serverUUID"
 val PROFILE_ID_AGENT_PROP = "teamcity.ecs.cloudProfileId"
-val IMAGE_NAME_AGENT_PROP = "teamcity.ecs.imageName"
-val INSTANCE_NAME_AGENT_PROP = "teamcity.ecs.instanceName"
+val IMAGE_ID_AGENT_PROP = "teamcity.ecs.imageId"
+val INSTANCE_ID_AGENT_PROP = "teamcity.ecs.instanceId"

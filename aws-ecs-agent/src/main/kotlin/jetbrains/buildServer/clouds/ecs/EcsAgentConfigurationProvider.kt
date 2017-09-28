@@ -32,8 +32,8 @@ class EcsAgentConfigurationProvider(agentEvents: EventDispatcher<AgentLifeCycleL
         with(agentConfigurationEx) {
             addConfigurationParameter(SERVER_UUID_AGENT_PROP, env[SERVER_UUID_ECS_ENV]!!)
             addConfigurationParameter(PROFILE_ID_AGENT_PROP, env[PROFILE_ID_ECS_ENV]!!)
-            addConfigurationParameter(IMAGE_NAME_AGENT_PROP, env[IMAGE_NAME_ECS_ENV]!!)
-            addConfigurationParameter(INSTANCE_NAME_AGENT_PROP, env[INSTANCE_NAME_ECS_ENV]!!)
+            addConfigurationParameter(IMAGE_ID_AGENT_PROP, env[IMAGE_ID_ECS_ENV]!!)
+            addConfigurationParameter(INSTANCE_ID_AGENT_PROP, env[INSTANCE_ID_ECS_ENV]!!)
         }
     }
 }

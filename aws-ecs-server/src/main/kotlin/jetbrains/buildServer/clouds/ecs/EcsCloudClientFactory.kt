@@ -35,11 +35,11 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
     }
 
     override fun canBeAgentOfType(description: AgentDescription): Boolean {
-        val map = description.getAvailableParameters()
+        val map = description.availableParameters
         return map.containsKey(SERVER_UUID_AGENT_PROP) &&
                 map.containsKey(PROFILE_ID_AGENT_PROP) &&
-                map.containsKey(IMAGE_NAME_AGENT_PROP) &&
-                map.containsKey(INSTANCE_NAME_AGENT_PROP)
+                map.containsKey(IMAGE_ID_AGENT_PROP) &&
+                map.containsKey(INSTANCE_ID_AGENT_PROP)
     }
 
     override fun createNewClient(state: CloudState, params: CloudClientParameters): CloudClientEx {

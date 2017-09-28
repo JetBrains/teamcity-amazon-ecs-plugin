@@ -7,7 +7,6 @@ import com.amazonaws.services.ecs.AmazonECS
 import com.amazonaws.services.ecs.AmazonECSClientBuilder
 import com.amazonaws.services.ecs.model.*
 import jetbrains.buildServer.clouds.ecs.EcsCloudClientParameters
-import jetbrains.buildServer.clouds.ecs.OFFICIAL_IMAGE_SERVER_URL_ECS_ENV
 import jetbrains.buildServer.version.ServerVersionHolder
 
 class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector {
@@ -33,11 +32,11 @@ class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector
         apiClient = builder.build()
     }
 
-    override fun runTask(taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, tcServerUrl: String): List<EcsTask> {
+    override fun runTask(taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, additionalEnvironment: Map<String, String>): List<EcsTask> {
         val containerOverrides = taskDefinition.containers.map {
             containerName -> ContainerOverride()
                                 .withName(containerName)
-                                .withEnvironment(KeyValuePair().withName(OFFICIAL_IMAGE_SERVER_URL_ECS_ENV).withValue(tcServerUrl))
+                                .withEnvironment(additionalEnvironment.entries.map { entry -> KeyValuePair().withName(entry.key).withValue(entry.value) })
         }
 
         val request = RunTaskRequest()

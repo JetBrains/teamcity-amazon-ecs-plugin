@@ -56,7 +56,11 @@ class EcsCloudClient(images: List<EcsCloudImage>,
 
     override fun startNewInstance(image: CloudImage, tag: CloudInstanceUserData): CloudInstance {
         val ecsImage = image as EcsCloudImage
-        val tasks = apiConnector.runTask(ecsImage.taskDefinition, ecsImage.cluster, ecsImage.taskGroup)
+        val taskDefinition = apiConnector.describeTaskDefinition(ecsImage.taskDefinition)
+        if(taskDefinition == null){
+            throw CloudException("""Task definition ${ecsImage.taskDefinition} is missing""")
+        }
+        val tasks = apiConnector.runTask(taskDefinition, ecsImage.cluster, ecsImage.taskGroup, tag.serverAddress)
         val newInstance = EcsCloudInstanceImpl(ecsImage, tasks[0], apiConnector)
         ecsImage.addInstance(newInstance)
         myCurrentError = null

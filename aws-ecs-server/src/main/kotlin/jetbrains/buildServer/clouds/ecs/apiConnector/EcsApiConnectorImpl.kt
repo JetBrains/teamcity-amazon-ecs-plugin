@@ -44,7 +44,9 @@ class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector
         val taskDefArns:List<String> = ArrayList<String>()
         var nextToken: String? = null;
         do{
-            val taskDefsResult = apiClient.listTaskDefinitions().withNextToken(nextToken)
+            var request = ListTaskDefinitionsRequest()
+            if(nextToken != null) request = request.withNextToken(nextToken)
+            val taskDefsResult = apiClient.listTaskDefinitions(request)
             taskDefArns.plus(taskDefsResult.taskDefinitionArns)
             nextToken = taskDefsResult.nextToken
         }
@@ -64,7 +66,9 @@ class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector
         val taskArns:List<String> = ArrayList()
         var nextToken: String? = null;
         do{
-            val tasksResult = apiClient.listTasks(ListTasksRequest().withCluster(cluster).withNextToken(nextToken))
+            var listTasksRequest = ListTasksRequest().withCluster(cluster)
+            if(nextToken != null) listTasksRequest = listTasksRequest.withNextToken(nextToken)
+            val tasksResult = apiClient.listTasks(listTasksRequest)
             taskArns.plus(tasksResult.taskArns)
             nextToken = tasksResult.nextToken
         }
@@ -82,9 +86,11 @@ class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector
 
     override fun listClusters(): List<String> {
         val clusterArns:List<String> = ArrayList()
-        var nextToken: String?;
+        var nextToken: String? = null
         do{
-            val tasksResult = apiClient.listClusters()
+            var request = ListClustersRequest()
+            if(nextToken != null) request = request.withNextToken(nextToken)
+            val tasksResult = apiClient.listClusters(request)
             clusterArns.plus(tasksResult.clusterArns)
             nextToken = tasksResult.nextToken
         }

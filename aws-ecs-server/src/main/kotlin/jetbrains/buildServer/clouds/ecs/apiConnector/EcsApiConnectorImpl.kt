@@ -41,13 +41,13 @@ class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector
     }
 
     override fun listTaskDefinitions(): List<String> {
-        val taskDefArns:List<String> = ArrayList<String>()
+        var taskDefArns:List<String> = ArrayList<String>()
         var nextToken: String? = null;
         do{
             var request = ListTaskDefinitionsRequest()
             if(nextToken != null) request = request.withNextToken(nextToken)
             val taskDefsResult = apiClient.listTaskDefinitions(request)
-            taskDefArns.plus(taskDefsResult.taskDefinitionArns)
+            taskDefArns = taskDefArns.plus(taskDefsResult.taskDefinitionArns)
             nextToken = taskDefsResult.nextToken
         }
         while(nextToken != null)
@@ -63,13 +63,13 @@ class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector
     }
 
     override fun listTasks(cluster: String?): List<String> {
-        val taskArns:List<String> = ArrayList()
+        var taskArns:List<String> = ArrayList()
         var nextToken: String? = null;
         do{
             var listTasksRequest = ListTasksRequest().withCluster(cluster)
             if(nextToken != null) listTasksRequest = listTasksRequest.withNextToken(nextToken)
             val tasksResult = apiClient.listTasks(listTasksRequest)
-            taskArns.plus(tasksResult.taskArns)
+            taskArns = taskArns.plus(tasksResult.taskArns)
             nextToken = tasksResult.nextToken
         }
         while(nextToken != null)
@@ -85,13 +85,13 @@ class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector
     }
 
     override fun listClusters(): List<String> {
-        val clusterArns:List<String> = ArrayList()
+        var clusterArns:List<String> = ArrayList()
         var nextToken: String? = null
         do{
             var request = ListClustersRequest()
             if(nextToken != null) request = request.withNextToken(nextToken)
             val tasksResult = apiClient.listClusters(request)
-            clusterArns.plus(tasksResult.clusterArns)
+            clusterArns = clusterArns.plus(tasksResult.clusterArns)
             nextToken = tasksResult.nextToken
         }
         while(nextToken != null)

@@ -11,7 +11,7 @@ interface EcsApiConnector {
     fun stopTask(task: String, cluster: String?, reason: String?)
 
     fun listTasks(cluster: String?): List<String> //list of task arns
-    fun describeTask(taskArn:String): EcsTask?
+    fun describeTask(taskArn:String, cluster: String?): EcsTask?
 
     fun listClusters(): List<String> //list of cluster arns
     fun describeCluster(clusterArn:String): EcsCluster?

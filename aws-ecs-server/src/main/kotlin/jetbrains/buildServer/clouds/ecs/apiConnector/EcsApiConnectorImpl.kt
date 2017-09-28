@@ -76,8 +76,8 @@ class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector
         return taskArns
     }
 
-    override fun describeTask(taskArn: String): EcsTask? {
-        val tasksResult = apiClient.describeTasks(DescribeTasksRequest().withTasks(taskArn))
+    override fun describeTask(taskArn: String, cluster: String?): EcsTask? {
+        val tasksResult = apiClient.describeTasks(DescribeTasksRequest().withTasks(taskArn).withCluster(cluster))
         if (!tasksResult.failures.isEmpty())
             throw EcsApiCallFailureException(tasksResult.failures)
 

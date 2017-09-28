@@ -15,7 +15,7 @@ class EcsCloudInstanceImpl(val cloudImage: EcsCloudImage, val ecsTask: EcsTask, 
     override fun getStatus(): InstanceStatus {
         val task: EcsTask?
         try{
-            task = apiConnector.describeTask(ecsTask.arn)
+            task = apiConnector.describeTask(ecsTask.arn, ecsTask.clusterArn)
         } catch (ex: EcsApiCallFailureException){
             return InstanceStatus.UNKNOWN
         }

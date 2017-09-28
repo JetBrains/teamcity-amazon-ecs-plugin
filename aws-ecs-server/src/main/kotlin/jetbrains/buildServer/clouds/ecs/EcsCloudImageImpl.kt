@@ -54,7 +54,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData, private val ap
     override fun populateInstances() {
         try {
             for (taskArn in apiConnector.listTasks(cluster)) {
-                val task = apiConnector.describeTask(taskArn)
+                val task = apiConnector.describeTask(taskArn, cluster)
                 if(task != null){
                     val cloudInstance = EcsCloudInstanceImpl(this, task, apiConnector)
                     myIdToInstanceMap.put(cloudInstance.getInstanceId(), cloudInstance)

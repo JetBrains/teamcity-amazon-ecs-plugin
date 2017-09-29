@@ -2,6 +2,7 @@ package jetbrains.buildServer.clouds.ecs
 
 import com.intellij.openapi.diagnostic.Logger
 import jetbrains.buildServer.clouds.CloudErrorInfo
+import jetbrains.buildServer.clouds.CloudException
 import jetbrains.buildServer.clouds.CloudInstance
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import java.util.concurrent.ConcurrentHashMap
@@ -65,7 +66,8 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData, private val ap
                     .associateBy({it.arn}, {it})
 
             for (task in tasks) {
-                val instanceId = taskDefinitions[task.taskDefinitionArn]!!.generateNewInstanceId()
+                val instanceId = task.getOverridenContainerEnv(INSTANCE_ID_ECS_ENV)
+                if(instanceId == null) throw CloudException("Can't resolve cloud instance id of ecs task ${task.arn}")
                 val cloudInstance = EcsCloudInstanceImpl(instanceId, this, task, apiConnector)
                 myIdToInstanceMap.put(instanceId, cloudInstance)
             }

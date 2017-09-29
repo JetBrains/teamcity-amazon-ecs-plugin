@@ -14,6 +14,7 @@ interface EcsTask {
     val desiredStatus: String
     val cratedAt: Date
     val startedAt: Date?
+    fun getOverridenContainerEnv(envVarName: String): String?
 }
 
 fun Task.wrap(): EcsTask = object : EcsTask{
@@ -31,4 +32,13 @@ fun Task.wrap(): EcsTask = object : EcsTask{
         get() = this@wrap.createdAt
     override val startedAt: Date?
         get() = this@wrap.startedAt
+
+    override fun getOverridenContainerEnv(envVarName: String): String? {
+        for(containerOverrides in this@wrap.overrides.containerOverrides){
+            containerOverrides.environment
+                    .filter { it.name.equals(envVarName) }
+                    .forEach { return it.value }
+        }
+        return null
+    }
 }

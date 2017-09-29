@@ -18,13 +18,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
 
     private var myCurrentlyRunningInstancesCount: Int = 0
     private var myCurrentError: CloudErrorInfo? = null
-    private var myImageNameToImageMap: ConcurrentHashMap<String, EcsCloudImage>
-    private var myImageIdToImageMap: ConcurrentHashMap<String, EcsCloudImage>
-
-    init {
-        myImageNameToImageMap = ConcurrentHashMap(Maps.uniqueIndex(images, { it?.name }))
-        myImageIdToImageMap = ConcurrentHashMap(Maps.uniqueIndex(images, { it?.id }))
-    }
+    private var myImageIdToImageMap: ConcurrentHashMap<String, EcsCloudImage> = ConcurrentHashMap(Maps.uniqueIndex(images, { it?.id }))
 
 
     override fun isInitialized(): Boolean {
@@ -58,7 +52,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
     override fun startNewInstance(image: CloudImage, tag: CloudInstanceUserData): CloudInstance {
         val ecsImage = image as EcsCloudImage
         val taskDefinition = apiConnector.describeTaskDefinition(ecsImage.taskDefinition) ?: throw CloudException("""Task definition ${ecsImage.taskDefinition} is missing""")
-        val instanceId = taskDefinition.generateInstanceId()
+        val instanceId = taskDefinition.generateNewInstanceId()
 
         val additionalEnvironment = HashMap<String, String>()
         additionalEnvironment.put(SERVER_UUID_ECS_ENV, serverUuid)
@@ -91,7 +85,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
     }
 
     override fun getImages(): MutableCollection<out CloudImage> {
-        return Collections.unmodifiableCollection(myImageNameToImageMap.values)
+        return Collections.unmodifiableCollection(myImageIdToImageMap.values)
     }
 
     override fun findImageById(imageId: String): CloudImage? {
@@ -104,10 +98,10 @@ class EcsCloudClient(images: List<EcsCloudImage>,
         if (serverUuid != agentParameters.get(SERVER_UUID_AGENT_PROP) || cloudProfileId != agentParameters.get(PROFILE_ID_AGENT_PROP))
             return null
 
-        val imageName = agentParameters.get(IMAGE_ID_AGENT_PROP)
+        val imageId = agentParameters.get(IMAGE_ID_AGENT_PROP)
         val instanceId = agentParameters.get(INSTANCE_ID_AGENT_PROP)
-        if (imageName != null && instanceId != null) {
-            val cloudImage = myImageNameToImageMap[imageName]
+        if (imageId != null && instanceId != null) {
+            val cloudImage = myImageIdToImageMap[imageId]
             if (cloudImage != null) {
                 return cloudImage.findInstanceById(instanceId)
             }

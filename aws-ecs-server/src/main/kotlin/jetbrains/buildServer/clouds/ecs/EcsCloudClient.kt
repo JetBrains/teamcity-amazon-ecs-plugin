@@ -4,11 +4,9 @@ import com.google.common.collect.Maps
 import com.intellij.openapi.diagnostic.Logger
 import jetbrains.buildServer.clouds.*
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
-import jetbrains.buildServer.clouds.ecs.apiConnector.EcsTaskDefinition
 import jetbrains.buildServer.serverSide.AgentDescription
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.collections.HashMap
 
 class EcsCloudClient(images: List<EcsCloudImage>,
@@ -17,7 +15,6 @@ class EcsCloudClient(images: List<EcsCloudImage>,
                      private val serverUuid: String,
                      private val cloudProfileId: String) : CloudClientEx {
     private val LOG = Logger.getInstance(EcsCloudClient::class.java.getName())
-    private val STARTING_INSTANCE_IDX = AtomicInteger(0)
 
     private var myCurrentlyRunningInstancesCount: Int = 0
     private var myCurrentError: CloudErrorInfo? = null
@@ -61,6 +58,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
     override fun startNewInstance(image: CloudImage, tag: CloudInstanceUserData): CloudInstance {
         val ecsImage = image as EcsCloudImage
         val taskDefinition = apiConnector.describeTaskDefinition(ecsImage.taskDefinition) ?: throw CloudException("""Task definition ${ecsImage.taskDefinition} is missing""")
+        val instanceId = taskDefinition.generateInstanceId()
 
         val additionalEnvironment = HashMap<String, String>()
         additionalEnvironment.put(SERVER_UUID_ECS_ENV, serverUuid)
@@ -68,10 +66,10 @@ class EcsCloudClient(images: List<EcsCloudImage>,
         additionalEnvironment.put(OFFICIAL_IMAGE_SERVER_URL_ECS_ENV, tag.serverAddress)
         additionalEnvironment.put(PROFILE_ID_ECS_ENV, tag.profileId)
         additionalEnvironment.put(IMAGE_ID_ECS_ENV, image.id)
-        additionalEnvironment.put(INSTANCE_ID_ECS_ENV, generateInstanceId(taskDefinition))
+        additionalEnvironment.put(INSTANCE_ID_ECS_ENV, instanceId)
 
         val tasks = apiConnector.runTask(taskDefinition, ecsImage.cluster, ecsImage.taskGroup, additionalEnvironment)
-        val newInstance = EcsCloudInstanceImpl(ecsImage, tasks[0], apiConnector)
+        val newInstance = EcsCloudInstanceImpl(instanceId, ecsImage, tasks[0], apiConnector)
         ecsImage.addInstance(newInstance)
         myCurrentError = null
         myCurrentlyRunningInstancesCount++
@@ -115,9 +113,5 @@ class EcsCloudClient(images: List<EcsCloudImage>,
             }
         }
         return null
-    }
-
-    private fun generateInstanceId(taskDefinition: EcsTaskDefinition): String {
-        return taskDefinition.family + STARTING_INSTANCE_IDX.incrementAndGet()
     }
 }

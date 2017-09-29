@@ -9,7 +9,7 @@ import jetbrains.buildServer.clouds.ecs.apiConnector.EcsTask
 import jetbrains.buildServer.serverSide.AgentDescription
 import java.util.*
 
-class EcsCloudInstanceImpl(val cloudImage: EcsCloudImage, val ecsTask: EcsTask, val apiConnector: EcsApiConnector) : EcsCloudInstance {
+class EcsCloudInstanceImpl(private val instanceId: String, val cloudImage: EcsCloudImage, val ecsTask: EcsTask, val apiConnector: EcsApiConnector) : EcsCloudInstance {
     private var myCurrentError: CloudErrorInfo? = null
 
     override fun getStatus(): InstanceStatus {
@@ -43,11 +43,11 @@ class EcsCloudInstanceImpl(val cloudImage: EcsCloudImage, val ecsTask: EcsTask, 
     }
 
     override fun getInstanceId(): String {
-        return ecsTask.arn
+        return instanceId
     }
 
     override fun getName(): String {
-        return ecsTask.arn
+        return instanceId
     }
 
     override fun getStartedTime(): Date {

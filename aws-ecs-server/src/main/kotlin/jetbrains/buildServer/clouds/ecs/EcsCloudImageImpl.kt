@@ -53,14 +53,23 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData, private val ap
 
     override fun populateInstances() {
         try {
-            for (taskArn in apiConnector.listTasks(cluster)) {
-                val task = apiConnector.describeTask(taskArn, cluster)
-                if(task != null){
-                    val cloudInstance = EcsCloudInstanceImpl(this, task, apiConnector)
-                    myIdToInstanceMap.put(cloudInstance.getInstanceId(), cloudInstance)
-                } else {
-                    LOG.warn("Failed to describe ECS task with arn $taskArn")
-                }
+            //TODO: not all the tasks are started by teamcity, use startedBy to filter
+            val taskArns = apiConnector.listTasks(cluster)
+
+            val tasks = taskArns
+                    .map { taskArn -> apiConnector.describeTask(taskArn, cluster) }
+                    .filterNotNull()
+
+            val taskDefinitions = tasks
+                    .map { task -> task.taskDefinitionArn }
+                    .distinct()
+                    .map { taskDefinitionArn -> apiConnector.describeTaskDefinition(taskDefinitionArn) }
+                    .filterNotNull()
+                    .associateBy({it.arn}, {it})
+
+            for (task in tasks) {
+                val cloudInstance = EcsCloudInstanceImpl(taskDefinitions[task.taskDefinitionArn]!!.generateInstanceId(), this, task, apiConnector)
+                myIdToInstanceMap.put(cloudInstance.getInstanceId(), cloudInstance)
             }
             myCurrentError = null
         } catch (ex: Throwable) {

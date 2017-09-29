@@ -1,5 +1,5 @@
 # TeamCity Amazon ECS plugin
-[![JetBrains incubator project](http://jb.gg/badges/incubator.svg)](https://plugins.jetbrains.com/plugin/9818-kubernetes-cloud-support)
+[![JetBrains incubator project](http://jb.gg/badges/incubator.svg)](https://plugins.jetbrains.com/plugin/10067-amazon-ecs-support) 
 [![plugin status]( 
 https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:TestDrive_TeamCityAmazonEcsPlugin_Build)/statusIcon.svg)](https://teamcity.jetbrains.com/viewType.html?buildTypeId=TestDrive_TeamCityAmazonEcsPlugin_Build&guest=1)
 

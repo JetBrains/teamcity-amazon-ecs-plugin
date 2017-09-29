@@ -51,12 +51,9 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData, private val ap
         return myIdToInstanceMap[id]
     }
 
-    override fun populateInstances() {
+    override fun populateInstances(startedBy: String) {
         try {
-            //TODO: not all the tasks are started by teamcity, use startedBy to filter
-            val taskArns = apiConnector.listTasks(cluster)
-
-            val tasks = taskArns
+            val tasks = apiConnector.listTasks(cluster, startedBy)
                     .map { taskArn -> apiConnector.describeTask(taskArn, cluster) }
                     .filterNotNull()
 

@@ -32,7 +32,7 @@ class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector
         apiClient = builder.build()
     }
 
-    override fun runTask(taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, additionalEnvironment: Map<String, String>): List<EcsTask> {
+    override fun runTask(taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, additionalEnvironment: Map<String, String>, startedBy: String?): List<EcsTask> {
         val containerOverrides = taskDefinition.containers.map {
             containerName -> ContainerOverride()
                                 .withName(containerName)
@@ -44,6 +44,7 @@ class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector
                 .withCluster(cluster)
                 .withGroup(taskGroup)
                 .withOverrides(TaskOverride().withContainerOverrides(containerOverrides))
+                .withStartedBy(startedBy)
 
         val runTaskResult = apiClient.runTask(request)
         if (!runTaskResult.failures.isEmpty())
@@ -74,12 +75,16 @@ class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector
         apiClient.stopTask(StopTaskRequest().withTask(task).withCluster(cluster))
     }
 
-    override fun listTasks(cluster: String?): List<String> {
+    override fun listTasks(cluster: String?, startedBy: String?): List<String> {
         var taskArns:List<String> = ArrayList()
         var nextToken: String? = null;
         do{
-            var listTasksRequest = ListTasksRequest().withCluster(cluster)
+            var listTasksRequest = ListTasksRequest()
+                    .withCluster(cluster)
+                    .withStartedBy(startedBy)
+
             if(nextToken != null) listTasksRequest = listTasksRequest.withNextToken(nextToken)
+
             val tasksResult = apiClient.listTasks(listTasksRequest)
             taskArns = taskArns.plus(tasksResult.taskArns)
             nextToken = tasksResult.nextToken

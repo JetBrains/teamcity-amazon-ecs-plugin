@@ -68,7 +68,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
         additionalEnvironment.put(IMAGE_ID_ECS_ENV, image.id)
         additionalEnvironment.put(INSTANCE_ID_ECS_ENV, instanceId)
 
-        val tasks = apiConnector.runTask(taskDefinition, ecsImage.cluster, ecsImage.taskGroup, additionalEnvironment)
+        val tasks = apiConnector.runTask(taskDefinition, ecsImage.cluster, ecsImage.taskGroup, additionalEnvironment, startedByTeamCity(serverUuid))
         val newInstance = EcsCloudInstanceImpl(instanceId, ecsImage, tasks[0], apiConnector)
         ecsImage.addInstance(newInstance)
         myCurrentError = null

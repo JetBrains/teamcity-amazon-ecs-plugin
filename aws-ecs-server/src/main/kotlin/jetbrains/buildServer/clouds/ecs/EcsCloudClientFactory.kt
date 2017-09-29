@@ -10,6 +10,10 @@ import jetbrains.buildServer.util.amazon.AWSCommonParams
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 import java.util.*
 
+fun startedByTeamCity(serverUUID: String?): String {
+    return "TeamCity:$serverUUID"
+}
+
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 05.07.17.
  */
@@ -45,9 +49,10 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
     override fun createNewClient(state: CloudState, params: CloudClientParameters): CloudClientEx {
         val ecsParams = params.toEcsParams()
         val apiConnector = EcsApiConnectorImpl(ecsParams)
+        val startedBy = startedByTeamCity(serverSettings.serverUUID)
         val images = ecsParams.imagesData.map{
             val image = it.toImage(apiConnector)
-            image.populateInstances()
+            image.populateInstances(startedBy)
             image
         }
         return EcsCloudClient(images, apiConnector, ecsParams, serverSettings.getServerUUID()!!, state.getProfileId())

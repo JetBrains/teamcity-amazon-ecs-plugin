@@ -11,7 +11,7 @@ import jetbrains.buildServer.web.openapi.PluginDescriptor
 import java.util.*
 
 fun startedByTeamCity(serverUUID: String?): String {
-    return "TeamCity:$serverUUID"
+    return serverUUID.toString()
 }
 
 /**

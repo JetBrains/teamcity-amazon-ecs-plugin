@@ -9,6 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger
 
 private val STARTING_INSTANCE_IDX = AtomicInteger(0)
 
-fun EcsTaskDefinition.generateInstanceId(): String {
-    return this.family + STARTING_INSTANCE_IDX.incrementAndGet()
+fun EcsTaskDefinition.generateNewInstanceId(): String {
+    return "${this.family}-${STARTING_INSTANCE_IDX.incrementAndGet()}"
 }

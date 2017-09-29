@@ -65,8 +65,9 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData, private val ap
                     .associateBy({it.arn}, {it})
 
             for (task in tasks) {
-                val cloudInstance = EcsCloudInstanceImpl(taskDefinitions[task.taskDefinitionArn]!!.generateInstanceId(), this, task, apiConnector)
-                myIdToInstanceMap.put(cloudInstance.getInstanceId(), cloudInstance)
+                val instanceId = taskDefinitions[task.taskDefinitionArn]!!.generateNewInstanceId()
+                val cloudInstance = EcsCloudInstanceImpl(instanceId, this, task, apiConnector)
+                myIdToInstanceMap.put(instanceId, cloudInstance)
             }
             myCurrentError = null
         } catch (ex: Throwable) {

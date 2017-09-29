@@ -11,7 +11,11 @@ import jetbrains.buildServer.web.openapi.PluginDescriptor
 import java.util.*
 
 fun startedByTeamCity(serverUUID: String?): String {
-    return serverUUID.toString()
+    val string = serverUUID.toString()
+    if(string.length > 36)
+        return string.substring(0, 36)
+    else
+        return string
 }
 
 /**

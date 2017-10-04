@@ -44,7 +44,7 @@ class EcsProfileEditController(val pluginDescriptor: PluginDescriptor,
                 for(taskDef in api.listTaskDefinitions().mapNotNull { taskDefArn -> api.describeTaskDefinition(taskDefArn) }){
                     val element = Element("taskDef")
                     element.setAttribute("id", taskDef.arn)
-                    element.setAttribute("text", taskDef.family)
+                    element.setAttribute("text", taskDef.displayName)
                     taskDefsElement.addContent(element)
                 }
                 val clustersElement = Element("clusters")

@@ -11,8 +11,9 @@
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="cons" class="jetbrains.buildServer.clouds.ecs.EcsParameterConstants"/>
 <jsp:useBean id="agentPools" scope="request" type="java.util.Collection<jetbrains.buildServer.serverSide.agentPools.AgentPool>"/>
+<jsp:useBean id="imageDataLoadUrl" scope="request" type="java.lang.String" />
 
-<script type="text/javascript">
+<script type=java.lang.String"text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}ecsSettings.css'/>");
 </script>
 
@@ -48,13 +49,13 @@
 
 <bs:dialog dialogId="EcsImageDialog" title="Add Amazon EC2 Container Service Cloud Image" closeCommand="BS.Ecs.ImageDialog.close()"
            dialogClass="EcsImageDialog" titleId="EcsImageDialogTitle">
-
     <table class="runnerFormTable paramsTable">
         <tr>
             <th>Task Definition:&nbsp;<l:star/></th>
             <td>
                 <div>
-                    <input type="text" id="${cons.taskDefinition}" value="" class="longField" data-id="${cons.taskDefinition}" data-err-id="${cons.taskDefinition}"/>
+                    <input type="text" id="${cons.taskDefinition}" value="" class="longField" data-id="${cons.taskDefinition}" data-err-id="${cons.taskDefinition}">
+                    <i class="icon-magic" style="cursor:pointer;" title="Choose task definition" onclick="BS.Ecs.TaskDefChooser.showPopup(this, ${imageDataLoadUrl})"></i>
                     <div class="smallNoteAttention">The family and revision (family:revision) or full Amazon Resource Name (ARN) of the task definition to run. If a revision is not specified, the latest ACTIVE revision is used.</div>
                     <span class="error option-error option-error_${cons.taskDefinition}"></span>
                 </div>
@@ -64,7 +65,8 @@
             <th>Cluster:</th>
             <td>
                 <div>
-                    <input type="text" id="${cons.cluster}" value="" class="longField" data-id="${cons.cluster}" data-err-id="${cons.cluster}"/>
+                    <input type="text" id="${cons.cluster}" value="" class="longField" data-id="${cons.cluster}" data-err-id="${cons.cluster}">
+                    <i class="icon-magic" style="cursor:pointer;" title="Choose cluster" onclick="BS.Ecs.ClusterChooser.showPopup(this, ${imageDataLoadUrl})"></i>
                     <div class="smallNoteAttention">The short name or full Amazon Resource Name (ARN) of the cluster on which to run cloud agents. Leave blank to use the default cluster.</div>
                     <span class="error option-error option-error_${cons.cluster}"></span>
                 </div>

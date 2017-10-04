@@ -41,14 +41,18 @@ class EcsProfileEditController(val pluginDescriptor: PluginDescriptor,
             val api = EcsApiConnectorImpl(props.toAwsCredentials(), AWSCommonParams.getRegionName(props))
             try {
                 val taskDefsElement = Element("taskDefs")
-                for(taskDef in api.listTaskDefinitions().mapNotNull { taskDefArn -> api.describeTaskDefinition(taskDefArn) }){
+                for(taskDef in api.listTaskDefinitions()
+                        .mapNotNull { taskDefArn -> api.describeTaskDefinition(taskDefArn) }
+                        .sortedBy { taskDef -> taskDef.displayName }){
                     val element = Element("taskDef")
                     element.setAttribute("id", taskDef.arn)
                     element.setAttribute("text", taskDef.displayName)
                     taskDefsElement.addContent(element)
                 }
                 val clustersElement = Element("clusters")
-                for(cluster in api.listClusters().mapNotNull { clusterArn -> api.describeCluster(clusterArn) }){
+                for(cluster in api.listClusters()
+                        .mapNotNull { clusterArn -> api.describeCluster(clusterArn) }
+                        .sortedBy { cluster -> cluster.name }){
                     val element = Element("cluster")
                     element.setAttribute("id", cluster.arn)
                     element.setAttribute("text", cluster.name)

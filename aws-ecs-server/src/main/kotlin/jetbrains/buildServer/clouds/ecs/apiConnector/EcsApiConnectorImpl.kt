@@ -6,18 +6,16 @@ import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.services.ecs.AmazonECS
 import com.amazonaws.services.ecs.AmazonECSClientBuilder
 import com.amazonaws.services.ecs.model.*
-import jetbrains.buildServer.clouds.ecs.EcsCloudClientParameters
 import jetbrains.buildServer.version.ServerVersionHolder
 
-class EcsApiConnectorImpl(ecsParams: EcsCloudClientParameters) : EcsApiConnector {
+class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) : EcsApiConnector {
     private val apiClient: AmazonECS
 
     init {
-        val awsCredentials = ecsParams.awsCredentials
         val builder = AmazonECSClientBuilder
                 .standard()
                 .withClientConfiguration(ClientConfiguration().withUserAgentPrefix("JetBrains TeamCity " + ServerVersionHolder.getVersion().displayVersion))
-                .withRegion(ecsParams.region)
+                .withRegion(awsRegion)
         if(awsCredentials != null){
             builder.withCredentials(object: AWSCredentialsProvider{
                 override fun getCredentials(): AWSCredentials {

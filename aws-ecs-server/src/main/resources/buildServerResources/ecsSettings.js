@@ -95,38 +95,26 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         });
 
         this.$taskDefinition.on('change', function (e, value) {
-            if (arguments.length === 1) {
-                this._image['taskDefinition'] = this.$taskDefinition.val();
-            } else {
-                this.$taskDefinition.val(value);
-            }
+            if(value) this.$taskDefinition.val(value);
+            this._image['taskDefinition'] = this.$taskDefinition.val();
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         this.$cluster.on('change', function (e, value) {
-            if (arguments.length === 1) {
-                this._image['cluster'] = this.$cluster.val();
-            } else {
-                this.$cluster.val(value);
-            }
+            if(value) this.$cluster.val(value);
+            this._image['cluster'] = this.$cluster.val();
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         this.$taskGroup.on('change', function (e, value) {
-            if (arguments.length === 1) {
-                this._image['taskGroup'] = this.$taskGroup.val();
-            } else {
-                this.$taskGroup.val(value);
-            }
+            if(value) this.$taskGroup.val(value);
+            this._image['taskGroup'] = this.$taskGroup.val();
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         this.$maxInstances.on('change', function (e, value) {
-            if (arguments.length === 1) {
-                this._image['maxInstances'] = this.$maxInstances.val();
-            } else {
-                this.$maxInstances.val(value);
-            }
+            if(value) this.$maxInstances.val(value);
+            this._image['maxInstances'] = this.$maxInstances.val();
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
     },
@@ -194,6 +182,14 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         return false;
     },
 
+    selectTaskDef: function(taskDef){
+        this.$taskDefinition.trigger('change', taskDef || '');
+    },
+
+    selectCluster: function(cluster){
+        this.$cluster.trigger('change', cluster || '');
+    },
+
     showAddImageDialog: function () {
         $j('#EcsImageDialogTitle').text('Add Amazon EC2 Container Service Cloud Image');
 
@@ -220,9 +216,9 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
 
         var image = this._image;
 
-        this.$taskDefinition.trigger('change', image['taskDefinition'] || '');
+        this.selectTaskDef(image['taskDefinition'] || '');
         this.$taskGroup.trigger('change', image['taskGroup'] || '');
-        this.$cluster.trigger('change', image['cluster'] || '');
+        this.selectCluster(image['cluster'] || '');
         this.$maxInstances.trigger('change', image['maxInstances'] || '');
 
         BS.Ecs.ImageDialog.showCentered();
@@ -231,9 +227,9 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
     _resetDataAndDialog: function () {
         this._image = {};
 
-        this.$taskDefinition.trigger('change', '');
+        this.selectTaskDef('');
         this.$taskGroup.trigger('change', '');
-        this.$cluster.trigger('change', '');
+        this.selectCluster('');
         this.$maxInstances.trigger('change', '');
     },
 
@@ -374,7 +370,7 @@ if(!BS.Ecs.TaskDefChooser){
     };
 
     BS.Ecs.TaskDefChooser.selectTaskDef = function (taskDef) {
-        BS.Ecs.ProfileSettingsForm.$taskDefinition.trigger('change', taskDef || '');
+        BS.Ecs.ProfileSettingsForm.selectTaskDef(taskDef);
         this.hidePopup();
     };
 }

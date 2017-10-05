@@ -369,10 +369,14 @@ if(!BS.Ecs.TaskDefChooser){
     BS.Ecs.TaskDefChooser.showPopup = function(nearestElement, dataLoadUrl){
         this.showPopupNearElement(nearestElement, {
             parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
-            url: dataLoadUrl,
-            method: 'post'
+            url: dataLoadUrl
         });
-    }
+    };
+
+    BS.Ecs.TaskDefChooser.selectTaskDef = function (taskDef) {
+        BS.Ecs.ProfileSettingsForm.$taskDefinition.trigger('change', taskDef || '');
+        this.hidePopup();
+    };
 }
 
 if(!BS.Ecs.ClusterChooser) {
@@ -386,8 +390,12 @@ if(!BS.Ecs.ClusterChooser) {
     BS.Ecs.ClusterChooser.showPopup = function(nearestElement, dataLoadUrl) {
         this.showPopupNearElement(nearestElement, {
             parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
-            url: dataLoadUrl,
-            method: 'post'
+            url: dataLoadUrl
         });
-    }
+    };
+
+    BS.Ecs.ClusterChooser.selectCluster = function (cluster) {
+        BS.Ecs.ProfileSettingsForm.$cluster.trigger('change', cluster || '');
+        this.hidePopup();
+    };
 }

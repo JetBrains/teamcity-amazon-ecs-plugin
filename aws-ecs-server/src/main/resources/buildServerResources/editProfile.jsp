@@ -14,7 +14,7 @@
 <jsp:useBean id="taskDefChooserUrl" scope="request" type="java.lang.String" />
 <jsp:useBean id="clusterChooserUrl" scope="request" type="java.lang.String" />
 
-<script type=java.lang.String"text/javascript">
+<script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}ecsSettings.css'/>");
 </script>
 

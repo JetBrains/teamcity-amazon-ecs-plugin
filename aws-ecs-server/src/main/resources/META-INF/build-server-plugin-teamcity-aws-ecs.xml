@@ -3,4 +3,6 @@
 <beans default-autowire="constructor">
     <bean class="jetbrains.buildServer.clouds.ecs.EcsCloudClientFactory"/>
     <bean class="jetbrains.buildServer.clouds.ecs.web.EcsProfileEditController"/>
+    <bean class="jetbrains.buildServer.clouds.ecs.web.EcsClusterChooserController"/>
+    <bean class="jetbrains.buildServer.clouds.ecs.web.EcsTaskDefinitionChooserController"/>
 </beans>

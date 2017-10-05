@@ -357,3 +357,37 @@ if(!BS.Ecs.ImageDialog) BS.Ecs.ImageDialog = OO.extend(BS.AbstractModalDialog, {
         return $('EcsImageDialog');
     }
 });
+
+if(!BS.Ecs.TaskDefChooser){
+    BS.Ecs.TaskDefChooser = new BS.Popup('taskDefChooser', {
+        hideDelay: 0,
+        hideOnMouseOut: false,
+        hideOnMouseClickOutside: true,
+        loadingText: "Loading task definitions..."
+    });
+
+    BS.Ecs.TaskDefChooser.showPopup = function(nearestElement, dataLoadUrl){
+        this.showPopupNearElement(nearestElement, {
+            parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
+            url: dataLoadUrl,
+            method: 'post'
+        });
+    }
+}
+
+if(!BS.Ecs.ClusterChooser) {
+    BS.Ecs.ClusterChooser = new BS.Popup('clusterChooser', {
+        hideDelay: 0,
+        hideOnMouseOut: false,
+        hideOnMouseClickOutside: true,
+        loadingText: "Loading clusters..."
+    });
+
+    BS.Ecs.ClusterChooser.showPopup = function(nearestElement, dataLoadUrl) {
+        this.showPopupNearElement(nearestElement, {
+            parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
+            url: dataLoadUrl,
+            method: 'post'
+        });
+    }
+}

@@ -2,16 +2,12 @@ package jetbrains.buildServer.clouds.ecs.web
 
 import com.intellij.openapi.diagnostic.Logger
 import jetbrains.buildServer.BuildProject
-import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnectorImpl
-import jetbrains.buildServer.clouds.ecs.toAwsCredentials
-import jetbrains.buildServer.controllers.ActionErrors
 import jetbrains.buildServer.controllers.BaseFormXmlController
 import jetbrains.buildServer.controllers.BasePropertiesBean
 import jetbrains.buildServer.internal.PluginPropertiesUtil
 import jetbrains.buildServer.serverSide.agentPools.AgentPool
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolUtil
-import jetbrains.buildServer.util.amazon.AWSCommonParams
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 import jetbrains.buildServer.web.openapi.WebControllerManager
 import org.jdom.Element
@@ -24,7 +20,9 @@ const val EDIT_ECS_HTML = "editEcs.html"
 
 class EcsProfileEditController(val pluginDescriptor: PluginDescriptor,
                                val agentPoolManager: AgentPoolManager,
-                               web: WebControllerManager) : BaseFormXmlController() {
+                               web: WebControllerManager,
+                               private val taskDefsController: EcsTaskDefinitionChooserController,
+                               private val clustersController: EcsClusterChooserController) : BaseFormXmlController() {
     private val LOG = Logger.getInstance(EcsProfileEditController::class.java.getName())
     private val url = pluginDescriptor.getPluginResourcesPath(EDIT_ECS_HTML)
 
@@ -36,37 +34,6 @@ class EcsProfileEditController(val pluginDescriptor: PluginDescriptor,
         val propsBean = BasePropertiesBean(null)
         PluginPropertiesUtil.bindPropertiesFromRequest(request, propsBean, true)
         val props = propsBean.properties
-
-        if (request.getParameter("loadData").toBoolean()){
-            val api = EcsApiConnectorImpl(props.toAwsCredentials(), AWSCommonParams.getRegionName(props))
-            try {
-                val taskDefsElement = Element("taskDefs")
-                for(taskDef in api.listTaskDefinitions()
-                        .mapNotNull { taskDefArn -> api.describeTaskDefinition(taskDefArn) }
-                        .sortedBy { taskDef -> taskDef.displayName }){
-                    val element = Element("taskDef")
-                    element.setAttribute("id", taskDef.arn)
-                    element.setAttribute("text", taskDef.displayName)
-                    taskDefsElement.addContent(element)
-                }
-                val clustersElement = Element("clusters")
-                for(cluster in api.listClusters()
-                        .mapNotNull { clusterArn -> api.describeCluster(clusterArn) }
-                        .sortedBy { cluster -> cluster.name }){
-                    val element = Element("cluster")
-                    element.setAttribute("id", cluster.arn)
-                    element.setAttribute("text", cluster.name)
-                    clustersElement.addContent(element)
-                }
-                xmlResponse.addContent(taskDefsElement)
-                xmlResponse.addContent(clustersElement)
-            } catch (ex: Exception){
-                LOG.debug(ex)
-                val errors = ActionErrors()
-                errors.addError("loadData", ex.message)
-                writeErrors(xmlResponse, errors)
-            }
-        }
     }
 
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse): ModelAndView {
@@ -78,7 +45,8 @@ class EcsProfileEditController(val pluginDescriptor: PluginDescriptor,
         }
         pools.addAll(agentPoolManager.getProjectOwnedAgentPools(projectId))
         modelAndView.model.put("agentPools", pools)
-        modelAndView.model.put("imageDataLoadUrl", url + "?loadData=true")
+        modelAndView.model.put("taskDefChooserUrl", taskDefsController.url)
+        modelAndView.model.put("clusterChooserUrl", clustersController.url)
         return modelAndView
     }
 }

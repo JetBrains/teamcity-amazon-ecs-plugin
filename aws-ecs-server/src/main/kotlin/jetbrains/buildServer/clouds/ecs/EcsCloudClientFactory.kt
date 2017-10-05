@@ -4,6 +4,7 @@ import jetbrains.buildServer.clouds.*
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnectorImpl
 import jetbrains.buildServer.clouds.ecs.web.EDIT_ECS_HTML
 import jetbrains.buildServer.serverSide.AgentDescription
+import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.serverSide.PropertiesProcessor
 import jetbrains.buildServer.serverSide.ServerSettings
 import jetbrains.buildServer.util.amazon.AWSCommonParams
@@ -69,8 +70,14 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
     }
 
     override fun getPropertiesProcessor(): PropertiesProcessor {
-        return PropertiesProcessor {
-            emptyList()
+        return object: PropertiesProcessor{
+            override fun process(properties: MutableMap<String, String>?): MutableCollection<InvalidProperty> {
+                val invalids = ArrayList<InvalidProperty>()
+                for (e in AWSCommonParams.validate(properties!!, false)) {
+                    invalids.add(InvalidProperty(e.key, e.value))
+                }
+                return invalids
+            }
         }
     }
 }

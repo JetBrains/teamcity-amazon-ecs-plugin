@@ -97,25 +97,25 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         });
 
         this.$taskDefinition.on('change', function (e, value) {
-            if(value) this.$taskDefinition.val(value);
+            if(value !== undefined) this.$taskDefinition.val(value);
             this._image['taskDefinition'] = this.$taskDefinition.val();
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         this.$cluster.on('change', function (e, value) {
-            if(value) this.$cluster.val(value);
+            if(value !== undefined) this.$cluster.val(value);
             this._image['cluster'] = this.$cluster.val();
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         this.$taskGroup.on('change', function (e, value) {
-            if(value) this.$taskGroup.val(value);
+            if(value !== undefined) this.$taskGroup.val(value);
             this._image['taskGroup'] = this.$taskGroup.val();
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         this.$maxInstances.on('change', function (e, value) {
-            if(value) this.$maxInstances.val(value);
+            if(value !== undefined) this.$maxInstances.val(value);
             this._image['maxInstances'] = this.$maxInstances.val();
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));

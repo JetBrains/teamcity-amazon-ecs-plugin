@@ -2,12 +2,16 @@ package jetbrains.buildServer.clouds.ecs.web
 
 import com.intellij.openapi.diagnostic.Logger
 import jetbrains.buildServer.BuildProject
+import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnectorImpl
+import jetbrains.buildServer.clouds.ecs.toAwsCredentials
+import jetbrains.buildServer.controllers.ActionErrors
 import jetbrains.buildServer.controllers.BaseFormXmlController
 import jetbrains.buildServer.controllers.BasePropertiesBean
 import jetbrains.buildServer.internal.PluginPropertiesUtil
 import jetbrains.buildServer.serverSide.agentPools.AgentPool
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolManager
 import jetbrains.buildServer.serverSide.agentPools.AgentPoolUtil
+import jetbrains.buildServer.util.amazon.AWSCommonParams
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 import jetbrains.buildServer.web.openapi.WebControllerManager
 import org.jdom.Element
@@ -31,9 +35,25 @@ class EcsProfileEditController(val pluginDescriptor: PluginDescriptor,
     }
 
     override fun doPost(request: HttpServletRequest, response: HttpServletResponse, xmlResponse: Element) {
-        val propsBean = BasePropertiesBean(null)
-        PluginPropertiesUtil.bindPropertiesFromRequest(request, propsBean, true)
-        val props = propsBean.properties
+        if (request.getParameter("testConnection").toBoolean()){
+            val propsBean = BasePropertiesBean(null)
+            PluginPropertiesUtil.bindPropertiesFromRequest(request, propsBean, true)
+            val props = propsBean.properties
+            try {
+                val api = EcsApiConnectorImpl(props.toAwsCredentials(), AWSCommonParams.getRegionName(props))
+                val testConnectionResult = api.testConnection()
+                if (!testConnectionResult.success) {
+                    val errors = ActionErrors()
+                    errors.addError("connection", testConnectionResult.message)
+                    writeErrors(xmlResponse, errors)
+                }
+            } catch (ex: Exception){
+                LOG.debug(ex)
+                val errors = ActionErrors()
+                errors.addError("connection", ex.message)
+                writeErrors(xmlResponse, errors)
+            }
+        }
     }
 
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse): ModelAndView {
@@ -47,6 +67,7 @@ class EcsProfileEditController(val pluginDescriptor: PluginDescriptor,
         modelAndView.model.put("agentPools", pools)
         modelAndView.model.put("taskDefChooserUrl", taskDefsController.url)
         modelAndView.model.put("clusterChooserUrl", clustersController.url)
+        modelAndView.model.put("testConnectionUrl", url + "?testConnection=true")
         return modelAndView
     }
 }

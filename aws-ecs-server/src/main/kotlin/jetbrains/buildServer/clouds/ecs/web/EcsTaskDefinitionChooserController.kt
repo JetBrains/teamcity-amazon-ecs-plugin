@@ -1,6 +1,7 @@
 package jetbrains.buildServer.clouds.ecs.web
 
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnectorImpl
+import jetbrains.buildServer.clouds.ecs.apiConnector.EcsTaskDefinition
 import jetbrains.buildServer.clouds.ecs.toAwsCredentials
 import jetbrains.buildServer.controllers.BaseController
 import jetbrains.buildServer.controllers.BasePropertiesBean
@@ -27,12 +28,18 @@ class EcsTaskDefinitionChooserController(private val pluginDescriptor: PluginDes
         PluginPropertiesUtil.bindPropertiesFromRequest(request, propsBean, true)
         val props = propsBean.properties
 
-        val api = EcsApiConnectorImpl(props.toAwsCredentials(), AWSCommonParams.getRegionName(props))
-
         val modelAndView = ModelAndView(pluginDescriptor.getPluginResourcesPath("taskDefs.jsp"))
-        modelAndView.model["taskDefs"] = api.listTaskDefinitions()
-                .mapNotNull { taskDefArn -> api.describeTaskDefinition(taskDefArn) }
-                .sortedBy { taskDef -> taskDef.displayName }
+        try {
+            val api = EcsApiConnectorImpl(props.toAwsCredentials(), AWSCommonParams.getRegionName(props))
+            val sortedTasDefs = api.listTaskDefinitions()
+                    .mapNotNull { taskDefArn -> api.describeTaskDefinition(taskDefArn) }
+                    .sortedBy { taskDef -> taskDef.displayName }
+            modelAndView.model["taskDefs"] = sortedTasDefs
+            modelAndView.model["error"] = ""
+        } catch (ex: Exception){
+            modelAndView.model["taskDefs"] = emptyList<EcsTaskDefinition>()
+            modelAndView.model["error"] = ex.localizedMessage
+        }
         return modelAndView
     }
 }

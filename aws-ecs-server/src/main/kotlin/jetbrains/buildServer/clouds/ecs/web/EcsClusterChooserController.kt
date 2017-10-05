@@ -1,6 +1,7 @@
 package jetbrains.buildServer.clouds.ecs.web
 
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnectorImpl
+import jetbrains.buildServer.clouds.ecs.apiConnector.EcsCluster
 import jetbrains.buildServer.clouds.ecs.toAwsCredentials
 import jetbrains.buildServer.controllers.BaseController
 import jetbrains.buildServer.controllers.BasePropertiesBean
@@ -27,12 +28,17 @@ class EcsClusterChooserController(private val pluginDescriptor: PluginDescriptor
         PluginPropertiesUtil.bindPropertiesFromRequest(request, propsBean, true)
         val props = propsBean.properties
 
-        val api = EcsApiConnectorImpl(props.toAwsCredentials(), AWSCommonParams.getRegionName(props))
-
         val modelAndView = ModelAndView(pluginDescriptor.getPluginResourcesPath("clusters.jsp"))
-        modelAndView.model["clusters"] = api.listClusters()
-                .mapNotNull { clusterArn -> api.describeCluster(clusterArn) }
-                .sortedBy { cluster -> cluster.name }
+        try {
+            val api = EcsApiConnectorImpl(props.toAwsCredentials(), AWSCommonParams.getRegionName(props))
+            modelAndView.model["clusters"] = api.listClusters()
+                    .mapNotNull { clusterArn -> api.describeCluster(clusterArn) }
+                    .sortedBy { cluster -> cluster.name }
+            modelAndView.model["error"] = ""
+        } catch (ex: Exception){
+            modelAndView.model["clusters"] = emptyList<EcsCluster>()
+            modelAndView.model["error"] = ex.localizedMessage
+        }
         return modelAndView
     }
 }

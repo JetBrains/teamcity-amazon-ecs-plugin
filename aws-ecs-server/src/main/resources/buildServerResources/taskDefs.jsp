@@ -6,9 +6,17 @@
 </script>
 
 <jsp:useBean id="taskDefs" scope="request" type="java.util.Collection<jetbrains.buildServer.clouds.ecs.apiConnector.EcsTaskDefinition>"/>
+<jsp:useBean id="error" scope="request" type="java.lang.String"/>
 
-<ul class="chooser">
-    <c:forEach var="taskDef" items="${taskDefs}">
-        <li value="${taskDef.arn}"><a style="cursor:pointer;" onclick="BS.Ecs.TaskDefChooser.selectTaskDef('${taskDef.displayName}')"><c:out value="${taskDef.displayName}"/></a></li>
-    </c:forEach>
-</ul>
+<c:choose>
+    <c:when test="${not empty error}">
+        <span class="testConnectionFailed"><c:out value="${error}"/></span>
+    </c:when>
+    <c:otherwise>
+        <ul class="chooser">
+            <c:forEach var="taskDef" items="${taskDefs}">
+                <li value="${taskDef.arn}"><a style="cursor:pointer;" onclick="BS.Ecs.TaskDefChooser.selectTaskDef('${taskDef.displayName}')"><c:out value="${taskDef.displayName}"/></a></li>
+            </c:forEach>
+        </ul>
+    </c:otherwise>
+</c:choose>

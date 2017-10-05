@@ -3,6 +3,8 @@ if (!BS.Ecs) BS.Ecs = {};
 
 if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.PluginPropertiesForm, {
 
+    testConnectionUrl: '',
+
     _dataKeys: [ 'taskDefinition', 'cluster', 'taskGroup', 'maxInstances' ],
 
     templates: {
@@ -345,6 +347,25 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
             return accumulator;
         }.bind(this), []);
         this.$imagesDataElem.val(JSON.stringify(imageData));
+    },
+
+    testConnection: function() {
+        BS.ajaxRequest(this.testConnectionUrl, {
+            parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
+            onFailure: function (response) {
+                BS.TestConnectionDialog.show(false, response, null);
+            }.bind(this),
+            onSuccess: function (response) {
+                var wereErrors = BS.XMLResponse.processErrors(response.responseXML, {
+                    onConnectionError: function(elem) {
+                        BS.TestConnectionDialog.show(false, elem.firstChild.nodeValue, null);
+                    }
+                }, BS.PluginPropertiesForm.propertiesErrorsHandler);
+                if(!wereErrors){
+                    BS.TestConnectionDialog.show(true, "", null);
+                }
+            }.bind(this)
+        });
     }
 });
 

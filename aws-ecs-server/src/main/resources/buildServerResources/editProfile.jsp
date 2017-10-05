@@ -11,6 +11,8 @@
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="cons" class="jetbrains.buildServer.clouds.ecs.EcsParameterConstants"/>
 <jsp:useBean id="agentPools" scope="request" type="java.util.Collection<jetbrains.buildServer.serverSide.agentPools.AgentPool>"/>
+
+<jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
 <jsp:useBean id="taskDefChooserUrl" scope="request" type="java.lang.String" />
 <jsp:useBean id="clusterChooserUrl" scope="request" type="java.lang.String" />
 
@@ -23,6 +25,13 @@
 <table class="runnerFormTable">
 
 <jsp:include page="editAWSCommonParams.jsp" />
+
+    <tr>
+        <th class="noBorder"></th>
+        <td class="noBorder">
+            <forms:button id="ecsTestConnectionButton" onclick="BS.Ecs.ProfileSettingsForm.testConnection();">Test connection</forms:button>
+        </td>
+    </tr>
 
 </table>
 
@@ -47,6 +56,12 @@
     </div>
     <forms:addButton title="Add image" id="showAddImageDialogButton">Add image</forms:addButton>
 </div>
+
+<bs:dialog dialogId="testConnectionDialog" dialogClass="vcsRootTestConnectionDialog" title="Test Connection" closeCommand="BS.TestConnectionDialog.close();"
+           closeAttrs="showdiscardchangesmessage='false'">
+    <div id="testConnectionStatus"></div>
+    <div id="testConnectionDetails" class="mono"></div>
+</bs:dialog>
 
 <bs:dialog dialogId="EcsImageDialog" title="Add Amazon EC2 Container Service Cloud Image" closeCommand="BS.Ecs.ImageDialog.close()"
            dialogClass="EcsImageDialog" titleId="EcsImageDialogTitle">
@@ -118,6 +133,7 @@
         dataType: "script",
         cache: true,
         success: function () {
+            BS.Ecs.ProfileSettingsForm.testConnectionUrl = '<c:url value="${testConnectionUrl}"/>';
             BS.Ecs.ProfileSettingsForm.initialize();
         }
     });

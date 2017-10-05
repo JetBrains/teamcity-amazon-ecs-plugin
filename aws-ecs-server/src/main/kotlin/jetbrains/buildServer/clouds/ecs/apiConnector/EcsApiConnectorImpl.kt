@@ -120,4 +120,13 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
 
         return describeClustersResult.clusters[0]?.wrap()
     }
+
+    override fun testConnection(): TestConnectionResult {
+        try {
+            apiClient.listClusters()
+            return TestConnectionResult("Connection successful", true)
+        } catch (ex: Exception){
+            return TestConnectionResult(ex.localizedMessage, false)
+        }
+    }
 }

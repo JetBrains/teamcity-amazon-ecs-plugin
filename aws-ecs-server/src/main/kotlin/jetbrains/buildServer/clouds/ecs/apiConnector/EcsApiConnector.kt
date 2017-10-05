@@ -15,5 +15,9 @@ interface EcsApiConnector {
 
     fun listClusters(): List<String> //list of cluster arns
     fun describeCluster(clusterArn:String): EcsCluster?
+    fun testConnection(): TestConnectionResult
+}
+
+class TestConnectionResult(val message: String?, val success: Boolean) {
 }
 

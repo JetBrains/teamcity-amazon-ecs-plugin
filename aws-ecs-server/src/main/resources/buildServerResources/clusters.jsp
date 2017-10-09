@@ -13,10 +13,17 @@
         <span class="testConnectionFailed"><c:out value="${error}"/></span>
     </c:when>
     <c:otherwise>
-        <ul class="chooser">
-            <c:forEach var="cluster" items="${clusters}">
-                <li value="${cluster.arn}"><a style="cursor:pointer;" onclick="BS.Ecs.ClusterChooser.selectCluster('${cluster.name}')"><c:out value="${cluster.name}"/></a></li>
-            </c:forEach>
-        </ul>
+        <c:choose>
+            <c:when test="${empty clusters}">
+                No clusters found
+            </c:when>
+            <c:otherwise>
+                <ul class="chooser">
+                    <c:forEach var="cluster" items="${clusters}">
+                        <li value="${cluster.arn}"><a style="cursor:pointer;" onclick="BS.Ecs.ClusterChooser.selectCluster('${cluster.name}')"><c:out value="${cluster.name}"/></a></li>
+                    </c:forEach>
+                </ul>
+            </c:otherwise>
+        </c:choose>
     </c:otherwise>
 </c:choose>

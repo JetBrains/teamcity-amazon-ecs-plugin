@@ -5,7 +5,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
 
     testConnectionUrl: '',
 
-    _dataKeys: [ 'taskDefinition', 'cluster', 'taskGroup', 'maxInstances' ],
+    _dataKeys: [ 'taskDefinition', 'agentNamePrefix', 'cluster', 'taskGroup', 'maxInstances' ],
 
     templates: {
         imagesTableRow: $j('<tr class="imagesTableRow">\
@@ -41,7 +41,9 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         //add / edit image dialog
         this.$addImageButton = $j('#ecsAddImageButton');
         this.$cancelAddImageButton = $j('#ecsCancelAddImageButton');
+
         this.$taskDefinition = $j('#taskDefinition');
+        this.$agentNamePrefix = $j('#agentNamePrefix');
         this.$taskGroup = $j('#taskGroup');
         this.$cluster = $j('#cluster');
         this.$maxInstances = $j('#maxInstances');
@@ -99,6 +101,12 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$taskDefinition.on('change', function (e, value) {
             if(value !== undefined) this.$taskDefinition.val(value);
             this._image['taskDefinition'] = this.$taskDefinition.val();
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
+
+        this.$agentNamePrefix.on('change', function (e, value) {
+            if(value !== undefined) this.$agentNamePrefix.val(value);
+            this._image['agentNamePrefix'] = this.$agentNamePrefix.val();
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
@@ -219,6 +227,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         var image = this._image;
 
         this.selectTaskDef(image['taskDefinition'] || '');
+        this.$agentNamePrefix.trigger('change', image['agentNamePrefix'] || '');
         this.$taskGroup.trigger('change', image['taskGroup'] || '');
         this.selectCluster(image['cluster'] || '');
         this.$maxInstances.trigger('change', image['maxInstances'] || '');
@@ -230,6 +239,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this._image = {};
 
         this.selectTaskDef('');
+        this.$agentNamePrefix.trigger('change', '');
         this.$taskGroup.trigger('change', '');
         this.selectCluster('');
         this.$maxInstances.trigger('change', '');

@@ -8,6 +8,7 @@ import java.util.*
  */
 interface EcsTask {
     val arn: String
+    val id: String
     val taskDefinitionArn: String
     val clusterArn: String?
     val lastStatus: String
@@ -18,6 +19,8 @@ interface EcsTask {
 }
 
 fun Task.wrap(): EcsTask = object : EcsTask{
+    override val id: String
+        get() = this@wrap.taskArn.substring(this@wrap.taskArn.indexOf(":task/") + 6)
     override val taskDefinitionArn: String
         get() = this@wrap.taskDefinitionArn
     override val clusterArn: String?

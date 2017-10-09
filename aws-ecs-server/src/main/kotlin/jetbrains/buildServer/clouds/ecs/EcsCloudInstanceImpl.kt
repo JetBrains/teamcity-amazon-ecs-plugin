@@ -47,7 +47,7 @@ class EcsCloudInstanceImpl(private val instanceId: String, val cloudImage: EcsCl
     }
 
     override fun getName(): String {
-        return instanceId
+        return ecsTask.id
     }
 
     override fun getStartedTime(): Date {

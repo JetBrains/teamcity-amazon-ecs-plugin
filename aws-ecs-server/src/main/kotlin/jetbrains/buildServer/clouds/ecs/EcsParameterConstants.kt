@@ -11,31 +11,13 @@ val IMAGE_INSTANCE_LIMIT_PARAM = "maxInstances"
 val TASK_DEFINITION_PARAM = "taskDefinition"
 val TASK_GROUP_PARAM = "taskGroup"
 val CLUSTER_PARAM = "cluster"
+val AGENT_NAME_PREFIX = "agentNamePrefix"
 
 class EcsParameterConstants{
-
-    val taskDefinition: String
-        get() {
-            return TASK_DEFINITION_PARAM
-        }
-
-    val cluster: String
-        get() {
-            return CLUSTER_PARAM
-        }
-
-    val taskGroup: String
-        get() {
-            return TASK_GROUP_PARAM
-        }
-
-    val maxInstances: String
-        get() {
-            return IMAGE_INSTANCE_LIMIT_PARAM
-        }
-
-    val agentPoolIdField: String
-        get() {
-            return CloudImageParameters.AGENT_POOL_ID_FIELD
-        }
+    val agentNamePrefix: String = AGENT_NAME_PREFIX
+    val taskDefinition: String = TASK_DEFINITION_PARAM
+    val cluster: String = CLUSTER_PARAM
+    val taskGroup: String = TASK_GROUP_PARAM
+    val maxInstances: String = IMAGE_INSTANCE_LIMIT_PARAM
+    val agentPoolIdField: String = CloudImageParameters.AGENT_POOL_ID_FIELD
 }

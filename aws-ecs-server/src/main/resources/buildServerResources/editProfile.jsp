@@ -77,7 +77,14 @@
                 </div>
             </td>
         </tr>
-        <tr>
+        <tr class="advancedSetting">
+            <th><label for="${cons.agentNamePrefix}">Agent name prefix:</label></th>
+            <td><input type="text" id="${cons.agentNamePrefix}" class="longField configParam"/>
+                <span id="error_${cons.agentNamePrefix}" class="error option-error option-error_${cons.agentNamePrefix}"></span>
+                <span class="smallNote">If no or incorrect prefix provided, default value <strong>ECS</strong> will be used</span>
+            </td>
+        </tr>
+        <tr class="advancedSetting">
             <th>Cluster:</th>
             <td>
                 <div>
@@ -98,7 +105,7 @@
                 </div>
             </td>
         </tr>
-        <tr>
+        <tr class="advancedSetting">
             <th>Max number of instances:</th>
             <td>
                 <div>
@@ -120,6 +127,9 @@
             </td>
         </tr>
     </table>
+
+    <admin:showHideAdvancedOpts containerId="EcsImageDialog" optsKey="ecsCloudSettings"/>
+    <admin:highlightChangedFields containerId="EcsImageDialog"/>
 
     <div class="popupSaveButtonsBlock">
         <forms:submit label="Add" type="button" id="ecsAddImageButton"/>

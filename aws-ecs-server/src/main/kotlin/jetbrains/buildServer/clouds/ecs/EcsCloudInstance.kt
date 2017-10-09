@@ -4,4 +4,5 @@ import jetbrains.buildServer.clouds.CloudInstance
 
 interface EcsCloudInstance : CloudInstance {
     fun terminate()
+    fun generateAgentName(): String
 }

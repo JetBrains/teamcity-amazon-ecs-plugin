@@ -88,7 +88,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
     }
 
     override fun generateAgentName(agent: AgentDescription): String? {
-        return agent.availableParameters.get(PROPOSED_AGENT_NAME_AGENT_PROP)
+        return (findInstanceByAgent(agent) as? EcsCloudInstance)?.generateAgentName() ?: agent.availableParameters[PROPOSED_AGENT_NAME_AGENT_PROP]
     }
 
     override fun getImages(): MutableCollection<out CloudImage> {

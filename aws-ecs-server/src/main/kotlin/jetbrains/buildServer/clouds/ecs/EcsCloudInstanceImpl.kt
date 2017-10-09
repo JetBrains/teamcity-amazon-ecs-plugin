@@ -50,6 +50,10 @@ class EcsCloudInstanceImpl(private val instanceId: String, val cloudImage: EcsCl
         return ecsTask.id
     }
 
+    override fun generateAgentName(): String {
+        return cloudImage.generateAgentName(instanceId)
+    }
+
     override fun getStartedTime(): Date {
         val startedAt = ecsTask.startedAt
         when {

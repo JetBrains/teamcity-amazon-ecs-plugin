@@ -50,24 +50,30 @@ class EcsCloudClient(images: List<EcsCloudImage>,
     }
 
     override fun startNewInstance(image: CloudImage, tag: CloudInstanceUserData): CloudInstance {
-        val ecsImage = image as EcsCloudImage
-        val taskDefinition = apiConnector.describeTaskDefinition(ecsImage.taskDefinition) ?: throw CloudException("""Task definition ${ecsImage.taskDefinition} is missing""")
-        val instanceId = taskDefinition.generateNewInstanceId()
+        try{
+            val ecsImage = image as EcsCloudImage
+            val taskDefinition = apiConnector.describeTaskDefinition(ecsImage.taskDefinition) ?: throw CloudException("""Task definition ${ecsImage.taskDefinition} is missing""")
+            val instanceId = taskDefinition.generateNewInstanceId()
 
-        val additionalEnvironment = HashMap<String, String>()
-        additionalEnvironment.put(SERVER_UUID_ECS_ENV, serverUuid)
-        additionalEnvironment.put(SERVER_URL_ECS_ENV, tag.serverAddress)
-        additionalEnvironment.put(OFFICIAL_IMAGE_SERVER_URL_ECS_ENV, tag.serverAddress)
-        additionalEnvironment.put(PROFILE_ID_ECS_ENV, tag.profileId)
-        additionalEnvironment.put(IMAGE_ID_ECS_ENV, image.id)
-        additionalEnvironment.put(INSTANCE_ID_ECS_ENV, instanceId)
+            val additionalEnvironment = HashMap<String, String>()
+            additionalEnvironment.put(SERVER_UUID_ECS_ENV, serverUuid)
+            additionalEnvironment.put(SERVER_URL_ECS_ENV, tag.serverAddress)
+            additionalEnvironment.put(OFFICIAL_IMAGE_SERVER_URL_ECS_ENV, tag.serverAddress)
+            additionalEnvironment.put(PROFILE_ID_ECS_ENV, tag.profileId)
+            additionalEnvironment.put(IMAGE_ID_ECS_ENV, image.id)
+            additionalEnvironment.put(INSTANCE_ID_ECS_ENV, instanceId)
 
-        val tasks = apiConnector.runTask(taskDefinition, ecsImage.cluster, ecsImage.taskGroup, additionalEnvironment, startedByTeamCity(serverUuid))
-        val newInstance = EcsCloudInstanceImpl(instanceId, ecsImage, tasks[0], apiConnector)
-        ecsImage.addInstance(newInstance)
-        myCurrentError = null
-        myCurrentlyRunningInstancesCount++
-        return newInstance
+            val tasks = apiConnector.runTask(taskDefinition, ecsImage.cluster, ecsImage.taskGroup, additionalEnvironment, startedByTeamCity(serverUuid))
+            val newInstance = EcsCloudInstanceImpl(instanceId, ecsImage, tasks[0], apiConnector)
+            ecsImage.addInstance(newInstance)
+            myCurrentError = null
+            myCurrentlyRunningInstancesCount++
+            return newInstance
+        } catch (ex: Exception){
+            LOG.debug("Failed to start cloud instance", ex)
+            myCurrentError = CloudErrorInfo("Failed to start cloud instance", ex.localizedMessage, ex)
+            throw ex
+        }
     }
 
     override fun terminateInstance(instance: CloudInstance) {

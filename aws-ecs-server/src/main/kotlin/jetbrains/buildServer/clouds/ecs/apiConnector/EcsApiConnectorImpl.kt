@@ -37,12 +37,12 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
                                 .withEnvironment(additionalEnvironment.entries.map { entry -> KeyValuePair().withName(entry.key).withValue(entry.value) })
         }
 
-        val request = RunTaskRequest()
+        var request = RunTaskRequest()
                 .withTaskDefinition(taskDefinition.arn)
-                .withCluster(cluster)
-                .withGroup(taskGroup)
                 .withOverrides(TaskOverride().withContainerOverrides(containerOverrides))
                 .withStartedBy(startedBy)
+        if(cluster != null && cluster.isEmpty()) request = request.withCluster(cluster)
+        if(taskGroup != null && taskGroup.isEmpty()) request = request.withGroup(taskGroup)
 
         val runTaskResult = apiClient.runTask(request)
         if (!runTaskResult.failures.isEmpty())

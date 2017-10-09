@@ -17,4 +17,10 @@ class EcsCloudImageData(private val rawImageData: CloudImageParameters) {
             val parameter = rawImageData.getParameter(IMAGE_INSTANCE_LIMIT_PARAM)
             return if (StringUtil.isEmpty(parameter)) -1 else Integer.valueOf(parameter)
         }
+    val agentNamePrefix: String
+        get() {
+            val prefix = rawImageData.getParameter(AGENT_NAME_PREFIX)
+            if(prefix == null || prefix.isEmpty()) return "ecs:"
+            else return prefix
+        }
 }

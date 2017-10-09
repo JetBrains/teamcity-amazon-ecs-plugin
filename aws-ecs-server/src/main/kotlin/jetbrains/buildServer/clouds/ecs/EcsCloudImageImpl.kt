@@ -73,6 +73,10 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData, private val ap
 
     }
 
+    override fun generateAgentName(instanceId: String): String {
+        return imageData.agentNamePrefix + instanceId
+    }
+
     override fun addInstance(instance: EcsCloudInstance) {
         myIdToInstanceMap.put(instance.instanceId, instance)
     }

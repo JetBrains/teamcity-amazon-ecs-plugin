@@ -19,6 +19,8 @@ You can [download the plugin](https://teamcity.jetbrains.com/repository/download
 
 ## Configuration
 
+Configure Amazon ECS [Cloud Profile](https://confluence.jetbrains.com/display/TCD10/Agent+Cloud+Profile#AgentCloudProfile-ConfiguringCloudProfile) for your project in the Server Administration UI.
+
 The plugin supports Amazon ECS cluster images to start new tasks with a TeamCity build agent running in one of the containers. The plugin supports the [official TeamCity Build Agent Docker image](https://hub.docker.com/r/jetbrains/teamcity-agent) out of the box. You can use your own image as well.
 
 ## License

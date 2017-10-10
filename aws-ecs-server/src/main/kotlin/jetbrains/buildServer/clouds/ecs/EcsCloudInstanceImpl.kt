@@ -1,5 +1,6 @@
 package jetbrains.buildServer.clouds.ecs
 
+import jetbrains.buildServer.agent.Constants
 import jetbrains.buildServer.clouds.CloudErrorInfo
 import jetbrains.buildServer.clouds.CloudImage
 import jetbrains.buildServer.clouds.InstanceStatus
@@ -80,7 +81,7 @@ class EcsCloudInstanceImpl(private val instanceId: String, val cloudImage: EcsCl
     }
 
     override fun containsAgent(agent: AgentDescription): Boolean {
-        return instanceId == agent.configurationParameters.get(INSTANCE_ID_AGENT_PROP)
+        return instanceId == agent.configurationParameters.get(Constants.ENV_PREFIX + INSTANCE_ID_ECS_ENV)
     }
 
     override fun terminate() {

@@ -2,6 +2,7 @@ package jetbrains.buildServer.clouds.ecs
 
 import com.google.common.collect.Maps
 import com.intellij.openapi.diagnostic.Logger
+import jetbrains.buildServer.agent.Constants
 import jetbrains.buildServer.clouds.*
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import jetbrains.buildServer.serverSide.AgentDescription
@@ -88,7 +89,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
     }
 
     override fun generateAgentName(agent: AgentDescription): String? {
-        return (findInstanceByAgent(agent) as? EcsCloudInstance)?.generateAgentName() ?: agent.availableParameters[PROPOSED_AGENT_NAME_AGENT_PROP]
+        return (findInstanceByAgent(agent) as? EcsCloudInstance)?.generateAgentName() ?: agent.availableParameters[Constants.ENV_PREFIX + PROPOSED_AGENT_NAME_ECS_ENV]
     }
 
     override fun getImages(): MutableCollection<out CloudImage> {
@@ -102,11 +103,11 @@ class EcsCloudClient(images: List<EcsCloudImage>,
     override fun findInstanceByAgent(agent: AgentDescription): CloudInstance? {
         val agentParameters = agent.getAvailableParameters()
 
-        if (serverUuid != agentParameters.get(SERVER_UUID_AGENT_PROP) || cloudProfileId != agentParameters.get(PROFILE_ID_AGENT_PROP))
+        if (serverUuid != agentParameters.get(Constants.ENV_PREFIX + SERVER_UUID_ECS_ENV) || cloudProfileId != agentParameters.get(Constants.ENV_PREFIX + PROFILE_ID_ECS_ENV))
             return null
 
-        val imageId = agentParameters.get(IMAGE_ID_AGENT_PROP)
-        val instanceId = agentParameters.get(INSTANCE_ID_AGENT_PROP)
+        val imageId = agentParameters.get(Constants.ENV_PREFIX + IMAGE_ID_ECS_ENV)
+        val instanceId = agentParameters.get(Constants.ENV_PREFIX + INSTANCE_ID_ECS_ENV)
         if (imageId != null && instanceId != null) {
             val cloudImage = myImageIdToImageMap[imageId]
             if (cloudImage != null) {

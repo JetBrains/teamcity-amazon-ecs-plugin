@@ -1,5 +1,6 @@
 package jetbrains.buildServer.clouds.ecs
 
+import jetbrains.buildServer.agent.Constants
 import jetbrains.buildServer.clouds.*
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnectorImpl
 import jetbrains.buildServer.clouds.ecs.web.EDIT_ECS_HTML
@@ -45,10 +46,10 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
 
     override fun canBeAgentOfType(description: AgentDescription): Boolean {
         val map = description.availableParameters
-        return map.containsKey(SERVER_UUID_AGENT_PROP) &&
-                map.containsKey(PROFILE_ID_AGENT_PROP) &&
-                map.containsKey(IMAGE_ID_AGENT_PROP) &&
-                map.containsKey(INSTANCE_ID_AGENT_PROP)
+        return map.containsKey(Constants.ENV_PREFIX + SERVER_UUID_ECS_ENV) &&
+                map.containsKey(Constants.ENV_PREFIX + PROFILE_ID_ECS_ENV) &&
+                map.containsKey(Constants.ENV_PREFIX + IMAGE_ID_ECS_ENV) &&
+                map.containsKey(Constants.ENV_PREFIX + INSTANCE_ID_ECS_ENV)
     }
 
     override fun createNewClient(state: CloudState, params: CloudClientParameters): CloudClientEx {

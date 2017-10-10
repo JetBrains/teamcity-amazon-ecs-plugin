@@ -177,7 +177,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
 
     _submitDialogClickHandler: function() {
         if (this.validateOptions()) {
-            if (this.$addImageButton.val().toLowerCase() === 'edit') {
+            if (this.$addImageButton.val().toLowerCase() === 'save') {
                 this.editImage(this.$addImageButton.data('image-id'));
             } else {
                 this.addImage();
@@ -219,7 +219,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         BS.Hider.addHideFunction('EcsImageDialog', this._resetDataAndDialog.bind(this));
 
         typeof imageId !== 'undefined' && (this._image = $j.extend({}, this.imagesData[imageId]));
-        this.$addImageButton.val('Edit').data('image-id', imageId);
+        this.$addImageButton.val('Save').data('image-id', imageId);
         if (imageId === 'undefined'){
             this.$addImageButton.removeData('image-id');
         }

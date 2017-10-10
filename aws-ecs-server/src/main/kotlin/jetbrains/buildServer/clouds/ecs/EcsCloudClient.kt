@@ -68,7 +68,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
             additionalEnvironment.put(PROFILE_ID_ECS_ENV, tag.profileId)
             additionalEnvironment.put(IMAGE_ID_ECS_ENV, image.id)
             additionalEnvironment.put(INSTANCE_ID_ECS_ENV, instanceId)
-            additionalEnvironment.put(PROPOSED_AGENT_NAME_ECS_ENV, ecsImage.generateAgentName(instanceId))
+            additionalEnvironment.put(AGENT_NAME_ECS_ENV, ecsImage.generateAgentName(instanceId))
 
             val tasks = apiConnector.runTask(taskDefinition, ecsImage.cluster, ecsImage.taskGroup, additionalEnvironment, startedByTeamCity(serverUuid))
             val newInstance = EcsCloudInstanceImpl(instanceId, ecsImage, tasks[0], apiConnector)
@@ -94,7 +94,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
     }
 
     override fun generateAgentName(agent: AgentDescription): String? {
-        return (findInstanceByAgent(agent) as? EcsCloudInstance)?.generateAgentName() ?: agent.availableParameters[Constants.ENV_PREFIX + PROPOSED_AGENT_NAME_ECS_ENV]
+        return (findInstanceByAgent(agent) as? EcsCloudInstance)?.generateAgentName() ?: agent.availableParameters[Constants.ENV_PREFIX + AGENT_NAME_ECS_ENV]
     }
 
     override fun getImages(): MutableCollection<out CloudImage> {

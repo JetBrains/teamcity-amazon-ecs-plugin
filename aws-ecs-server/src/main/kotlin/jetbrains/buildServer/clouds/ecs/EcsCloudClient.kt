@@ -21,6 +21,11 @@ class EcsCloudClient(images: List<EcsCloudImage>,
     private var myCurrentError: CloudErrorInfo? = null
     private var myImageIdToImageMap: ConcurrentHashMap<String, EcsCloudImage> = ConcurrentHashMap(Maps.uniqueIndex(images, { it?.id }))
 
+    init {
+        for (image in images) {
+            myCurrentlyRunningInstancesCount += image.instanceCount
+        }
+    }
 
     override fun isInitialized(): Boolean {
         //TODO: wait while all images populate list of their instances

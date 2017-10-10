@@ -20,4 +20,5 @@ class EcsParameterConstants{
     val taskGroup: String = TASK_GROUP_PARAM
     val maxInstances: String = IMAGE_INSTANCE_LIMIT_PARAM
     val agentPoolIdField: String = CloudImageParameters.AGENT_POOL_ID_FIELD
+    val profileInstanceLimit: String = PROFILE_INSTANCE_LIMIT_PARAM
 }

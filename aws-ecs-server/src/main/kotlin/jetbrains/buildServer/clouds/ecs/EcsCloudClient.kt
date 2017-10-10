@@ -42,8 +42,8 @@ class EcsCloudClient(images: List<EcsCloudImage>,
             LOG.debug("Can't start instance of unknown cloud image with id " + kubeCloudImageId)
             return false
         }
-        val profileInstanceLimit = ecsClientParams.instanceLimit
-        if (profileInstanceLimit > 0 && myCurrentlyRunningInstancesCount >= profileInstanceLimit)
+
+        if (ecsClientParams.instanceLimit in 1..myCurrentlyRunningInstancesCount)
             return false
 
         val imageLimit = kubeCloudImage.instanceLimit

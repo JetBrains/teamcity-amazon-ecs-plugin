@@ -33,6 +33,15 @@
         </td>
     </tr>
 
+    <tr>
+        <th><label for="${cons.profileInstanceLimit}">Maximum instances count:</label></th>
+        <td>
+            <props:textProperty name="${cons.profileInstanceLimit}" className="settings"/>
+            <span id="error_${cons.profileInstanceLimit}" class="error"></span>
+            <span class="smallNote">Maximum number of instances that can be started. Use blank to have no limit</span>
+        </td>
+    </tr>
+
 </table>
 
 <h2 class="noBorder section-header">Agent images</h2>

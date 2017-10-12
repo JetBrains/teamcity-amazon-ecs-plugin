@@ -15,6 +15,7 @@
 <jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
 <jsp:useBean id="taskDefChooserUrl" scope="request" type="java.lang.String" />
 <jsp:useBean id="clusterChooserUrl" scope="request" type="java.lang.String" />
+<jsp:useBean id="deleteImageUrl" class="java.lang.String" scope="request"/>
 
 <script type="text/javascript">
     BS.LoadStyleSheetDynamically("<c:url value='${teamcityPluginResourcesPath}ecsSettings.css'/>");
@@ -146,6 +147,17 @@
     </div>
 </bs:dialog>
 
+<bs:dialog dialogId="EcsDeleteImageDialog" title="Delete Amazon ECS Cloud Image" closeCommand="BS.Ecs.DeleteImageDialog.close()"
+           dialogClass="EcsDeleteImageDialog" titleId="EcsDeleteImageDialogTitle">
+
+    <div id="ecsDeleteImageDialogBody"></div>
+
+    <div class="popupSaveButtonsBlock">
+        <forms:submit label="Delete" type="button" id="ecsDeleteImageButton"/>
+        <forms:button title="Cancel" id="ecsCancelDeleteImageButton">Cancel</forms:button>
+    </div>
+</bs:dialog>
+
 <script type="text/javascript">
     $j.ajax({
         url: "<c:url value="${teamcityPluginResourcesPath}ecsSettings.js"/>",
@@ -153,6 +165,7 @@
         cache: true,
         success: function () {
             BS.Ecs.ProfileSettingsForm.testConnectionUrl = '<c:url value="${testConnectionUrl}"/>';
+            BS.Ecs.DeleteImageDialog.url = '<c:url value="${deleteImageUrl}"/>';
             BS.Ecs.ProfileSettingsForm.initialize();
         }
     });

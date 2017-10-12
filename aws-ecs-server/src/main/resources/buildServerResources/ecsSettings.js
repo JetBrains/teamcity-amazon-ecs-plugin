@@ -42,6 +42,9 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$addImageButton = $j('#ecsAddImageButton');
         this.$cancelAddImageButton = $j('#ecsCancelAddImageButton');
 
+        this.$deleteImageButton = $j('#ecsDeleteImageButton');
+        this.$cancelDeleteImageButton = $j('#ecsCancelDeleteImageButton');
+
         this.$taskDefinition = $j('#taskDefinition');
         this.$agentNamePrefix = $j('#agentNamePrefix');
         this.$taskGroup = $j('#taskGroup');
@@ -79,15 +82,11 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$cancelAddImageButton.on('click', this._cancelDialogClickHandler.bind(this));
 
         this.$imagesTable.on('click', this.selectors.rmImageLink, function () {
-            var $this = $j(this),
-                id = $this.data('image-id'),
-                imageName = self.imagesData[id].taskDefinition;
-
-            if (confirm('Are you sure you want to remove the image "' + imageName + '"?')) {
-                self.removeImage($this);
-            }
+            self.showDeleteImageDialog($j(this));
             return false;
         });
+        this.$deleteImageButton.on('click', this._submitDeleteImageDialogClickHandler.bind(this));
+        this.$cancelDeleteImageButton.on('click', this._cancelDeleteImageDialogClickHandler.bind(this));
 
         var editDelegates = this.selectors.imagesTableRow + ' .highlight, ' + this.selectors.editImageLink;
         var that = this;
@@ -339,10 +338,10 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this._renderImagesTable();
     },
 
-    removeImage: function ($elem) {
-        delete this.imagesData[$elem.data('image-id')];
+    removeImage: function (imageId) {
+        delete this.imagesData[imageId];
         this._imagesDataLength -= 1;
-        $elem.parents(this.selectors.imagesTableRow).remove();
+        this.$imagesTable.find('tr[data-image-id=\'' + imageId + '\']').remove();
         this.saveImagesData();
         this._toggleImagesTable();
     },
@@ -375,6 +374,39 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
                     BS.TestConnectionDialog.show(true, "", null);
                 }
             }.bind(this)
+        });
+    },
+
+    showDeleteImageDialog: function ($elem) {
+        var imageId = $elem.parents(this.selectors.imagesTableRow).data('image-id');
+
+        BS.ajaxUpdater($("ecsDeleteImageDialogBody"), BS.Ecs.DeleteImageDialog.url + window.location.search, {
+            method: 'get',
+            parameters : {
+                imageId : imageId
+            },
+            onComplete: function() {
+                BS.Ecs.DeleteImageDialog.show(imageId);
+            }
+        });
+    },
+
+    _cancelDeleteImageDialogClickHandler: function () {
+        BS.Ecs.DeleteImageDialog.close();
+        return false;
+    },
+
+    _submitDeleteImageDialogClickHandler: function() {
+        var imageId = BS.Ecs.DeleteImageDialog.currentImageId;
+        BS.ajaxRequest(BS.Ecs.DeleteImageDialog.url + window.location.search, {
+            method: 'post',
+            parameters : {
+                imageId : imageId
+            },
+            onComplete: function() {
+                BS.Ecs.ProfileSettingsForm.removeImage(imageId);
+                BS.Ecs.DeleteImageDialog.close();
+            }
         });
     }
 });
@@ -426,3 +458,17 @@ if(!BS.Ecs.ClusterChooser) {
         this.hidePopup();
     };
 }
+
+if(!BS.Ecs.DeleteImageDialog) BS.Ecs.DeleteImageDialog = OO.extend(BS.AbstractModalDialog, {
+    url: '',
+    currentImageId: '',
+
+    getContainer: function() {
+        return $('EcsDeleteImageDialog');
+    },
+
+    show: function (imageId) {
+        BS.Ecs.DeleteImageDialog.currentImageId = imageId;
+        BS.Ecs.DeleteImageDialog.showCentered();
+    }
+});

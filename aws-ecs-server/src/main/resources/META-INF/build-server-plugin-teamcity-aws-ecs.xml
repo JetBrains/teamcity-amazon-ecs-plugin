@@ -5,4 +5,5 @@
     <bean class="jetbrains.buildServer.clouds.ecs.web.EcsProfileEditController"/>
     <bean class="jetbrains.buildServer.clouds.ecs.web.EcsClusterChooserController"/>
     <bean class="jetbrains.buildServer.clouds.ecs.web.EcsTaskDefinitionChooserController"/>
+    <bean class="jetbrains.buildServer.clouds.ecs.web.EcsDeleteImageDialogController"/>
 </beans>

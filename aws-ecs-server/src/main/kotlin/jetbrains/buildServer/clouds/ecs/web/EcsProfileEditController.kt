@@ -26,7 +26,8 @@ class EcsProfileEditController(val pluginDescriptor: PluginDescriptor,
                                val agentPoolManager: AgentPoolManager,
                                web: WebControllerManager,
                                private val taskDefsController: EcsTaskDefinitionChooserController,
-                               private val clustersController: EcsClusterChooserController) : BaseFormXmlController() {
+                               private val clustersController: EcsClusterChooserController,
+                               private val deleteImageDialogController: EcsDeleteImageDialogController) : BaseFormXmlController() {
     private val LOG = Logger.getInstance(EcsProfileEditController::class.java.getName())
     private val url = pluginDescriptor.getPluginResourcesPath(EDIT_ECS_HTML)
 
@@ -67,6 +68,7 @@ class EcsProfileEditController(val pluginDescriptor: PluginDescriptor,
         modelAndView.model.put("agentPools", pools)
         modelAndView.model.put("taskDefChooserUrl", taskDefsController.url)
         modelAndView.model.put("clusterChooserUrl", clustersController.url)
+        modelAndView.model.put("deleteImageUrl", deleteImageDialogController.url)
         modelAndView.model.put("testConnectionUrl", url + "?testConnection=true")
         return modelAndView
     }

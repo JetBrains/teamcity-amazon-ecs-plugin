@@ -44,6 +44,7 @@ dependencies {
     compile 'jetbrains.buildServer.util:amazon-util:11'
     provided "org.jetbrains.teamcity:cloud-interface:$teamcityVersion"
     provided "org.jetbrains.teamcity:cloud-shared:$teamcityVersion"
+    provided "org.jetbrains.teamcity:cloud-server-api:$teamcityVersion"
     provided "org.jetbrains.teamcity:server-web-api:$teamcityVersion"
     provided "org.jetbrains.teamcity.internal:server:$teamcityVersion"
 }

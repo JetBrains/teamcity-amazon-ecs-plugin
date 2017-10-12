@@ -23,6 +23,20 @@ Configure Amazon ECS [Cloud Profile](https://confluence.jetbrains.com/display/TC
 
 The plugin supports Amazon ECS cluster images to start new tasks with a TeamCity build agent running in one of the containers. The plugin supports the [official TeamCity Build Agent Docker image](https://hub.docker.com/r/jetbrains/teamcity-agent) out of the box. You can use your own image as well.
 
+## IAM Role
+
+Allow following actions to AIM role you use in cloud profile.
+- ecs:DescribeClusters
+- ecs:DescribeTaskDefinition
+- ecs:DescribeTasks
+- ecs:ListClusters
+- ecs:ListTaskDefinitions
+- ecs:ListTasks
+- ecs:RunTask
+- ecs:StopTask
+
+See [example policy file](https://github.com/JetBrains/teamcity-amazon-ecs-plugin/blob/master/example-iam-policy.yaml).
+
 ## License
 
 Apache 2.0
@@ -30,4 +44,3 @@ Apache 2.0
 ## Feedback
 
 Please feel free to post feedback in the repository [issues](https://github.com/ekoshkin/teamcity-amazon-ecs-plugin/issues).
-

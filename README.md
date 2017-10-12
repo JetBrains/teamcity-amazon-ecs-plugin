@@ -35,8 +35,6 @@ Allow following actions to AIM role you use in cloud profile.
 - ecs:RunTask
 - ecs:StopTask
 
-See [example policy file](https://github.com/JetBrains/teamcity-amazon-ecs-plugin/blob/master/example-iam-policy.yaml).
-
 ## License
 
 Apache 2.0

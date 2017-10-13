@@ -50,6 +50,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$taskGroup = $j('#taskGroup');
         this.$cluster = $j('#cluster');
         this.$maxInstances = $j('#maxInstances');
+        this.$agentPoolId = $j('#agent_pool_id');
 
         this.$imagesDataElem = $j('#' + 'source_images_json');
 
@@ -124,6 +125,12 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$maxInstances.on('change', function (e, value) {
             if(value !== undefined) this.$maxInstances.val(value);
             this._image['maxInstances'] = this.$maxInstances.val();
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
+
+        this.$agentPoolId.on('change', function (e, value) {
+            if(value !== undefined) this.$agentPoolId.val(value);
+            this._image['agent_pool_id'] = this.$agentPoolId.val();
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
     },
@@ -230,6 +237,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$taskGroup.trigger('change', image['taskGroup'] || '');
         this.selectCluster(image['cluster'] || '');
         this.$maxInstances.trigger('change', image['maxInstances'] || '');
+        this.$agentPoolId.trigger('change', image['agent_pool_id'] || '');
 
         BS.Ecs.ImageDialog.showCentered();
     },
@@ -242,6 +250,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$taskGroup.trigger('change', '');
         this.selectCluster('');
         this.$maxInstances.trigger('change', '');
+        this.$agentPoolId.trigger('change', '0');
     },
 
     validateOptions: function (options){

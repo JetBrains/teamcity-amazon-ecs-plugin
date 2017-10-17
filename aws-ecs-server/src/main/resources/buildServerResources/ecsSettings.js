@@ -23,6 +23,13 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         imagesTableRow: '.imagesTableRow'
     },
 
+    defaults: {
+        taskDefinition: '!SHOULD_NOT_BE_EMPTY!',
+        cluster: '<Default>',
+        taskGroup: 'family:<Task Definition Name>',
+        maxInstances: '<Unlimited>'
+    },
+
     _errors: {
         badParam: 'Bad parameter',
         required: 'This field cannot be blank',
@@ -164,9 +171,10 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
 
     _renderImageRow: function (props, id) {
         var $row = this.templates.imagesTableRow.clone().attr('data-image-id', id);
+        var defaults = this.defaults;
 
         this._dataKeys.forEach(function (className) {
-            $row.find('.' + className).text(props[className] || '<Default>');
+            $row.find('.' + className).text(props[className] || defaults[className]);
         });
 
         $row.find(this.selectors.rmImageLink).data('image-id', id);

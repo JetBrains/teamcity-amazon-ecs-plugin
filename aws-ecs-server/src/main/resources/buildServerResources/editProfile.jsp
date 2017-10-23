@@ -79,12 +79,12 @@
         <tr>
             <th>Task Definition:&nbsp;<l:star/></th>
             <td>
-                <div>
+                <div style="white-space: nowrap">
                     <input type="text" id="${cons.taskDefinition}" value="" class="longField" data-id="${cons.taskDefinition}" data-err-id="${cons.taskDefinition}">
                     <i class="icon-magic" style="cursor:pointer;" title="Choose task definition" onclick="BS.Ecs.TaskDefChooser.showPopup(this, '<c:url value="${taskDefChooserUrl}"/>')"></i>
-                    <div class="smallNoteAttention">The family and revision (family:revision) or full Amazon Resource Name (ARN) of the task definition to run. If a revision is not specified, the latest ACTIVE revision is used.</div>
-                    <span class="error option-error option-error_${cons.taskDefinition}"></span>
                 </div>
+                <div class="smallNoteAttention">The family and revision (family:revision) or full Amazon Resource Name (ARN) of the task definition to run. If a revision is not specified, the latest ACTIVE revision is used.</div>
+                <span class="error option-error option-error_${cons.taskDefinition}"></span>
             </td>
         </tr>
         <tr class="advancedSetting">
@@ -97,12 +97,12 @@
         <tr class="advancedSetting">
             <th>Cluster:</th>
             <td>
-                <div>
+                <div style="white-space: nowrap">
                     <input type="text" id="${cons.cluster}" value="" class="longField" data-id="${cons.cluster}" data-err-id="${cons.cluster}">
                     <i class="icon-magic" style="cursor:pointer;" title="Choose cluster" onclick="BS.Ecs.ClusterChooser.showPopup(this, '<c:url value="${clusterChooserUrl}"/>')"></i>
-                    <div class="smallNoteAttention">The short name or full Amazon Resource Name (ARN) of the cluster on which to run cloud agents. Leave blank to use the default cluster.</div>
-                    <span class="error option-error option-error_${cons.cluster}"></span>
                 </div>
+                <div class="smallNoteAttention">The short name or full Amazon Resource Name (ARN) of the cluster on which to run cloud agents. Leave blank to use the default cluster.</div>
+                <span class="error option-error option-error_${cons.cluster}"></span>
             </td>
         </tr>
         <tr class="advancedSetting">

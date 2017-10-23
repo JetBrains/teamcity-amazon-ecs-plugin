@@ -2,10 +2,6 @@ plugins{
     id 'com.github.rodm.teamcity-common' version '1.0'
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
@@ -14,11 +10,13 @@ teamcity {
     version = teamcityVersion
 }
 
-apply plugin: 'idea'
-apply plugin: 'kotlin'
-
 compileKotlin {
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "1.6"
     }
+}
+
+tasks.withType(JavaCompile) {
+    sourceCompatibility = "1.6"
+    targetCompatibility = "1.6"
 }

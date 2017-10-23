@@ -4,7 +4,6 @@ plugins {
 
 repositories {
     maven { url "http://jcenter.bintray.com" }
-    mavenCentral()
 }
 
 dependencyManagement {
@@ -63,7 +62,6 @@ compileKotlin {
     }
 }
 
-apply plugin: 'kotlin'
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"

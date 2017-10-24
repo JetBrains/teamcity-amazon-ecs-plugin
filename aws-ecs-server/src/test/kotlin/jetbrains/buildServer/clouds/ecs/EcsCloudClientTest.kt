@@ -3,6 +3,7 @@ package jetbrains.buildServer.clouds.ecs
 import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.clouds.CloudClientParameters
 import jetbrains.buildServer.clouds.CloudImage
+import jetbrains.buildServer.clouds.InstanceStatus
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import org.jmock.Expectations
 import org.jmock.Mockery
@@ -18,7 +19,11 @@ import org.testng.annotations.Test
 class EcsCloudClientTest : BaseTestCase() {
     private lateinit var m:Mockery
     private lateinit var api:EcsApiConnector
-    private lateinit var cache:EcsDataCache
+    private val cache:EcsDataCache = object: EcsDataCache{
+        override fun getInstanceStatus(taskArn: String, resolver: () -> InstanceStatus): InstanceStatus {
+            return resolver.invoke()
+        }
+    }
 
     @BeforeMethod
     @Throws(Exception::class)

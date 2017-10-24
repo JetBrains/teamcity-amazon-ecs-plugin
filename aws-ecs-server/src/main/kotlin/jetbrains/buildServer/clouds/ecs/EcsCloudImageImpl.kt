@@ -6,7 +6,7 @@ import jetbrains.buildServer.clouds.CloudInstance
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import java.util.concurrent.ConcurrentHashMap
 
-class EcsCloudImageImpl(private val imageData: EcsCloudImageData, private val apiConnector: EcsApiConnector) : EcsCloudImage {
+class EcsCloudImageImpl(private val imageData: EcsCloudImageData, private val apiConnector: EcsApiConnector, private val cache: EcsDataCache) : EcsCloudImage {
     private val LOG = Logger.getInstance(EcsCloudImageImpl::class.java.getName())
 
     private val myIdToInstanceMap = ConcurrentHashMap<String, EcsCloudInstance>()
@@ -62,7 +62,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData, private val ap
                 if(instanceId == null){
                     LOG.warn("Can't resolve cloud instance id of ecs task ${task.arn}")
                 } else {
-                    myIdToInstanceMap.put(instanceId, EcsCloudInstanceImpl(instanceId, this, task, apiConnector))
+                    myIdToInstanceMap.put(instanceId, CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, task, apiConnector), cache))
                 }
             }
             myCurrentError = null

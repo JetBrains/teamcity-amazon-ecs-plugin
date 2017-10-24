@@ -12,7 +12,8 @@ import kotlin.collections.HashMap
 
 class EcsCloudClient(images: List<EcsCloudImage>,
                      val apiConnector: EcsApiConnector,
-                     val ecsClientParams: EcsCloudClientParameters,
+                     private val cache: EcsDataCache,
+                     private val ecsClientParams: EcsCloudClientParameters,
                      private val serverUuid: String,
                      private val cloudProfileId: String) : CloudClientEx {
     private val LOG = Logger.getInstance(EcsCloudClient::class.java.getName())
@@ -71,7 +72,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
             additionalEnvironment.put(AGENT_NAME_ECS_ENV, ecsImage.generateAgentName(instanceId))
 
             val tasks = apiConnector.runTask(taskDefinition, ecsImage.cluster, ecsImage.taskGroup, additionalEnvironment, startedByTeamCity(serverUuid))
-            val newInstance = EcsCloudInstanceImpl(instanceId, ecsImage, tasks[0], apiConnector)
+            val newInstance = CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, ecsImage, tasks[0], apiConnector), cache)
             ecsImage.addInstance(newInstance)
             myCurrentError = null
             myCurrentlyRunningInstancesCount++

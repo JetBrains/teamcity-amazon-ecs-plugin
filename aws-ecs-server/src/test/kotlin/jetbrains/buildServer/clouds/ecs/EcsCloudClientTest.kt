@@ -18,6 +18,7 @@ import org.testng.annotations.Test
 class EcsCloudClientTest : BaseTestCase() {
     private lateinit var m:Mockery
     private lateinit var api:EcsApiConnector
+    private lateinit var cache:EcsDataCache
 
     @BeforeMethod
     @Throws(Exception::class)
@@ -43,7 +44,7 @@ class EcsCloudClientTest : BaseTestCase() {
     }
 
     private fun createClient(serverUuid: String, profileId: String, images: List<EcsCloudImage>, cloudClientParameters: CloudClientParameters): EcsCloudClient {
-        return EcsCloudClient(images, api, EcsCloudClientParametersImpl(cloudClientParameters), serverUuid, profileId)
+        return EcsCloudClient(images, api, cache, EcsCloudClientParametersImpl(cloudClientParameters), serverUuid, profileId)
     }
 
     @Test

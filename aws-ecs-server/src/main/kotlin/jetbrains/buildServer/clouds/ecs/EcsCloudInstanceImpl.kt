@@ -13,6 +13,9 @@ import java.util.*
 class EcsCloudInstanceImpl(private val instanceId: String, val cloudImage: EcsCloudImage, val ecsTask: EcsTask, val apiConnector: EcsApiConnector) : EcsCloudInstance {
     private var myCurrentError: CloudErrorInfo? = null
 
+    override val taskArn: String
+        get() = ecsTask.arn
+
     override fun getStatus(): InstanceStatus {
         val task: EcsTask?
         try{

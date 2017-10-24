@@ -2,6 +2,8 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans default-autowire="constructor">
     <bean class="jetbrains.buildServer.clouds.ecs.EcsCloudClientFactory"/>
+    <bean class="jetbrains.buildServer.clouds.ecs.EcsDataCacheImpl"/>
+
     <bean class="jetbrains.buildServer.clouds.ecs.web.EcsProfileEditController"/>
     <bean class="jetbrains.buildServer.clouds.ecs.web.EcsClusterChooserController"/>
     <bean class="jetbrains.buildServer.clouds.ecs.web.EcsTaskDefinitionChooserController"/>

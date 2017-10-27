@@ -37,7 +37,7 @@
     <tr>
         <th><label for="${cons.profileInstanceLimit}">Maximum instances count:</label></th>
         <td>
-            <props:textProperty name="${cons.profileInstanceLimit}" className="settings"/>
+            <props:textProperty name="${cons.profileInstanceLimit}" className="settings longField"/>
             <span id="error_${cons.profileInstanceLimit}" class="error"></span>
             <span class="smallNote">Maximum number of instances that can be started. Use blank to have no limit</span>
         </td>

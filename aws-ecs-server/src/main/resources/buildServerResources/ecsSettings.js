@@ -33,7 +33,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
     _errors: {
         badParam: 'Bad parameter',
         required: 'This field cannot be blank',
-        notSelected: 'Something should be seleted',
+        notSelected: 'Something should be selected',
         nonNegative: 'Must be non-negative number'
     },
 

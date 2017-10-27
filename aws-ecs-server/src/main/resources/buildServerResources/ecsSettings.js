@@ -458,7 +458,8 @@ if(!BS.Ecs.TaskDefChooser){
     BS.Ecs.TaskDefChooser.showPopup = function(nearestElement, dataLoadUrl){
         this.showPopupNearElement(nearestElement, {
             parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
-            url: dataLoadUrl
+            url: dataLoadUrl,
+            shift:{x:15,y:15}
         });
     };
 
@@ -479,7 +480,8 @@ if(!BS.Ecs.ClusterChooser) {
     BS.Ecs.ClusterChooser.showPopup = function(nearestElement, dataLoadUrl) {
         this.showPopupNearElement(nearestElement, {
             parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
-            url: dataLoadUrl
+            url: dataLoadUrl,
+            shift:{x:15,y:15}
         });
     };
 

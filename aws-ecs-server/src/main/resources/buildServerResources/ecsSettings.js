@@ -63,12 +63,11 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
 
         var self = this;
         var rawImagesData = this.$imagesDataElem.val() || '[]';
-        this._lastImageId = this._imagesDataLength = 0;
+        this._imagesDataLength = 0;
         try {
             var imagesData = JSON.parse(rawImagesData);
             this.imagesData = imagesData.reduce(function (accumulator, imageDataStr) {
-                accumulator[self._lastImageId++] = imageDataStr;
-                self._imagesDataLength++;
+                accumulator[self._imagesDataLength++] = imageDataStr;
                 return accumulator;
             }, {});
         } catch (e) {
@@ -345,7 +344,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
     },
 
     addImage: function () {
-        var newImageId = this._lastImageId++,
+        var newImageId = this.generateNewImageId(),
             newImage = this._image;
         newImage['source-id'] = newImageId;
         this._renderImageRow(newImage, newImageId);
@@ -353,6 +352,12 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this._imagesDataLength += 1;
         this.saveImagesData();
         this._toggleImagesTable();
+    },
+
+    generateNewImageId: function () {
+        return Math.max.apply(Math, $j.map(this.imagesData, function callback(currentValue) {
+            return currentValue['source-id'];
+        })) + 1;
     },
 
     editImage: function (id) {

@@ -33,7 +33,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
     _errors: {
         badParam: 'Bad parameter',
         required: 'This field cannot be blank',
-        notSeleted: 'Something should be seleted',
+        notSelected: 'Something should be seleted',
         nonNegative: 'Must be non-negative number'
     },
 
@@ -277,6 +277,14 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
                 var maxInstances = this._image['maxInstances'];
                 if (maxInstances && (!$j.isNumeric(maxInstances) || maxInstances < 0 )) {
                     this.addOptionError('nonNegative', 'maxInstances');
+                    isValid = false;
+                }
+            }.bind(this),
+
+            agent_pool_id : function () {
+                var agentPoolId = this._image['agent_pool_id'];
+                if (!agentPoolId || agentPoolId === '' || agentPoolId === 'undefined') {
+                    this.addOptionError('notSelected', 'agent_pool_id');
                     isValid = false;
                 }
             }.bind(this)

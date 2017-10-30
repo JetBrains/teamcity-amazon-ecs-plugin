@@ -52,9 +52,9 @@
         <table id="ecsImagesTable" class="settings imagesTable hidden">
             <tbody>
             <tr>
-                <th class="name">Task Definition</th>
+                <th class="name">Task definition</th>
                 <th class="name">Cluster</th>
-                <th class="name">Task Group</th>
+                <th class="name">Task group</th>
                 <th class="name">Max # of instances</th>
                 <th class="name" colspan="2"></th>
             </tr>
@@ -77,7 +77,7 @@
            dialogClass="EcsImageDialog" titleId="EcsImageDialogTitle">
     <table class="runnerFormTable paramsTable">
         <tr>
-            <th>Task Definition:&nbsp;<l:star/></th>
+            <th>Task definition:&nbsp;<l:star/></th>
             <td>
                 <div style="white-space: nowrap">
                     <input type="text" id="${cons.taskDefinition}" value="" class="longField" data-id="${cons.taskDefinition}" data-err-id="${cons.taskDefinition}">
@@ -106,7 +106,7 @@
             </td>
         </tr>
         <tr class="advancedSetting">
-            <th>Task Group:</th>
+            <th>Task group:</th>
             <td>
                 <div>
                     <input type="text" id="${cons.taskGroup}" value="" class="longField" data-id="${cons.taskGroup}" data-err-id="${cons.taskGroup}"/>

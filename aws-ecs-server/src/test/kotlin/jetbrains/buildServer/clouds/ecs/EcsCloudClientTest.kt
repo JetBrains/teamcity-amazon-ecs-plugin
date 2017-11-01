@@ -19,7 +19,6 @@ import org.testng.annotations.Test
 class EcsCloudClientTest : BaseTestCase() {
     private lateinit var m:Mockery
     private lateinit var api:EcsApiConnector
-    private lateinit var clusterMonitor:EcsClusterMonitor
 
     private val cache:EcsDataCache = object: EcsDataCache{
         override fun getInstanceStatus(taskArn: String, resolver: () -> InstanceStatus): InstanceStatus {
@@ -33,12 +32,6 @@ class EcsCloudClientTest : BaseTestCase() {
         super.setUp()
         m = Mockery()
         api = m.mock(EcsApiConnector::class.java)
-        clusterMonitor = m.mock(EcsClusterMonitor::class.java)
-        m.checking(object : Expectations() {
-            init {
-                allowing(clusterMonitor).clusterHasAvailableResources(); will(returnValue(true))
-            }
-        })
     }
 
     @AfterMethod
@@ -57,7 +50,7 @@ class EcsCloudClientTest : BaseTestCase() {
     }
 
     private fun createClient(serverUuid: String, profileId: String, images: List<EcsCloudImage>, cloudClientParameters: CloudClientParameters): EcsCloudClient {
-        return EcsCloudClient(images, api, cache, EcsCloudClientParametersImpl(cloudClientParameters), serverUuid, profileId, clusterMonitor)
+        return EcsCloudClient(images, api, cache, EcsCloudClientParametersImpl(cloudClientParameters), serverUuid, profileId)
     }
 
     @Test

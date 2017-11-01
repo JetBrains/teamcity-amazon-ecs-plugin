@@ -62,7 +62,7 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
             image.populateInstances(startedBy)
             image
         }
-        return EcsCloudClient(images, apiConnector, cache, ecsParams, serverSettings.getServerUUID()!!, state.getProfileId(), EcsClusterMonitorImpl(ecsParams, apiConnector))
+        return EcsCloudClient(images, apiConnector, cache, ecsParams, serverSettings.getServerUUID()!!, state.getProfileId())
     }
 
     override fun getInitialParameterValues(): MutableMap<String, String> {

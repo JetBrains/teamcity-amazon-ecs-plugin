@@ -7,10 +7,14 @@ interface EcsCloudImage : CloudImage {
     val cluster: String?
     val taskGroup: String?
     val instanceLimit: Int
+    val memoryReservalionLimit: Int
+
     val instanceCount: Int
 
     fun addInstance(instance: EcsCloudInstance)
     fun deleteInstance(instance: EcsCloudInstance)
     fun populateInstances(startedBy:String)
     fun generateAgentName(instanceId: String): String
+
+    fun canStartNewInstance(): Boolean
 }

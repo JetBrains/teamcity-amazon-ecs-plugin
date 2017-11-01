@@ -6,7 +6,14 @@ import jetbrains.buildServer.clouds.CloudInstance
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import java.util.concurrent.ConcurrentHashMap
 
-class EcsCloudImageImpl(private val imageData: EcsCloudImageData, private val apiConnector: EcsApiConnector, private val cache: EcsDataCache) : EcsCloudImage {
+class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
+                        private val apiConnector: EcsApiConnector,
+                        private val cache: EcsDataCache) : EcsCloudImage {
+    override fun canStartNewInstance(): Boolean {
+        if(instanceLimit > 0 && instanceCount >= instanceLimit) return false
+        return memoryReservalionLimit <= 0 || apiConnector.getMemoryReservationMax(cluster) < memoryReservalionLimit
+    }
+
     private val LOG = Logger.getInstance(EcsCloudImageImpl::class.java.getName())
 
     private val myIdToInstanceMap = ConcurrentHashMap<String, EcsCloudInstance>()
@@ -14,6 +21,9 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData, private val ap
 
     override val instanceLimit: Int
         get() = imageData.instanceLimit
+
+    override val memoryReservalionLimit: Int
+        get() = imageData.memoryReservalionLimit
 
     override val instanceCount: Int
         get() = myIdToInstanceMap.size

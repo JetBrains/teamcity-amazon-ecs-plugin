@@ -129,4 +129,8 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
             return TestConnectionResult(ex.localizedMessage, false)
         }
     }
+
+    override fun getMemoryReservationMax(cluster: String?): Int {
+        return 0
+    }
 }

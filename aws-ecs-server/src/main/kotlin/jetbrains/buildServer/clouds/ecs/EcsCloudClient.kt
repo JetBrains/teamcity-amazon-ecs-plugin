@@ -15,8 +15,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
                      private val cache: EcsDataCache,
                      private val ecsClientParams: EcsCloudClientParameters,
                      private val serverUuid: String,
-                     private val cloudProfileId: String,
-                     private val clusterMonitor: EcsClusterMonitor) : CloudClientEx {
+                     private val cloudProfileId: String) : CloudClientEx {
     private val LOG = Logger.getInstance(EcsCloudClient::class.java.getName())
 
     private var myCurrentlyRunningInstancesCount: Int = 0
@@ -53,10 +52,9 @@ class EcsCloudClient(images: List<EcsCloudImage>,
         if (ecsClientParams.instanceLimit in 1..myCurrentlyRunningInstancesCount)
             return false
 
-        val imageLimit = kubeCloudImage.instanceLimit
-        if(imageLimit > 0 && kubeCloudImage.instanceCount >= imageLimit) return false
+        if(!kubeCloudImage.canStartNewInstance()) return false;
 
-        return !errorsLimitExausted() && clusterMonitor.clusterHasAvailableResources()
+        return !errorsLimitExausted()
     }
 
     private fun errorsLimitExausted(): Boolean {

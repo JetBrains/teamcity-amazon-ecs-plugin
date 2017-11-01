@@ -12,11 +12,19 @@ class EcsCloudImageData(private val rawImageData: CloudImageParameters) {
     val taskGroup: String? = rawImageData.getParameter(TASK_GROUP_PARAM)
     val cluster: String? = rawImageData.getParameter(CLUSTER_PARAM)
     val taskDefinition: String = rawImageData.getParameter(TASK_DEFINITION_PARAM)!!
+
     val instanceLimit: Int
         get() {
             val parameter = rawImageData.getParameter(IMAGE_INSTANCE_LIMIT_PARAM)
             return if (StringUtil.isEmpty(parameter)) -1 else Integer.valueOf(parameter)
         }
+
+    val memoryReservalionLimit: Int
+        get() {
+            val parameter = rawImageData.getParameter(MEMORY_RESERVATION_LIMIT_PARAM)
+            return if (StringUtil.isEmpty(parameter)) -1 else Integer.valueOf(parameter)
+        }
+
     val agentNamePrefix: String
         get() {
             val prefix = rawImageData.getParameter(AGENT_NAME_PREFIX)

@@ -34,7 +34,7 @@
         </td>
     </tr>
 
-    <tr>
+    <tr class="advancedSetting">
         <th><label for="${cons.profileInstanceLimit}">Maximum instances count:</label></th>
         <td>
             <props:textProperty name="${cons.profileInstanceLimit}" className="settings longField"/>
@@ -56,6 +56,7 @@
                 <th class="name">Cluster</th>
                 <th class="name">Task group</th>
                 <th class="name">Max # of instances</th>
+                <th class="name">Max cluster memory reservation (%)</th>
                 <th class="name" colspan="2"></th>
             </tr>
             </tbody>
@@ -125,6 +126,14 @@
             </td>
         </tr>
         <tr class="advancedSetting">
+            <th><label for="${cons.memoryReservationLimit}">Max cluster memory reservation (%):</label></th>
+            <td>
+                <input type="text" id="${cons.memoryReservationLimit}" value="" class="longField" data-id="${cons.memoryReservationLimit}" data-err-id="${cons.memoryReservationLimit}"/>
+                <span class="smallNote">Maximum allowed cluster memory reservation percentile. Will deny to start new cloud instances when limit is being reached. Use blank to have no limit.</span>
+                <span class="error option-error option-error_${cons.memoryReservationLimit}"></span>
+            </td>
+        </tr>
+        <tr class="advancedSetting">
             <th><label for="${cons.agentPoolIdField}">Agent pool:</label></th>
             <td>
                 <select id="${cons.agentPoolIdField}" data-id="${cons.agentPoolIdField}" class="longField configParam">
@@ -138,7 +147,7 @@
         </tr>
     </table>
 
-    <admin:showHideAdvancedOpts containerId="EcsImageDialog" optsKey="ecsCloudSettings"/>
+    <admin:showHideAdvancedOpts containerId="EcsImageDialog" optsKey="ecsImageSettings"/>
     <admin:highlightChangedFields containerId="EcsImageDialog"/>
 
     <div class="popupSaveButtonsBlock">

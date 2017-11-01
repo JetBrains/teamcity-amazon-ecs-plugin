@@ -4,6 +4,7 @@ import com.intellij.openapi.diagnostic.Logger
 import jetbrains.buildServer.clouds.CloudErrorInfo
 import jetbrains.buildServer.clouds.CloudInstance
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
+import jetbrains.buildServer.serverSide.TeamCityProperties
 import java.util.concurrent.ConcurrentHashMap
 
 class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
@@ -11,7 +12,8 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                         private val cache: EcsDataCache) : EcsCloudImage {
     override fun canStartNewInstance(): Boolean {
         if(instanceLimit > 0 && instanceCount >= instanceLimit) return false
-        return memoryReservalionLimit <= 0 || apiConnector.getMemoryReservationMax(cluster) < memoryReservalionLimit
+        val monitoringPeriod = TeamCityProperties.getInteger("teamcity.ecs.cluster.monitoring.period", 60 * 5)
+        return memoryReservalionLimit <= 0 || apiConnector.getAverageMemoryReservation(cluster, monitoringPeriod) < memoryReservalionLimit
     }
 
     private val LOG = Logger.getInstance(EcsCloudImageImpl::class.java.getName())

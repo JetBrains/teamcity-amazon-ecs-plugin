@@ -22,4 +22,5 @@ class EcsParameterConstants{
     val maxInstances: String = IMAGE_INSTANCE_LIMIT_PARAM
     val agentPoolIdField: String = CloudImageParameters.AGENT_POOL_ID_FIELD
     val profileInstanceLimit: String = PROFILE_INSTANCE_LIMIT_PARAM
+    val memoryReservationLimit: String = MEMORY_RESERVATION_LIMIT_PARAM
 }

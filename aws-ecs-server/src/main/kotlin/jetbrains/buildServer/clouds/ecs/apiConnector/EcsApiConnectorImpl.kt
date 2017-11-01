@@ -3,21 +3,30 @@ package jetbrains.buildServer.clouds.ecs.apiConnector
 import com.amazonaws.ClientConfiguration
 import com.amazonaws.auth.AWSCredentials
 import com.amazonaws.auth.AWSCredentialsProvider
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
+import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder
+import com.amazonaws.services.cloudwatch.model.Dimension
+import com.amazonaws.services.cloudwatch.model.GetMetricStatisticsRequest
+import com.amazonaws.services.cloudwatch.model.Statistic
 import com.amazonaws.services.ecs.AmazonECS
 import com.amazonaws.services.ecs.AmazonECSClientBuilder
 import com.amazonaws.services.ecs.model.*
 import jetbrains.buildServer.version.ServerVersionHolder
+import java.util.*
+import java.util.concurrent.TimeUnit
+
 
 class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) : EcsApiConnector {
-    private val apiClient: AmazonECS
+    private val ecs: AmazonECS
+    private val cloudWatch: AmazonCloudWatch
 
     init {
-        val builder = AmazonECSClientBuilder
+        val ecsBuilder = AmazonECSClientBuilder
                 .standard()
                 .withClientConfiguration(ClientConfiguration().withUserAgentPrefix("JetBrains TeamCity " + ServerVersionHolder.getVersion().displayVersion))
                 .withRegion(awsRegion)
         if(awsCredentials != null){
-            builder.withCredentials(object: AWSCredentialsProvider{
+            ecsBuilder.withCredentials(object: AWSCredentialsProvider{
                 override fun getCredentials(): AWSCredentials {
                     return awsCredentials
                 }
@@ -27,7 +36,23 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
                 }
             })
         }
-        apiClient = builder.build()
+        ecs = ecsBuilder.build()
+
+        var cloudWatchBuilder = AmazonCloudWatchClientBuilder.standard()
+                .withClientConfiguration(ClientConfiguration().withUserAgentPrefix("JetBrains TeamCity " + ServerVersionHolder.getVersion().displayVersion))
+                .withRegion(awsRegion)
+        if(awsCredentials != null){
+            cloudWatchBuilder.withCredentials(object: AWSCredentialsProvider{
+                override fun getCredentials(): AWSCredentials {
+                    return awsCredentials
+                }
+
+                override fun refresh() {
+                    //no-op
+                }
+            })
+        }
+        cloudWatch = cloudWatchBuilder.build()
     }
 
     override fun runTask(taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, additionalEnvironment: Map<String, String>, startedBy: String?): List<EcsTask> {
@@ -44,7 +69,7 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
         if(cluster != null && !cluster.isEmpty()) request = request.withCluster(cluster)
         if(taskGroup != null && !taskGroup.isEmpty()) request = request.withGroup(taskGroup)
 
-        val runTaskResult = apiClient.runTask(request)
+        val runTaskResult = ecs.runTask(request)
         if (!runTaskResult.failures.isEmpty())
             throw EcsApiCallFailureException(runTaskResult.failures)
 
@@ -57,7 +82,7 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
         do{
             var request = ListTaskDefinitionsRequest()
             if(nextToken != null) request = request.withNextToken(nextToken)
-            val taskDefsResult = apiClient.listTaskDefinitions(request)
+            val taskDefsResult = ecs.listTaskDefinitions(request)
             taskDefArns = taskDefArns.plus(taskDefsResult.taskDefinitionArns)
             nextToken = taskDefsResult.nextToken
         }
@@ -66,11 +91,11 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
     }
 
     override fun describeTaskDefinition(taskDefinitionArn: String): EcsTaskDefinition? {
-        return apiClient.describeTaskDefinition(DescribeTaskDefinitionRequest().withTaskDefinition(taskDefinitionArn)).taskDefinition.wrap()
+        return ecs.describeTaskDefinition(DescribeTaskDefinitionRequest().withTaskDefinition(taskDefinitionArn)).taskDefinition.wrap()
     }
 
     override fun stopTask(task: String, cluster: String?, reason: String?) {
-        apiClient.stopTask(StopTaskRequest().withTask(task).withCluster(cluster))
+        ecs.stopTask(StopTaskRequest().withTask(task).withCluster(cluster))
     }
 
     override fun listTasks(cluster: String?, startedBy: String?): List<String> {
@@ -83,7 +108,7 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
 
             if(nextToken != null) listTasksRequest = listTasksRequest.withNextToken(nextToken)
 
-            val tasksResult = apiClient.listTasks(listTasksRequest)
+            val tasksResult = ecs.listTasks(listTasksRequest)
             taskArns = taskArns.plus(tasksResult.taskArns)
             nextToken = tasksResult.nextToken
         }
@@ -92,7 +117,7 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
     }
 
     override fun describeTask(taskArn: String, cluster: String?): EcsTask? {
-        val tasksResult = apiClient.describeTasks(DescribeTasksRequest().withTasks(taskArn).withCluster(cluster))
+        val tasksResult = ecs.describeTasks(DescribeTasksRequest().withTasks(taskArn).withCluster(cluster))
         if (!tasksResult.failures.isEmpty())
             throw EcsApiCallFailureException(tasksResult.failures)
 
@@ -105,7 +130,7 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
         do{
             var request = ListClustersRequest()
             if(nextToken != null) request = request.withNextToken(nextToken)
-            val tasksResult = apiClient.listClusters(request)
+            val tasksResult = ecs.listClusters(request)
             clusterArns = clusterArns.plus(tasksResult.clusterArns)
             nextToken = tasksResult.nextToken
         }
@@ -114,7 +139,7 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
     }
 
     override fun describeCluster(clusterArn: String): EcsCluster? {
-        val describeClustersResult = apiClient.describeClusters(DescribeClustersRequest().withClusters(clusterArn))
+        val describeClustersResult = ecs.describeClusters(DescribeClustersRequest().withClusters(clusterArn))
         if (!describeClustersResult.failures.isEmpty())
             throw EcsApiCallFailureException(describeClustersResult.failures)
 
@@ -123,14 +148,25 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
 
     override fun testConnection(): TestConnectionResult {
         try {
-            apiClient.listClusters()
+            ecs.listClusters()
             return TestConnectionResult("Connection successful", true)
         } catch (ex: Exception){
             return TestConnectionResult(ex.localizedMessage, false)
         }
     }
 
-    override fun getMemoryReservationMax(cluster: String?): Int {
-        return 0
+    override fun getAverageMemoryReservation(cluster: String?, period:Int): Int {
+        val currentTimeMillis = System.currentTimeMillis()
+        val request = GetMetricStatisticsRequest()
+                .withMetricName("MemoryReservation")
+                .withNamespace("AWS/ECS")
+                .withDimensions(Dimension().withName("ClusterName").withValue(cluster))
+                .withStatistics(Statistic.Average)
+                .withStartTime(Date(currentTimeMillis - TimeUnit.SECONDS.toMillis(period.toLong())))
+                .withEndTime(Date(currentTimeMillis))
+                .withPeriod(period)
+
+        val response = cloudWatch.getMetricStatistics(request)
+        return response.datapoints[0].average.toInt()
     }
 }

@@ -21,10 +21,10 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
     private val myIdToInstanceMap = ConcurrentHashMap<String, EcsCloudInstance>()
     private var myCurrentError: CloudErrorInfo? = null
 
-    override val instanceLimit: Int
+    private val instanceLimit: Int
         get() = imageData.instanceLimit
 
-    override val memoryReservalionLimit: Int
+    private val memoryReservalionLimit: Int
         get() = imageData.memoryReservalionLimit
 
     override val instanceCount: Int

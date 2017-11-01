@@ -6,8 +6,6 @@ interface EcsCloudImage : CloudImage {
     val taskDefinition: String
     val cluster: String?
     val taskGroup: String?
-    val instanceLimit: Int
-    val memoryReservalionLimit: Int
 
     val instanceCount: Int
 

@@ -73,10 +73,10 @@ class EcsCloudClientTest : BaseTestCase() {
         val image = m.mock(EcsCloudImage::class.java)
         m.checking(object : Expectations() {
             init {
-                allowing(image).name; will(Expectations.returnValue("image-1-name"))
-                allowing(image).id; will(Expectations.returnValue("image-1-id"))
-                allowing(image).instanceCount; will(Expectations.returnValue(0))
-                allowing(image).instanceLimit; will(Expectations.returnValue(0))
+                allowing(image).name; will(returnValue("image-1-name"))
+                allowing(image).id; will(returnValue("image-1-id"))
+                allowing(image).instanceCount; will(returnValue(0))
+                allowing(image).canStartNewInstance(); will(returnValue(true))
             }
         })
         val images = listOf(image)
@@ -92,7 +92,7 @@ class EcsCloudClientTest : BaseTestCase() {
             init {
                 allowing(image).id; will(Expectations.returnValue("image-1-id"))
                 allowing(image).instanceCount; will(Expectations.returnValue(1))
-                allowing(image).instanceLimit; will(Expectations.returnValue(2))
+                allowing(image).canStartNewInstance(); will(returnValue(true))
             }
         })
         val images = listOf(image)
@@ -104,14 +104,14 @@ class EcsCloudClientTest : BaseTestCase() {
 
     @Test
     @Throws(Exception::class)
-    fun testCanStartNewInstance_ImageLimit() {
+    fun testCanStartNewInstance_ImageCanNotStartNewInstance() {
         val image = m.mock(EcsCloudImage::class.java)
         m.checking(object : Expectations() {
             init {
                 allowing(image).name; will(Expectations.returnValue("image-1-name"))
                 allowing(image).id; will(Expectations.returnValue("image-1-id"))
                 allowing(image).instanceCount; will(Expectations.returnValue(1))
-                allowing(image).instanceLimit; will(Expectations.returnValue(1))
+                allowing(image).canStartNewInstance(); will(returnValue(false))
             }
         })
         val images = listOf(image)

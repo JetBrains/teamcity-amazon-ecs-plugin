@@ -52,13 +52,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
         if (ecsClientParams.instanceLimit in 1..myCurrentlyRunningInstancesCount)
             return false
 
-        if(!kubeCloudImage.canStartNewInstance()) return false;
-
-        return !errorsLimitExausted()
-    }
-
-    private fun errorsLimitExausted(): Boolean {
-        return false
+        return kubeCloudImage.canStartNewInstance()
     }
 
     override fun startNewInstance(image: CloudImage, tag: CloudInstanceUserData): CloudInstance {

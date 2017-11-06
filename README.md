@@ -37,7 +37,7 @@ Allow following actions to AIM role you use in cloud profile.
 - ecs:ListTasks
 - ecs:RunTask
 - ecs:StopTask
-- (optional) cloudwatch:getMetrics
+- (optional) cloudwatch:GetMetricStatistics
 
 ## License
 

@@ -162,7 +162,7 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
                 .withNamespace("AWS/ECS")
                 .withDimensions(Dimension().withName("ClusterName").withValue(cluster))
                 .withStatistics(Statistic.Maximum)
-                .withStartTime(Date(currentTimeMillis - TimeUnit.MINUTES.toMillis(period.toLong())))
+                .withStartTime(Date(currentTimeMillis - TimeUnit.MINUTES.toMillis(period.toLong() * 2)))
                 .withEndTime(Date(currentTimeMillis))
                 .withPeriod(period * 60)
         val datapoints = cloudWatch.getMetricStatistics(request).datapoints

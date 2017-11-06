@@ -17,7 +17,7 @@ interface EcsApiConnector {
     fun describeCluster(clusterArn:String): EcsCluster?
     fun testConnection(): TestConnectionResult
 
-    fun getAverageMemoryReservation(cluster: String?, period: Int): Int
+    fun getMaxCPUReservation(cluster: String?, period: Int): Int
 }
 
 class TestConnectionResult(val message: String?, val success: Boolean) {

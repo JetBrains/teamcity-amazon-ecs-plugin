@@ -5,7 +5,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
 
     testConnectionUrl: '',
 
-    _dataKeys: [ 'taskDefinition', 'agentNamePrefix', 'cluster', 'taskGroup', 'maxInstances', 'memoryReservationLimit' ],
+    _dataKeys: [ 'taskDefinition', 'agentNamePrefix', 'cluster', 'taskGroup', 'maxInstances', 'cpuReservationLimit' ],
 
     templates: {
         imagesTableRow: $j('<tr class="imagesTableRow">\
@@ -13,7 +13,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
 <td class="cluster highlight"></td>\
 <td class="taskGroup highlight"></td>\
 <td class="maxInstances highlight"></td>\
-<td class="memoryReservationLimit highlight"></td>\
+<td class="cpuReservationLimit highlight"></td>\
 <td class="edit highlight"><a href="#" class="editVmImageLink">edit</a></td>\
 <td class="remove"><a href="#" class="removeVmImageLink">delete</a></td>\
         </tr>')},
@@ -29,7 +29,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         cluster: '<Default>',
         taskGroup: 'family:<Task Definition Name>',
         maxInstances: '<Unlimited>',
-        memoryReservationLimit: '<Unlimited>'
+        cpuReservationLimit: '<Unlimited>'
     },
 
     _errors: {
@@ -60,7 +60,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$taskGroup = $j('#taskGroup');
         this.$cluster = $j('#cluster');
         this.$maxInstances = $j('#maxInstances');
-        this.$memoryReservationLimit = $j('#memoryReservationLimit');
+        this.$cpuReservationLimit = $j('#cpuReservationLimit');
         this.$agentPoolId = $j('#agent_pool_id');
 
         this.$imagesDataElem = $j('#' + 'source_images_json');
@@ -138,9 +138,9 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
-        this.$memoryReservationLimit.on('change', function (e, value) {
-            if(value !== undefined) this.$memoryReservationLimit.val(value);
-            this._image['memoryReservationLimit'] = this.$memoryReservationLimit.val();
+        this.$cpuReservationLimit.on('change', function (e, value) {
+            if(value !== undefined) this.$cpuReservationLimit.val(value);
+            this._image['cpuReservationLimit'] = this.$cpuReservationLimit.val();
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
@@ -254,7 +254,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$taskGroup.trigger('change', image['taskGroup'] || '');
         this.selectCluster(image['cluster'] || '');
         this.$maxInstances.trigger('change', image['maxInstances'] || '');
-        this.$memoryReservationLimit.trigger('change', image['memoryReservationLimit'] || '');
+        this.$cpuReservationLimit.trigger('change', image['cpuReservationLimit'] || '');
         this.$agentPoolId.trigger('change', image['agent_pool_id'] || '');
 
         BS.Ecs.ImageDialog.showCentered();
@@ -268,7 +268,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$taskGroup.trigger('change', '');
         this.selectCluster('');
         this.$maxInstances.trigger('change', '');
-        this.$memoryReservationLimit.trigger('change', '');
+        this.$cpuReservationLimit.trigger('change', '');
         this.$agentPoolId.trigger('change', '0');
     },
 
@@ -292,10 +292,10 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
                 }
             }.bind(this),
 
-            memoryReservationLimit: function () {
-                var memoryReservationLimit = this._image['memoryReservationLimit'];
-                if (memoryReservationLimit && (!$j.isNumeric(memoryReservationLimit) || memoryReservationLimit < 0 || memoryReservationLimit > 100 )) {
-                    this.addOptionError('nonPercentile', 'memoryReservationLimit');
+            cpuReservationLimit: function () {
+                var cpuReservationLimit = this._image['cpuReservationLimit'];
+                if (cpuReservationLimit && (!$j.isNumeric(cpuReservationLimit) || cpuReservationLimit < 0 || cpuReservationLimit > 100 )) {
+                    this.addOptionError('nonPercentile', 'cpuReservationLimit');
                     isValid = false;
                 }
             }.bind(this),

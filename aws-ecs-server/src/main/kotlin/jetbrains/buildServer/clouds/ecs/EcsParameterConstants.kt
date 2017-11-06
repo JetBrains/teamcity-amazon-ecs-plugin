@@ -8,7 +8,7 @@ import jetbrains.buildServer.clouds.CloudImageParameters
 
 val PROFILE_INSTANCE_LIMIT_PARAM = "profileInstanceLimit"
 val IMAGE_INSTANCE_LIMIT_PARAM = "maxInstances"
-val MEMORY_RESERVATION_LIMIT_PARAM = "memoryReservationLimit"
+val CPU_RESERVATION_LIMIT_PARAM = "cpuReservationLimit"
 val TASK_DEFINITION_PARAM = "taskDefinition"
 val TASK_GROUP_PARAM = "taskGroup"
 val CLUSTER_PARAM = "cluster"
@@ -22,5 +22,5 @@ class EcsParameterConstants{
     val maxInstances: String = IMAGE_INSTANCE_LIMIT_PARAM
     val agentPoolIdField: String = CloudImageParameters.AGENT_POOL_ID_FIELD
     val profileInstanceLimit: String = PROFILE_INSTANCE_LIMIT_PARAM
-    val memoryReservationLimit: String = MEMORY_RESERVATION_LIMIT_PARAM
+    val cpuReservationLimit: String = CPU_RESERVATION_LIMIT_PARAM
 }

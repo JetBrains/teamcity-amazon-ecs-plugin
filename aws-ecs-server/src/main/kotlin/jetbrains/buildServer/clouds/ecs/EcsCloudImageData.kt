@@ -19,9 +19,9 @@ class EcsCloudImageData(private val rawImageData: CloudImageParameters) {
             return if (StringUtil.isEmpty(parameter)) -1 else Integer.valueOf(parameter)
         }
 
-    val memoryReservalionLimit: Int
+    val cpuReservalionLimit: Int
         get() {
-            val parameter = rawImageData.getParameter(MEMORY_RESERVATION_LIMIT_PARAM)
+            val parameter = rawImageData.getParameter(CPU_RESERVATION_LIMIT_PARAM)
             return if (StringUtil.isEmpty(parameter)) -1 else Integer.valueOf(parameter)
         }
 

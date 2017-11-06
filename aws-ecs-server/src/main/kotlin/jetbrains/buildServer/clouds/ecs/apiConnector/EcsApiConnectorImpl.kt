@@ -155,18 +155,18 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
         }
     }
 
-    override fun getAverageMemoryReservation(cluster: String?, period:Int): Int {
+    override fun getMaxCPUReservation(cluster: String?, period:Int): Int {
         val currentTimeMillis = System.currentTimeMillis()
         val request = GetMetricStatisticsRequest()
-                .withMetricName("MemoryReservation")
+                .withMetricName("CPUReservation")
                 .withNamespace("AWS/ECS")
                 .withDimensions(Dimension().withName("ClusterName").withValue(cluster))
-                .withStatistics(Statistic.Average)
-                .withStartTime(Date(currentTimeMillis - TimeUnit.SECONDS.toMillis(period.toLong())))
+                .withStatistics(Statistic.Maximum)
+                .withStartTime(Date(currentTimeMillis - TimeUnit.MINUTES.toMillis(period.toLong())))
                 .withEndTime(Date(currentTimeMillis))
-                .withPeriod(period)
-
-        val response = cloudWatch.getMetricStatistics(request)
-        return response.datapoints[0].average.toInt()
+                .withPeriod(period * 60)
+        val datapoints = cloudWatch.getMetricStatistics(request).datapoints
+        if(datapoints.isEmpty()) return -1
+        return datapoints[0].maximum.toInt()
     }
 }

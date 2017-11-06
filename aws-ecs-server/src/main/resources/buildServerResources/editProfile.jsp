@@ -56,7 +56,7 @@
                 <th class="name">Cluster</th>
                 <th class="name">Task group</th>
                 <th class="name">Max # of instances</th>
-                <th class="name">Max cluster memory reservation (%)</th>
+                <th class="name">Max cluster CPU reservation (%)</th>
                 <th class="name" colspan="2"></th>
             </tr>
             </tbody>
@@ -126,11 +126,11 @@
             </td>
         </tr>
         <tr class="advancedSetting">
-            <th><label for="${cons.memoryReservationLimit}">Max cluster memory reservation (%):</label></th>
+            <th><label for="${cons.cpuReservationLimit}">Max cluster CPU reservation (%):</label></th>
             <td>
-                <input type="text" id="${cons.memoryReservationLimit}" value="" class="longField" data-id="${cons.memoryReservationLimit}" data-err-id="${cons.memoryReservationLimit}"/>
-                <span class="smallNote">Maximum allowed cluster memory reservation percentile. Will deny to start new cloud instances when limit is being reached. Use blank to have no limit.</span>
-                <span class="error option-error option-error_${cons.memoryReservationLimit}"></span>
+                <input type="text" id="${cons.cpuReservationLimit}" value="" class="longField" data-id="${cons.cpuReservationLimit}" data-err-id="${cons.cpuReservationLimit}"/>
+                <span class="smallNote">Maximum allowed cluster CPU reservation percentile. Will deny to start new cloud instances when limit is being reached. Use blank to have no limit.</span>
+                <span class="error option-error option-error_${cons.cpuReservationLimit}"></span>
             </td>
         </tr>
         <tr class="advancedSetting">

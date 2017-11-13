@@ -12,7 +12,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                         private val cache: EcsDataCache,
                         private val serverUUID: String) : EcsCloudImage {
     override fun canStartNewInstance(): Boolean {
-        if(instanceLimit > 0 && instanceCount >= instanceLimit) return false
+        if(instanceLimit > 0 && runningInstanceCount >= instanceLimit) return false
         val monitoringPeriod = TeamCityProperties.getInteger(ECS_METRICS_MONITORING_PERIOD, 1)
         return cpuReservalionLimit <= 0 || apiConnector.getMaxCPUReservation(cluster, monitoringPeriod) < cpuReservalionLimit
     }
@@ -28,8 +28,8 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
     private val cpuReservalionLimit: Int
         get() = imageData.cpuReservalionLimit
 
-    override val instanceCount: Int
-        get() = myIdToInstanceMap.size
+    override val runningInstanceCount: Int
+        get() = myIdToInstanceMap.filterValues { instance -> instance.status.isStartingOrStarted }.size
 
     override val taskDefinition: String
         get() = imageData.taskDefinition

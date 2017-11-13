@@ -19,15 +19,11 @@ class EcsCloudClient(images: List<EcsCloudImage>,
                      private val cloudProfileId: String) : CloudClientEx {
     private val LOG = Logger.getInstance(EcsCloudClient::class.java.getName())
 
-    private var myCurrentlyRunningInstancesCount: Int = 0
     private var myCurrentError: CloudErrorInfo? = null
     private var myImageIdToImageMap: ConcurrentHashMap<String, EcsCloudImage> = ConcurrentHashMap(Maps.uniqueIndex(images, { it?.id }))
 
     init {
         updater.registerClient(this)
-        for (image in images) {
-            myCurrentlyRunningInstancesCount += image.instanceCount
-        }
     }
 
     override fun isInitialized(): Boolean {
@@ -52,7 +48,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
             return false
         }
 
-        if (ecsClientParams.instanceLimit in 1..myCurrentlyRunningInstancesCount)
+        if (ecsClientParams.instanceLimit in 1..images.sumBy { image.runningInstanceCount })
             return false
 
         return kubeCloudImage.canStartNewInstance()
@@ -77,7 +73,6 @@ class EcsCloudClient(images: List<EcsCloudImage>,
             val newInstance = CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, ecsImage, tasks[0], apiConnector), cache)
             ecsImage.populateInstances()
             myCurrentError = null
-            myCurrentlyRunningInstancesCount++
             return newInstance
         } catch (ex: Exception){
             LOG.debug("Failed to start cloud instance", ex)
@@ -89,7 +84,6 @@ class EcsCloudClient(images: List<EcsCloudImage>,
     override fun terminateInstance(instance: CloudInstance) {
         val kubeCloudInstance = instance as EcsCloudInstance
         kubeCloudInstance.terminate()
-        myCurrentlyRunningInstancesCount--
     }
 
     override fun restartInstance(instance: CloudInstance) {

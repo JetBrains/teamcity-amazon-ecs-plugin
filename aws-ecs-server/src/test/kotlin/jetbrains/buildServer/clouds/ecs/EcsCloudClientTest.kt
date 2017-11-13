@@ -86,7 +86,7 @@ class EcsCloudClientTest : BaseTestCase() {
             init {
                 allowing(image).name; will(returnValue("image-1-name"))
                 allowing(image).id; will(returnValue("image-1-id"))
-                allowing(image).instanceCount; will(returnValue(0))
+                allowing(image).runningInstanceCount; will(returnValue(0))
                 allowing(image).canStartNewInstance(); will(returnValue(true))
             }
         })
@@ -102,7 +102,7 @@ class EcsCloudClientTest : BaseTestCase() {
         m.checking(object : Expectations() {
             init {
                 allowing(image).id; will(Expectations.returnValue("image-1-id"))
-                allowing(image).instanceCount; will(Expectations.returnValue(1))
+                allowing(image).runningInstanceCount; will(Expectations.returnValue(1))
                 allowing(image).canStartNewInstance(); will(returnValue(true))
             }
         })
@@ -121,7 +121,7 @@ class EcsCloudClientTest : BaseTestCase() {
             init {
                 allowing(image).name; will(Expectations.returnValue("image-1-name"))
                 allowing(image).id; will(Expectations.returnValue("image-1-id"))
-                allowing(image).instanceCount; will(Expectations.returnValue(1))
+                allowing(image).runningInstanceCount; will(Expectations.returnValue(1))
                 allowing(image).canStartNewInstance(); will(returnValue(false))
             }
         })
@@ -139,10 +139,10 @@ class EcsCloudClientTest : BaseTestCase() {
             init {
                 allowing(image1).id; will(Expectations.returnValue("image-1-id"))
                 allowing(image1).name; will(Expectations.returnValue("image"))
-                allowing(image1).instanceCount; will(Expectations.returnValue(0))
+                allowing(image1).runningInstanceCount; will(Expectations.returnValue(0))
                 allowing(image2).id; will(Expectations.returnValue("image-2-id"))
                 allowing(image2).name; will(Expectations.returnValue("image"))
-                allowing(image2).instanceCount; will(Expectations.returnValue(0))
+                allowing(image2).runningInstanceCount; will(Expectations.returnValue(0))
             }
         })
         createClient(listOf(image1, image2))

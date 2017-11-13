@@ -7,7 +7,7 @@ interface EcsCloudImage : CloudImage {
     val cluster: String?
     val taskGroup: String?
 
-    val instanceCount: Int
+    val runningInstanceCount: Int
 
     fun populateInstances()
     fun generateAgentName(instanceId: String): String

@@ -98,13 +98,22 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
         ecs.stopTask(StopTaskRequest().withTask(task).withCluster(cluster))
     }
 
-    override fun listTasks(cluster: String?, startedBy: String?): List<String> {
+    override fun listRunningTasks(cluster: String?, startedBy: String?): List<String> {
+        return listTasks(cluster, startedBy, DesiredStatus.RUNNING)
+    }
+
+    override fun listStoppedTasks(cluster: String?, startedBy: String?): List<String> {
+        return listTasks(cluster, startedBy, DesiredStatus.STOPPED)
+    }
+
+    private fun listTasks(cluster: String?, startedBy: String?, desiredStatus:DesiredStatus): List<String> {
         var taskArns:List<String> = ArrayList()
         var nextToken: String? = null;
         do{
             var listTasksRequest = ListTasksRequest()
                     .withCluster(cluster)
                     .withStartedBy(startedBy)
+                    .withDesiredStatus(desiredStatus)
 
             if(nextToken != null) listTasksRequest = listTasksRequest.withNextToken(nextToken)
 

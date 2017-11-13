@@ -65,13 +65,17 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
     override fun populateInstances() {
         try {
-            val tasks = apiConnector.listTasks(cluster, startedByTeamCity(serverUUID))
+            val startedBy = startedByTeamCity(serverUUID)
+            val runningTasks = apiConnector.listRunningTasks(cluster, startedBy)
+                    .map { taskArn -> apiConnector.describeTask(taskArn, cluster) }
+                    .filterNotNull()
+            val stoppedTasks = apiConnector.listStoppedTasks(cluster, startedBy)
                     .map { taskArn -> apiConnector.describeTask(taskArn, cluster) }
                     .filterNotNull()
 
             synchronized(myIdToInstanceMap, {
                 myIdToInstanceMap.clear()
-                for (task in tasks) {
+                for (task in runningTasks.union(stoppedTasks)) {
                     val instanceId = task.getOverridenContainerEnv(INSTANCE_ID_ECS_ENV)
                     if(instanceId == null){
                         LOG.warn("Can't resolve cloud instance id of ecs task ${task.arn}")

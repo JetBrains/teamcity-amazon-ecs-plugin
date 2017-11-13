@@ -5,7 +5,6 @@ import jetbrains.buildServer.clouds.CloudErrorInfo
 import jetbrains.buildServer.clouds.CloudInstance
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import jetbrains.buildServer.serverSide.TeamCityProperties
-import java.util.concurrent.ConcurrentHashMap
 
 class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                         private val apiConnector: EcsApiConnector,
@@ -19,7 +18,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
     private val LOG = Logger.getInstance(EcsCloudImageImpl::class.java.getName())
 
-    private val myIdToInstanceMap = ConcurrentHashMap<String, EcsCloudInstance>()
+    private val myIdToInstanceMap = HashMap<String, EcsCloudInstance>()
     private var myCurrentError: CloudErrorInfo? = null
 
     private val instanceLimit: Int
@@ -70,16 +69,19 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                     .map { taskArn -> apiConnector.describeTask(taskArn, cluster) }
                     .filterNotNull()
 
-            for (task in tasks) {
-                val instanceId = task.getOverridenContainerEnv(INSTANCE_ID_ECS_ENV)
-                if(instanceId == null){
-                    LOG.warn("Can't resolve cloud instance id of ecs task ${task.arn}")
-                } else {
-                    cache.cleanInstanceStatus(task.arn);
-                    myIdToInstanceMap.put(instanceId, CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, task, apiConnector), cache))
+            synchronized(myIdToInstanceMap, {
+                myIdToInstanceMap.clear()
+                for (task in tasks) {
+                    val instanceId = task.getOverridenContainerEnv(INSTANCE_ID_ECS_ENV)
+                    if(instanceId == null){
+                        LOG.warn("Can't resolve cloud instance id of ecs task ${task.arn}")
+                    } else {
+                        cache.cleanInstanceStatus(task.arn);
+                        myIdToInstanceMap.put(instanceId, CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, task, apiConnector), cache))
+                    }
                 }
-            }
-            myCurrentError = null
+                myCurrentError = null
+            })
         } catch (ex: Throwable) {
             myCurrentError = CloudErrorInfo("Failed populate instances", ex.message.toString(), ex)
             throw ex

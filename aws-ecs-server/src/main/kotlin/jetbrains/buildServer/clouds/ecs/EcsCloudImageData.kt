@@ -4,7 +4,9 @@ import jetbrains.buildServer.clouds.CloudImageParameters
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import jetbrains.buildServer.util.StringUtil
 
-fun EcsCloudImageData.toImage(apiConnector: EcsApiConnector, cache: EcsDataCache): EcsCloudImage  = EcsCloudImageImpl(this, apiConnector, cache)
+fun EcsCloudImageData.toImage(apiConnector: EcsApiConnector,
+                              cache: EcsDataCache,
+                              serverUUID: String): EcsCloudImage  = EcsCloudImageImpl(this, apiConnector, cache, serverUUID)
 
 class EcsCloudImageData(private val rawImageData: CloudImageParameters) {
     val id: String = rawImageData.id!!

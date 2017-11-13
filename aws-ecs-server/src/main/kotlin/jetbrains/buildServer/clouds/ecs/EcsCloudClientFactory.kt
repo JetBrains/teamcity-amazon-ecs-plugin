@@ -56,13 +56,13 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
     override fun createNewClient(state: CloudState, params: CloudClientParameters): CloudClientEx {
         val ecsParams = params.toEcsParams()
         val apiConnector = EcsApiConnectorImpl(ecsParams.awsCredentials, ecsParams.region)
-        val startedBy = startedByTeamCity(serverSettings.serverUUID)
+        val serverUUID = serverSettings.serverUUID!!
         val images = ecsParams.imagesData.map{
-            val image = it.toImage(apiConnector, cache)
-            image.populateInstances(startedBy)
+            val image = it.toImage(apiConnector, cache, serverUUID)
+            image.populateInstances()
             image
         }
-        return EcsCloudClient(images, apiConnector, cache, ecsParams, serverSettings.getServerUUID()!!, state.getProfileId())
+        return EcsCloudClient(images, apiConnector, cache, ecsParams, serverUUID, state.profileId)
     }
 
     override fun getInitialParameterValues(): MutableMap<String, String> {

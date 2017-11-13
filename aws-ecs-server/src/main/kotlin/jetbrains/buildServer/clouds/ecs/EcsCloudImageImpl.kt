@@ -9,7 +9,8 @@ import java.util.concurrent.ConcurrentHashMap
 
 class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                         private val apiConnector: EcsApiConnector,
-                        private val cache: EcsDataCache) : EcsCloudImage {
+                        private val cache: EcsDataCache,
+                        private val serverUUID: String) : EcsCloudImage {
     override fun canStartNewInstance(): Boolean {
         if(instanceLimit > 0 && instanceCount >= instanceLimit) return false
         val monitoringPeriod = TeamCityProperties.getInteger("teamcity.ecs.cluster.monitoring.period", 1)
@@ -63,9 +64,9 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         return myIdToInstanceMap[id]
     }
 
-    override fun populateInstances(startedBy: String) {
+    override fun populateInstances() {
         try {
-            val tasks = apiConnector.listTasks(cluster, startedBy)
+            val tasks = apiConnector.listTasks(cluster, startedByTeamCity(serverUUID))
                     .map { taskArn -> apiConnector.describeTask(taskArn, cluster) }
                     .filterNotNull()
 

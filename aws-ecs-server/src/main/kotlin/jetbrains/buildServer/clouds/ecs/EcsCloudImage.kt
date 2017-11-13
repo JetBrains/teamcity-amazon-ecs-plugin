@@ -11,7 +11,7 @@ interface EcsCloudImage : CloudImage {
 
     fun addInstance(instance: EcsCloudInstance)
     fun deleteInstance(instance: EcsCloudInstance)
-    fun populateInstances(startedBy:String)
+    fun populateInstances()
     fun generateAgentName(instanceId: String): String
 
     fun canStartNewInstance(): Boolean

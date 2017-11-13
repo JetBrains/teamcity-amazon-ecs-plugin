@@ -64,7 +64,6 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         return myIdToInstanceMap[id]
     }
 
-    //TODO: background update task
     override fun populateInstances() {
         try {
             val tasks = apiConnector.listTasks(cluster, startedByTeamCity(serverUUID))

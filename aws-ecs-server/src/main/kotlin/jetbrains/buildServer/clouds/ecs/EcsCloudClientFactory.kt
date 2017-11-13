@@ -26,7 +26,8 @@ fun startedByTeamCity(serverUUID: String?): String {
 class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
                             pluginDescriptor: PluginDescriptor,
                             private val serverSettings: ServerSettings,
-                            private val cache: EcsDataCache) : CloudClientFactory {
+                            private val cache: EcsDataCache,
+                            private val instanceUpdater: EcsInstancesUpdater) : CloudClientFactory {
     val editUrl = pluginDescriptor.getPluginResourcesPath(EDIT_ECS_HTML)
 
     init {
@@ -62,7 +63,7 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
             image.populateInstances()
             image
         }
-        return EcsCloudClient(images, apiConnector, cache, ecsParams, serverUUID, state.profileId)
+        return EcsCloudClient(images, apiConnector, instanceUpdater, cache, ecsParams, serverUUID, state.profileId)
     }
 
     override fun getInitialParameterValues(): MutableMap<String, String> {

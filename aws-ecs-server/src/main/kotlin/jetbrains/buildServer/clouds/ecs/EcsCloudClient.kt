@@ -11,7 +11,8 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.HashMap
 
 class EcsCloudClient(images: List<EcsCloudImage>,
-                     val apiConnector: EcsApiConnector,
+                     private val apiConnector: EcsApiConnector,
+                     private val updater: EcsInstancesUpdater,
                      private val cache: EcsDataCache,
                      private val ecsClientParams: EcsCloudClientParameters,
                      private val serverUuid: String,
@@ -23,6 +24,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
     private var myImageIdToImageMap: ConcurrentHashMap<String, EcsCloudImage> = ConcurrentHashMap(Maps.uniqueIndex(images, { it?.id }))
 
     init {
+        updater.registerClient(this)
         for (image in images) {
             myCurrentlyRunningInstancesCount += image.instanceCount
         }
@@ -34,6 +36,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
     }
 
     override fun dispose() {
+        updater.unregisterClient(this)
         LOG.debug("EcsCloudClient disposed")
     }
 

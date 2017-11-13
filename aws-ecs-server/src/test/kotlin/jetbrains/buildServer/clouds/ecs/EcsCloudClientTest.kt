@@ -29,6 +29,14 @@ class EcsCloudClientTest : BaseTestCase() {
         }
     }
 
+    private val updater:EcsInstancesUpdater = object: EcsInstancesUpdater{
+        override fun registerClient(client: EcsCloudClient) {
+        }
+
+        override fun unregisterClient(client: EcsCloudClient) {
+        }
+    }
+
     @BeforeMethod
     @Throws(Exception::class)
     public override fun setUp() {
@@ -53,7 +61,7 @@ class EcsCloudClientTest : BaseTestCase() {
     }
 
     private fun createClient(serverUuid: String, profileId: String, images: List<EcsCloudImage>, cloudClientParameters: CloudClientParameters): EcsCloudClient {
-        return EcsCloudClient(images, api, cache, EcsCloudClientParametersImpl(cloudClientParameters), serverUuid, profileId)
+        return EcsCloudClient(images, api, updater, cache, EcsCloudClientParametersImpl(cloudClientParameters), serverUuid, profileId)
     }
 
     @Test

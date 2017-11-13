@@ -28,7 +28,7 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
                             private val serverSettings: ServerSettings,
                             private val cache: EcsDataCache,
                             private val instanceUpdater: EcsInstancesUpdater) : CloudClientFactory {
-    val editUrl = pluginDescriptor.getPluginResourcesPath(EDIT_ECS_HTML)
+    private val editUrl = pluginDescriptor.getPluginResourcesPath(EDIT_ECS_HTML)
 
     init {
         cloudRegister.registerCloudFactory(this)
@@ -63,24 +63,22 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
             image.populateInstances()
             image
         }
-        return EcsCloudClient(images, apiConnector, instanceUpdater, cache, ecsParams, serverUUID, state.profileId)
+        return EcsCloudClient(images, instanceUpdater, ecsParams, serverUUID, state.profileId)
     }
 
     override fun getInitialParameterValues(): MutableMap<String, String> {
         val result = HashMap<String, String>()
-        result.putAll(AWSCommonParams.getDefaults(serverSettings.getServerUUID()))
+        result.putAll(AWSCommonParams.getDefaults(serverSettings.serverUUID))
         return result
     }
 
     override fun getPropertiesProcessor(): PropertiesProcessor {
-        return object: PropertiesProcessor{
-            override fun process(properties: MutableMap<String, String>?): MutableCollection<InvalidProperty> {
-                val invalids = ArrayList<InvalidProperty>()
-                for (e in AWSCommonParams.validate(properties!!, false)) {
-                    invalids.add(InvalidProperty(e.key, e.value))
-                }
-                return invalids
+        return PropertiesProcessor { properties ->
+            val invalids = ArrayList<InvalidProperty>()
+            for (e in AWSCommonParams.validate(properties!!, false)) {
+                invalids.add(InvalidProperty(e.key, e.value))
             }
+            invalids
         }
     }
 }

@@ -2,7 +2,9 @@ package jetbrains.buildServer.clouds.ecs
 
 import com.intellij.openapi.diagnostic.Logger
 import jetbrains.buildServer.clouds.CloudErrorInfo
+import jetbrains.buildServer.clouds.CloudException
 import jetbrains.buildServer.clouds.CloudInstance
+import jetbrains.buildServer.clouds.CloudInstanceUserData
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import jetbrains.buildServer.serverSide.TeamCityProperties
 
@@ -10,8 +12,9 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                         private val apiConnector: EcsApiConnector,
                         private val cache: EcsDataCache,
                         private val serverUUID: String) : EcsCloudImage {
+
     override fun canStartNewInstance(): Boolean {
-        if(instanceLimit > 0 && runningInstanceCount >= instanceLimit) return false
+        if(instanceLimit in 1..runningInstanceCount) return false
         val monitoringPeriod = TeamCityProperties.getInteger(ECS_METRICS_MONITORING_PERIOD, 1)
         return cpuReservalionLimit <= 0 || apiConnector.getMaxCPUReservation(cluster, monitoringPeriod) < cpuReservalionLimit
     }
@@ -27,17 +30,17 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
     private val cpuReservalionLimit: Int
         get() = imageData.cpuReservalionLimit
 
-    override val runningInstanceCount: Int
-        get() = myIdToInstanceMap.filterValues { instance -> instance.status.isStartingOrStarted }.size
-
-    override val taskDefinition: String
-        get() = imageData.taskDefinition
-
-    override val cluster: String?
+    private val cluster: String?
         get() = imageData.cluster
 
-    override val taskGroup: String?
+    private val taskGroup: String?
         get() = imageData.taskGroup
+
+    private val taskDefinition: String
+        get() = imageData.taskDefinition
+
+    override val runningInstanceCount: Int
+        get() = myIdToInstanceMap.filterValues { instance -> instance.status.isStartingOrStarted }.size
 
     override fun getAgentPoolId(): Int? {
         return imageData.agentPoolId
@@ -63,15 +66,12 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         return myIdToInstanceMap[id]
     }
 
+    //TODO: handle concurrent modification exception
     override fun populateInstances() {
         try {
             val startedBy = startedByTeamCity(serverUUID)
-            val runningTasks = apiConnector.listRunningTasks(cluster, startedBy)
-                    .map { taskArn -> apiConnector.describeTask(taskArn, cluster) }
-                    .filterNotNull()
-            val stoppedTasks = apiConnector.listStoppedTasks(cluster, startedBy)
-                    .map { taskArn -> apiConnector.describeTask(taskArn, cluster) }
-                    .filterNotNull()
+            val runningTasks = apiConnector.listRunningTasks(cluster, startedBy).mapNotNull { taskArn -> apiConnector.describeTask(taskArn, cluster) }
+            val stoppedTasks = apiConnector.listStoppedTasks(cluster, startedBy).mapNotNull { taskArn -> apiConnector.describeTask(taskArn, cluster) }
 
             synchronized(myIdToInstanceMap, {
                 myIdToInstanceMap.clear()
@@ -80,7 +80,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                     if(instanceId == null){
                         LOG.warn("Can't resolve cloud instance id of ecs task ${task.arn}")
                     } else {
-                        cache.cleanInstanceStatus(task.arn);
+                        cache.cleanInstanceStatus(task.arn)
                         myIdToInstanceMap.put(instanceId, CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, task, apiConnector), cache))
                     }
                 }
@@ -92,7 +92,36 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         }
     }
 
+    override fun startNewInstance(tag: CloudInstanceUserData): EcsCloudInstance {
+        val taskDefinition = apiConnector.describeTaskDefinition(taskDefinition) ?: throw CloudException("""Task definition $taskDefinition is missing""")
+        val instanceId = generateNewInstanceId(taskDefinition.family, myIdToInstanceMap.keys)
+
+        val additionalEnvironment = HashMap<String, String>()
+        additionalEnvironment.put(SERVER_UUID_ECS_ENV, serverUUID)
+        additionalEnvironment.put(SERVER_URL_ECS_ENV, tag.serverAddress)
+        additionalEnvironment.put(OFFICIAL_IMAGE_SERVER_URL_ECS_ENV, tag.serverAddress)
+        additionalEnvironment.put(PROFILE_ID_ECS_ENV, tag.profileId)
+        additionalEnvironment.put(IMAGE_ID_ECS_ENV, id)
+        additionalEnvironment.put(INSTANCE_ID_ECS_ENV, instanceId)
+        additionalEnvironment.put(AGENT_NAME_ECS_ENV, generateAgentName(instanceId))
+
+        val tasks = apiConnector.runTask(taskDefinition, cluster, taskGroup, additionalEnvironment, startedByTeamCity(serverUUID))
+        val newInstance = CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, tasks[0], apiConnector), cache)
+        populateInstances()
+        return newInstance
+    }
+
     override fun generateAgentName(instanceId: String): String {
         return imageData.agentNamePrefix + instanceId
+    }
+
+    private fun generateNewInstanceId(prefix: String, currentIds: Collection<String>): String {
+        var counter = 1
+        var newId = "$prefix-${counter}"
+        while (currentIds.contains(newId)){
+            counter++
+            newId = "$prefix-${counter}"
+        }
+        return newId
     }
 }

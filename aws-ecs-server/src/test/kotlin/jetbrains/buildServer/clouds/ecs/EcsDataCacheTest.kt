@@ -17,7 +17,7 @@ class EcsDataCacheTest : BaseTestCase() {
     @BeforeMethod
     override fun setUp() {
         super.setUp()
-        setInternalProperty(CACHE_EXPIRATION_TIMEOUT_PROPERTY, 50.toString())
+        setInternalProperty(ECS_CACHE_EXPIRATION_TIMEOUT, 50.toString())
         cache = EcsDataCacheImpl()
     }
 

@@ -4,8 +4,6 @@ import jetbrains.buildServer.clouds.InstanceStatus
 import jetbrains.buildServer.serverSide.TeamCityProperties
 import java.util.concurrent.ConcurrentHashMap
 
-val CACHE_EXPIRATION_TIMEOUT_PROPERTY = "teamcity.ecs.cache.expirationTimeout"
-
 class EcsDataCacheImpl : EcsDataCache {
     private val cache: MutableMap<String, CacheEntry<InstanceStatus>> = ConcurrentHashMap()
 
@@ -13,7 +11,7 @@ class EcsDataCacheImpl : EcsDataCache {
         val now = System.currentTimeMillis()
         synchronized(cache){
             val cacheEntry = cache.get(taskArn)
-            if(cacheEntry == null || (now - cacheEntry.timestamp) > TeamCityProperties.getInteger(CACHE_EXPIRATION_TIMEOUT_PROPERTY, 10 * 1000)){
+            if(cacheEntry == null || (now - cacheEntry.timestamp) > TeamCityProperties.getInteger(ECS_CACHE_EXPIRATION_TIMEOUT, 10 * 1000)){
                 cache.put(taskArn, CacheEntry(now, resolver.invoke()))
             }
         }

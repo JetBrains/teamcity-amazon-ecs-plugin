@@ -90,6 +90,6 @@ class EcsCloudInstanceImpl(private val instanceId: String, val cloudImage: EcsCl
     override fun terminate() {
         apiConnector.stopTask(ecsTask.arn, ecsTask.clusterArn, "Terminated by TeamCity server")
         myCurrentError = null
-        cloudImage.deleteInstance(this)
+        cloudImage.populateInstances()
     }
 }

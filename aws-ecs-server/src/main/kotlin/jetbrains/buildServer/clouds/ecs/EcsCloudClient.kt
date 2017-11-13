@@ -72,7 +72,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
 
             val tasks = apiConnector.runTask(taskDefinition, ecsImage.cluster, ecsImage.taskGroup, additionalEnvironment, startedByTeamCity(serverUuid))
             val newInstance = CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, ecsImage, tasks[0], apiConnector), cache)
-            ecsImage.addInstance(newInstance)
+            ecsImage.populateInstances()
             myCurrentError = null
             myCurrentlyRunningInstancesCount++
             return newInstance

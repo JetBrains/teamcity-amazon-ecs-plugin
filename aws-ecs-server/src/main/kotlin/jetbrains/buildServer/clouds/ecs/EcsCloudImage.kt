@@ -9,8 +9,6 @@ interface EcsCloudImage : CloudImage {
 
     val instanceCount: Int
 
-    fun addInstance(instance: EcsCloudInstance)
-    fun deleteInstance(instance: EcsCloudInstance)
     fun populateInstances()
     fun generateAgentName(instanceId: String): String
 

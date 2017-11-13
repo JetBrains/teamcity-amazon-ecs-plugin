@@ -64,6 +64,8 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         return myIdToInstanceMap[id]
     }
 
+    //TODO: reset instance status cache
+    //TODO: background update task
     override fun populateInstances() {
         try {
             val tasks = apiConnector.listTasks(cluster, startedByTeamCity(serverUUID))
@@ -83,18 +85,9 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
             myCurrentError = CloudErrorInfo("Failed populate instances", ex.message.toString(), ex)
             throw ex
         }
-
     }
 
     override fun generateAgentName(instanceId: String): String {
         return imageData.agentNamePrefix + instanceId
-    }
-
-    override fun addInstance(instance: EcsCloudInstance) {
-        myIdToInstanceMap.put(instance.instanceId, instance)
-    }
-
-    override fun deleteInstance(instance: EcsCloudInstance) {
-        myIdToInstanceMap.remove(instance.instanceId)
     }
 }

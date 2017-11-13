@@ -21,4 +21,8 @@ class EcsDataCacheImpl : EcsDataCache {
     }
 
     class CacheEntry<T>(val timestamp: Long, val data: T)
+
+    override fun cleanInstanceStatus(arn: String) {
+        cache.remove(arn)
+    }
 }

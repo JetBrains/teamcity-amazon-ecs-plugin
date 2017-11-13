@@ -21,6 +21,9 @@ class EcsCloudClientTest : BaseTestCase() {
     private lateinit var api:EcsApiConnector
 
     private val cache:EcsDataCache = object: EcsDataCache{
+        override fun cleanInstanceStatus(arn: String) {
+        }
+
         override fun getInstanceStatus(taskArn: String, resolver: () -> InstanceStatus): InstanceStatus {
             return resolver.invoke()
         }

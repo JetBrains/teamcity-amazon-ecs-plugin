@@ -64,7 +64,6 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         return myIdToInstanceMap[id]
     }
 
-    //TODO: reset instance status cache
     //TODO: background update task
     override fun populateInstances() {
         try {
@@ -77,6 +76,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                 if(instanceId == null){
                     LOG.warn("Can't resolve cloud instance id of ecs task ${task.arn}")
                 } else {
+                    cache.cleanInstanceStatus(task.arn);
                     myIdToInstanceMap.put(instanceId, CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, task, apiConnector), cache))
                 }
             }

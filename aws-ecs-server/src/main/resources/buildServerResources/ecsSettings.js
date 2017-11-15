@@ -375,7 +375,8 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
     },
 
     generateNewImageId: function () {
-        return Math.max.apply(Math, $j.map(this.imagesData, function callback(currentValue) {
+        if($j.isEmptyObject(this.imagesData)) return 1;
+        else return Math.max.apply(Math, $j.map(this.imagesData, function callback(currentValue) {
             return currentValue['source-id'];
         })) + 1;
     },

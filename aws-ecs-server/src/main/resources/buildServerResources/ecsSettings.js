@@ -5,7 +5,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
 
     testConnectionUrl: '',
 
-    _dataKeys: [ 'taskDefinition', 'agentNamePrefix', 'cluster', 'taskGroup', 'maxInstances', 'cpuReservationLimit' ],
+    _dataKeys: [ 'taskDefinition', 'agentNamePrefix', 'cluster', 'taskGroup', 'maxInstances', 'cpuReservationLimit', 'agent_pool_id'],
 
     templates: {
         imagesTableRow: $j('<tr class="imagesTableRow">\
@@ -269,7 +269,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.selectCluster('');
         this.$maxInstances.trigger('change', '');
         this.$cpuReservationLimit.trigger('change', '');
-        this.$agentPoolId.trigger('change', '0');
+        this.$agentPoolId.trigger('change', '');
     },
 
     validateOptions: function (options){
@@ -302,7 +302,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
 
             agent_pool_id : function () {
                 var agentPoolId = this._image['agent_pool_id'];
-                if (!agentPoolId || agentPoolId === '' || agentPoolId === 'undefined') {
+                if (!agentPoolId || agentPoolId === '' || agentPoolId === undefined) {
                     this.addOptionError('notSelected', 'agent_pool_id');
                     isValid = false;
                 }

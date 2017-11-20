@@ -66,7 +66,6 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         return myIdToInstanceMap[id]
     }
 
-    //TODO: handle concurrent modification exception
     override fun populateInstances() {
         try {
             val startedBy = startedByTeamCity(serverUUID)
@@ -92,6 +91,8 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         }
     }
 
+
+    @Synchronized
     override fun startNewInstance(tag: CloudInstanceUserData): EcsCloudInstance {
         val taskDefinition = apiConnector.describeTaskDefinition(taskDefinition) ?: throw CloudException("""Task definition $taskDefinition is missing""")
         val instanceId = generateNewInstanceId(taskDefinition.family, myIdToInstanceMap.keys)

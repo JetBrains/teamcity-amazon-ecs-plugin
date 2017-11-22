@@ -1,5 +1,7 @@
 package jetbrains.buildServer.clouds.ecs
 
+import com.amazonaws.services.ecs.model.ClientException
+import com.intellij.openapi.diagnostic.Logger
 import jetbrains.buildServer.agent.Constants
 import jetbrains.buildServer.clouds.CloudErrorInfo
 import jetbrains.buildServer.clouds.CloudImage
@@ -11,6 +13,7 @@ import jetbrains.buildServer.serverSide.AgentDescription
 import java.util.*
 
 class EcsCloudInstanceImpl(private val instanceId: String, val cloudImage: EcsCloudImage, val ecsTask: EcsTask, val apiConnector: EcsApiConnector) : EcsCloudInstance {
+    private val LOG = Logger.getInstance(EcsCloudInstanceImpl::class.java.getName())
     private var myCurrentError: CloudErrorInfo? = null
 
     override val taskArn: String
@@ -88,8 +91,13 @@ class EcsCloudInstanceImpl(private val instanceId: String, val cloudImage: EcsCl
     }
 
     override fun terminate() {
-        apiConnector.stopTask(ecsTask.arn, ecsTask.clusterArn, "Terminated by TeamCity server")
-        myCurrentError = null
+        try{
+            apiConnector.stopTask(ecsTask.arn, ecsTask.clusterArn, "Terminated by TeamCity server")
+            myCurrentError = null
+        } catch (ex:ClientException){
+            LOG.debug(ex)
+            myCurrentError = CloudErrorInfo("Failed to stop cloud instance with id" + instanceId)
+        }
         cloudImage.populateInstances()
     }
 }

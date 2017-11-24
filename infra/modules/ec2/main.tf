@@ -45,7 +45,7 @@ USERDATA
 
   ebs_block_device {
     device_name = "/dev/xvdcz"
-    volume_size = "50"
+    volume_size = "${var.ec2_volume_size}"
     volume_type = "gp2"
   }
 

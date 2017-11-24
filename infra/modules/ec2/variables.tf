@@ -40,3 +40,8 @@ variable "asg_max_size" {
 variable "vpc_zone_identifier" {
   type = "list"
 }
+
+variable "ec2_volume_size" {
+  description = "The size of instance volume in gigabytes for docker service."
+  default     = "50"
+}

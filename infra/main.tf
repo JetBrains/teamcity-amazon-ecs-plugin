@@ -25,6 +25,7 @@ module "ec2" {
   asg_min_size            = "${var.asg_min_size}"
   asg_max_size            = "${var.asg_max_size}"
   ec2_keypair_name        = "${var.ec2_keypair_name}"
+  ec2_volume_size         = "${var.ec2_volume_size}"
   docker_basesize         = "${var.agent_disk}"
   instance_profile_arn    = "${module.iam.instance_profile_arn}"
   iam_role_sns_lambda_arn = "${module.iam.iam_role_sns_lambda_arn}"

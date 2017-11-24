@@ -18,6 +18,11 @@ variable "ec2_keypair_name" {
   description = "The key name that should be used for the EC2 instance."
 }
 
+variable "ec2_volume_size" {
+  description = "The size of instance volume in gigabytes for docker service."
+  default     = "50"
+}
+
 variable "vpc_id" {
   description = "The id of the VPC"
 }

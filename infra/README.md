@@ -1,68 +1,66 @@
-AWS ECS Terraform example
-=========================
-Terraform example which creates ECS cluster and autoscalling group for TeamCity agents.
+# AWS ECS Terraform example
 
-These types of resources are supported:
+This is terraform example which creates [ECS cluster](modules/ecs) over [EC2 AutoScalling group](modules/ec2) for TeamCity agents.
 
-* [AutoScaling group](https://www.terraform.io/docs/providers/aws/r/autoscaling_group.html)
-* [AutoScaling lifecycle hook](https://www.terraform.io/docs/providers/aws/r/autoscaling_lifecycle_hooks.html)
-* [AutoScaling notification](https://www.terraform.io/docs/providers/aws/r/autoscaling_notification.html)
-* [AutoScaling policy](https://www.terraform.io/docs/providers/aws/r/autoscaling_policy.html)
-* [CloudWatch metric alarm](https://www.terraform.io/docs/providers/aws/r/cloudwatch_metric_alarm.html)
-* [CloudWatch event rule](https://www.terraform.io/docs/providers/aws/r/cloudwatch_event_rule.html)
-* [CloudWatch event target](https://www.terraform.io/docs/providers/aws/r/cloudwatch_event_target.html)
-* [CloudWatch log group](https://www.terraform.io/docs/providers/aws/r/cloudwatch_log_group.html)
-* [Launch configuration](https://www.terraform.io/docs/providers/aws/r/launch_configuration.html)
-* [SNS topic](https://www.terraform.io/docs/providers/aws/r/sns_topic.html)
-* [SNS topic subscription](https://www.terraform.io/docs/providers/aws/r/sns_topic_subscription.html)
-* [ECS cluster](https://www.terraform.io/docs/providers/aws/r/ecs_cluster.html)
-* [ECS task definition](https://www.terraform.io/docs/providers/aws/r/ecs_task_definition.html)
-* [IAM access key](https://www.terraform.io/docs/providers/aws/r/iam_access_key.html)
-* [IAM instance profile](https://www.terraform.io/docs/providers/aws/r/iam_instance_profile.html)
-* [IAM policy](https://www.terraform.io/docs/providers/aws/r/iam_policy.html)
-* [IAM role](https://www.terraform.io/docs/providers/aws/r/iam_role.html)
-* [IAM role policy](https://www.terraform.io/docs/providers/aws/r/iam_role_policy.html)
-* [IAM role policy attachment](https://www.terraform.io/docs/providers/aws/r/iam_role_policy_attachment.html)
-* [Lambda function](https://www.terraform.io/docs/providers/aws/r/lambda_function.html)
-* [Lambda permission](https://www.terraform.io/docs/providers/aws/r/lambda_permission.html)
+## Description
 
-Main idea
----------
+### Capacity planning
 
-This example creates ECS cluster over EC2 AutoScalling group. CloudWatch observes ECS metrics.
-If CPU Reservation metric equal 100% AutoScaler scale-out. If less then 100% AutoScaler scale-in.
+By default autoscaler setup [c3.xlarge](variables.tf#L14) instances contains 4096 CPU units and [50GB disk](variables.tf#L23).
+Agent container reserves [2048 CPU units](variables.tf#L54) and [20GB disk](variables.tf#L64).
+So instance may contains up to two agents.
+
+An important place is the allocation of disk space. We use the docker parameter(`--storage-opt dm.basesize=20`) for this limitation.
+Of course, if you don't use "Amazon ECS-Optimized Amazon Linux AMI", you need to rewrite user data of [Launch Configuration](modules/ec2/main.tf#L21-L39).
+
+Before you customize this parameters, you must complete this requirements:
+* CPU of instance must be 100% utilized by agents.
+* Disk of instance must be enough for agent containers and docker images.
+
+### Autoscale
+
+CloudWatch observes ECS metrics. If CPU Reservation metric equal 100% AutoScaler scale-out.
+If less then 100% AutoScaler scale-in.
 
 Scale-out is a simple. But Scale-in is not. 
 
 All instances have Scale-In protection. So AutoScaler always try to make a Scale-In.
-CloudWatch observes ECS events and runs Lambda unprotect function.
+[CloudWatch](modules/lambda/main.tf#L64-L82) observes ECS events and runs [Lambda unprotect function](modules/lambda/ecs-unprotect-lambda/index.py).
 This function removes Scale-In protection from instances without ECS tasks. 
 But it keeps the number of instances equal to the minimum number instances in AutoScalling group.
 You can customize retain number in [Lambda module](modules/lambda/main.tf#L59).
 
 Thus, we remove unused instances and keeps some instances for future.
 
-Requirements
-------------
+### Security
 
-1) Configured default AWS profile:
+This example contains IAM policies for Lambda, ec2 instances. 
+Also we create server account for run tasks on ECS cluster.
 
+### Build Agent logs
+
+ECS forward agent logs to CloudWatch Log group `/aws/ecs/${var.project_name}-agent-${var.stack_name}`
+You can configure logdriver in [ECS module](modules/ecs/main.tf#L34-L41)
+
+## Requirements
+
+* Terraform version 0.11.0 or newer.
+* Configured default AWS profile:
     ```bash
     bash-3.2$ cat ~/.aws/credentials
     [default]
     aws_access_key_id = AWSACCESSKEYID
     aws_secret_access_key = AwSsEcReTAcCeSsKeY
     ```
-    
-2) AWS VPC id: `vpc-123abc45`
+* AWS VPC id: `vpc-123abc45`
+* AWS EC2 KeyPair name: `teamcity-example.pub`
 
-3) AWS EC2 KeyPair name: `teamcity-example.pub`
-
-Usage
------
+## Usage
 
 Apply terraform infrastructure and you get ECS plug-in settings in outputs:
 ```bash
+bash-3.2$ git clone https://github.com/JetBrains/teamcity-amazon-ecs-plugin.git
+bash-3.2$ cd teamcity-amazon-ecs-plugin/infra
 bash-3.2$ terraform apply -var 'ec2_keypair_name=teamcity-example.pub' -var 'vpc_id=vpc-123abc45'
 provider.aws.region
   The region where AWS operations will take place. Examples
@@ -84,20 +82,12 @@ aws_access_key_id = PLUGINACCESSKEYID
 aws_secret_access_key = PLUGINSECRETACCESSKEY
 ecs_cluster_name = teamcity-example
 ecs_taskdefinition_name = teamcity-agent-example
-
 ```
 
-Customization
--------------
+Paste these outputs into ECS Cloud profile and run ECS Cloud agents.
 
-You can customize agent resources, EC2 instance type and autoscaler property in `variables.tf`
+Happy building with TeamCity!
 
+## License
 
-Terraform version
------------------
-
-Terraform version 0.11.0 or newer is required for this version to work.
-
-License
--------
-Apache 2. See LICENSE for full details.
+Apache 2. See [LICENSE](LICENSE) for full details.

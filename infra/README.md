@@ -1,46 +1,45 @@
 # AWS ECS Terraform example
 
-This is terraform example which creates [ECS cluster](modules/ecs) over [EC2 AutoScalling group](modules/ec2) for TeamCity agents.
+This is a Terraform example which creates an [ECS cluster](modules/ecs) over the [EC2 AutoScalling group](modules/ec2) for TeamCity agents.
 
 ## Description
 
 ### Capacity planning
 
-By default autoscaler setup [c3.xlarge](variables.tf#L14) instances contains 4096 CPU units and [50GB disk](variables.tf#L23).
-Agent container reserves [2048 CPU units](variables.tf#L54) and [20GB disk](variables.tf#L64).
-So instance may contains up to two agents.
+By default, the autoscaler setup [c3.xlarge](variables.tf#L14) instances contain 4096 CPU units and [50GB disk](variables.tf#L23).
+The Agent container reserves [2048 CPU units](variables.tf#L54) and [20GB disk](variables.tf#L64).
+So an instance may contain up to two agents.
 
-An important place is the allocation of disk space. We use the docker parameter(`--storage-opt dm.basesize=20`) for this limitation.
-Of course, if you don't use "Amazon ECS-Optimized Amazon Linux AMI", you need to rewrite user data of [Launch Configuration](modules/ec2/main.tf#L21-L39).
+Allocating disk space is important. The Docker parameter (`--storage-opt dm.basesize=20`) is used for this limitation. If you don't use the "Amazon ECS-Optimized Amazon Linux AMI", you need to rewrite the user data of the [Launch Configuration](modules/ec2/main.tf#L21-L39).
 
-Before you customize this parameters, you must complete this requirements:
-* CPU of instance must be 100% utilized by agents.
-* Disk of instance must be enough for agent containers and docker images.
+Before customizing these parameters, the following requirements must be met:
+* The instance CPU must be utilized by agents 100%.
+* The instance disk space must be sufficient for agent containers and Docker images.
 
 ### Autoscale
 
-CloudWatch observes ECS metrics. If CPU Reservation metric equal 100% AutoScaler scale-out.
-If less then 100% AutoScaler scale-in.
+CloudWatch observes ECS metrics. If the CPU Reservation metric equals 100%, AutoScaler will scale-out.
+If it is less then 100%, the AutoScaler will scale-in.
 
-Scale-out is a simple. But Scale-in is not. 
+Scaling-out is much simpler than scaling-in. 
 
-All instances have Scale-In protection. So AutoScaler always try to make a Scale-In.
-[CloudWatch](modules/lambda/main.tf#L64-L82) observes ECS events and runs [Lambda unprotect function](modules/lambda/ecs-unprotect-lambda/index.py).
-This function removes Scale-In protection from instances without ECS tasks. 
-But it keeps the number of instances equal to the minimum number instances in AutoScalling group.
-You can customize retain number in [Lambda module](modules/lambda/main.tf#L59).
+All instances have Scale-In protection, and AutoScaler always tries to make a Scale-In.
+[CloudWatch](modules/lambda/main.tf#L64-L82) monitors ECS events and runs the[Lambda unprotect function](modules/lambda/ecs-unprotect-lambda/index.py).
+This function removes the Scale-In protection from instances without ECS tasks. 
+But it keeps the number of instances equal to the minimum number of instances in the AutoScalling group.
+You can customize the retain number in [Lambda module](modules/lambda/main.tf#L59).
 
 Thus, we remove unused instances and keeps some instances for future.
 
 ### Security
 
 This example contains IAM policies for Lambda, ec2 instances. 
-Also we create server account for run tasks on ECS cluster.
+Also we create the server account to run tasks on the ECS cluster.
 
 ### Build Agent logs
 
 ECS forward agent logs to CloudWatch Log group `/aws/ecs/${var.project_name}-agent-${var.stack_name}`
-You can configure logdriver in [ECS module](modules/ecs/main.tf#L34-L41)
+You can configure logdriver in the [ECS module](modules/ecs/main.tf#L34-L41)
 
 ## Requirements
 

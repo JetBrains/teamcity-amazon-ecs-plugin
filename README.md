@@ -3,11 +3,11 @@
 [![plugin status]( 
 https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:TestDrive_TeamCityAmazonEcsPlugin_Build)/statusIcon.svg)](https://teamcity.jetbrains.com/viewType.html?buildTypeId=TestDrive_TeamCityAmazonEcsPlugin_Build&guest=1)
 
-TeamCity plugin which allows running build agents in containers on AWS ECS cluster.
+TeamCity plugin which allows running build agents on an AWS ECS cluster.
 
 ## Status
 
-Plugin Development is in progress. Please do not use it in production environment.
+The plugin Development is in progress. Please *do not use it in the production environment*.
 
 ## Compatibility
 

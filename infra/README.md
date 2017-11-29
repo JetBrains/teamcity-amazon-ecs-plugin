@@ -6,7 +6,7 @@ This is a Terraform example which creates an [ECS cluster](modules/ecs) over the
 
 ### Capacity planning
 
-By default, the autoscaler setup [c3.xlarge](variables.tf#L14) instances contain 4096 CPU units and [50GB disk](variables.tf#L23).
+By default, the autoscaler sets up [c3.xlarge](variables.tf#L14) instances containing 4096 CPU units and [50GB disk](variables.tf#L23).
 The Agent container reserves [2048 CPU units](variables.tf#L54) and [20GB disk](variables.tf#L64).
 So an instance may contain up to two agents.
 
@@ -19,26 +19,25 @@ Before customizing these parameters, the following requirements must be met:
 ### Autoscale
 
 CloudWatch observes ECS metrics. If the CPU Reservation metric equals 100%, AutoScaler will scale-out.
-If it is less then 100%, the AutoScaler will scale-in.
+If it is less than 100%, the AutoScaler will scale-in.
 
 Scaling-out is much simpler than scaling-in. 
 
 All instances have Scale-In protection, and AutoScaler always tries to make a Scale-In.
-[CloudWatch](modules/lambda/main.tf#L64-L82) monitors ECS events and runs the[Lambda unprotect function](modules/lambda/ecs-unprotect-lambda/index.py).
-This function removes the Scale-In protection from instances without ECS tasks. 
-But it keeps the number of instances equal to the minimum number of instances in the AutoScalling group.
+[CloudWatch](modules/lambda/main.tf#L64-L82) monitors ECS events and runs the [Lambda unprotect function](modules/lambda/ecs-unprotect-lambda/index.py).
+This function removes the Scale-In protection from instances without ECS tasks, but keeps the number of instances equal to the minimum number of instances in the AutoScalling group. Thus, we remove unused instances and keep some instances for future.
+
 You can customize the retain number in [Lambda module](modules/lambda/main.tf#L59).
 
-Thus, we remove unused instances and keeps some instances for future.
 
 ### Security
 
 This example contains IAM policies for Lambda, ec2 instances. 
-Also we create the server account to run tasks on the ECS cluster.
+We also create the server account to run tasks on the ECS cluster.
 
 ### Build Agent logs
 
-ECS forward agent logs to CloudWatch Log group `/aws/ecs/${var.project_name}-agent-${var.stack_name}`
+ECS forward agent logs to the CloudWatch Log group `/aws/ecs/${var.project_name}-agent-${var.stack_name}`
 You can configure logdriver in the [ECS module](modules/ecs/main.tf#L34-L41)
 
 ## Requirements
@@ -56,7 +55,7 @@ You can configure logdriver in the [ECS module](modules/ecs/main.tf#L34-L41)
 
 ## Usage
 
-Apply terraform infrastructure and you get ECS plug-in settings in outputs:
+Apply the Terraform infrastructure and you get the ECS plug-in settings in outputs:
 ```bash
 bash-3.2$ git clone https://github.com/JetBrains/teamcity-amazon-ecs-plugin.git
 bash-3.2$ cd teamcity-amazon-ecs-plugin/infra
@@ -83,7 +82,7 @@ ecs_cluster_name = teamcity-example
 ecs_taskdefinition_name = teamcity-agent-example
 ```
 
-Paste these outputs into ECS Cloud profile and run ECS Cloud agents.
+Paste these outputs into the ECS Cloud profile and run ECS Cloud agents.
 
 Happy building with TeamCity!
 

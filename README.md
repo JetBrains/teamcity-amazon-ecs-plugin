@@ -24,7 +24,19 @@ Configure Amazon ECS [Cloud Profile](https://confluence.jetbrains.com/display/TC
 The plugin supports Amazon ECS cluster images to start new tasks with a TeamCity build agent running in one of the containers. The plugin supports the [official TeamCity Build Agent Docker image](https://hub.docker.com/r/jetbrains/teamcity-agent) out of the box. You can use your own image as well.
 
 ### Limit Cluster Resources Usage
-Specify ECS cloud image advanced setting 'Max cluster CPU reservation' to stop creating new TeamCity cloud instances when cluster is overloaded. This requires additional permission granted to AWS user: cloudwatch:GetMetricStatistics 
+
+Specify ECS cloud image advanced setting 'Max cluster CPU reservation' to stop creating new TeamCity cloud instances when cluster is overloaded. This requires additional permission granted to AWS user: cloudwatch:GetMetricStatistics
+
+### Proxy Settings
+
+Use [global server proxy settings](https://confluence.jetbrains.com/pages/viewpage.action?pageId=74845225#HowTo...-ConfigureTeamCitytoUseProxyServerforOutgoingConnections).
+
+Or set plugin specific [internal properties](https://confluence.jetbrains.com/display/TCD10/Configuring+TeamCity+Server+Startup+Properties#ConfiguringTeamCityServerStartupProperties-TeamCityinternalproperties)
+ - teamcity.ecs.https.proxyHost
+ - teamcity.ecs.https.proxyPort
+ - teamcity.ecs.https.proxyLogin
+ - teamcity.ecs.https.proxyPassword
+
 
 ## IAM Role
 

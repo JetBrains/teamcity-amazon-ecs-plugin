@@ -38,11 +38,11 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
             clientConfig.setProxyPort(httpProxyPort)
         }
 
-        if (httpProxyUser.isBlank()){
+        if (!httpProxyUser.isBlank()){
             clientConfig.setProxyUsername(httpProxyUser)
         }
 
-        if (httpProxyPassword.isBlank()){
+        if (!httpProxyPassword.isBlank()){
             clientConfig.setProxyPassword(httpProxyPassword)
         }
 

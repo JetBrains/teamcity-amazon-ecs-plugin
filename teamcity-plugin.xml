@@ -4,7 +4,7 @@
         <name>aws-ecs-plugin</name>
         <display-name>Amazon EC2 Container Service Support</display-name>
         <version>@Plugin_Version@</version>
-        <description>Allows to run TeamCity build agents on Amazon EC2 Container Service</description>
+        <description>Allows running TeamCity build agents on Amazon EC2 Container Service</description>
         <vendor>
             <name>JetBrains, s.r.o.</name>
             <url>http://www.jetbrains.com</url>

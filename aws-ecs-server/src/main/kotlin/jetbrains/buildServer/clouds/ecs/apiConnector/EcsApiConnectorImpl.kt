@@ -11,6 +11,7 @@ import com.amazonaws.services.cloudwatch.model.Statistic
 import com.amazonaws.services.ecs.AmazonECS
 import com.amazonaws.services.ecs.AmazonECSClientBuilder
 import com.amazonaws.services.ecs.model.*
+import jetbrains.buildServer.serverSide.TeamCityProperties
 import jetbrains.buildServer.version.ServerVersionHolder
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -21,9 +22,32 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
     private val cloudWatch: AmazonCloudWatch
 
     init {
+        val clientConfig = ClientConfiguration().withUserAgentPrefix("JetBrains TeamCity " + ServerVersionHolder.getVersion().displayVersion)
+
+        val httpProxy = TeamCityProperties.getProperty("teamcity.ecs.http.proxy.host", TeamCityProperties.getProperty("teamcity.https.proxyHost"))
+        val httpProxyPort = TeamCityProperties.getInteger("teamcity.ecs.http.proxy.port", TeamCityProperties.getInteger("teamcity.https.proxyHost", -1))
+        val httpProxyUser = TeamCityProperties.getProperty("teamcity.ecs.http.proxy.user", TeamCityProperties.getProperty("teamcity.https.proxyLogin"))
+        val httpProxyPassword = TeamCityProperties.getProperty("teamcity.ecs.http.proxy.password", TeamCityProperties.getProperty("teamcity.https.proxyPassword"))
+
+        if (!httpProxy.isEmpty()){
+           clientConfig.setProxyHost(httpProxy)
+        }
+
+        if (httpProxyPort <= 0){
+            clientConfig.setProxyPort(httpProxyPort)
+        }
+
+        if (!httpProxyUser.isEmpty()){
+            clientConfig.setProxyUsername(httpProxyUser)
+        }
+
+        if (!httpProxyPassword.isEmpty()){
+            clientConfig.setProxyPassword(httpProxyPassword)
+        }
+
         val ecsBuilder = AmazonECSClientBuilder
                 .standard()
-                .withClientConfiguration(ClientConfiguration().withUserAgentPrefix("JetBrains TeamCity " + ServerVersionHolder.getVersion().displayVersion))
+                .withClientConfiguration(clientConfig)
                 .withRegion(awsRegion)
         if(awsCredentials != null){
             ecsBuilder.withCredentials(object: AWSCredentialsProvider{
@@ -39,7 +63,7 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
         ecs = ecsBuilder.build()
 
         var cloudWatchBuilder = AmazonCloudWatchClientBuilder.standard()
-                .withClientConfiguration(ClientConfiguration().withUserAgentPrefix("JetBrains TeamCity " + ServerVersionHolder.getVersion().displayVersion))
+                .withClientConfiguration(clientConfig)
                 .withRegion(awsRegion)
         if(awsCredentials != null){
             cloudWatchBuilder.withCredentials(object: AWSCredentialsProvider{

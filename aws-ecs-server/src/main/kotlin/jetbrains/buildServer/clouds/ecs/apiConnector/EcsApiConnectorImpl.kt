@@ -24,10 +24,10 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
     init {
         val clientConfig = ClientConfiguration().withUserAgentPrefix("JetBrains TeamCity " + ServerVersionHolder.getVersion().displayVersion)
 
-        val httpProxy = TeamCityProperties.getProperty("teamcity.ecs.http.proxy.host", TeamCityProperties.getProperty("teamcity.https.proxyHost"))
-        val httpProxyPort = TeamCityProperties.getInteger("teamcity.ecs.http.proxy.port", TeamCityProperties.getInteger("teamcity.https.proxyHost", -1))
-        val httpProxyUser = TeamCityProperties.getProperty("teamcity.ecs.http.proxy.user", TeamCityProperties.getProperty("teamcity.https.proxyLogin"))
-        val httpProxyPassword = TeamCityProperties.getProperty("teamcity.ecs.http.proxy.password", TeamCityProperties.getProperty("teamcity.https.proxyPassword"))
+        val httpProxy = TeamCityProperties.getProperty("teamcity.ecs.https.proxyHost", TeamCityProperties.getProperty("teamcity.https.proxyHost"))
+        val httpProxyPort = TeamCityProperties.getInteger("teamcity.ecs.https.proxyPort", TeamCityProperties.getInteger("teamcity.https.proxyPort", -1))
+        val httpProxyUser = TeamCityProperties.getProperty("teamcity.ecs.https.proxyLogin", TeamCityProperties.getProperty("teamcity.https.proxyLogin"))
+        val httpProxyPassword = TeamCityProperties.getProperty("teamcity.ecs.https.proxyPassword", TeamCityProperties.getProperty("teamcity.https.proxyPassword"))
 
         if (!httpProxy.isEmpty()){
            clientConfig.setProxyHost(httpProxy)

@@ -1,13 +1,9 @@
 # TeamCity Amazon ECS plugin
-[![JetBrains incubator project](http://jb.gg/badges/incubator.svg)](https://plugins.jetbrains.com/plugin/10067-amazon-ecs-support) 
+[![official JetBrains project](http://jb.gg/badges/official.svg)](https://plugins.jetbrains.com/plugin/10067-amazon-ecs-support) 
 [![plugin status]( 
 https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:TestDrive_TeamCityAmazonEcsPlugin_Build)/statusIcon.svg)](https://teamcity.jetbrains.com/viewType.html?buildTypeId=TestDrive_TeamCityAmazonEcsPlugin_Build&guest=1)
 
 TeamCity plugin which allows running build agents on an AWS ECS cluster.
-
-## Status
-
-The plugin Development is in progress. Please *do not use it in the production environment*.
 
 ## Compatibility
 
@@ -17,7 +13,7 @@ The plugin is compatible with TeamCity 2017.1.x and later.
 
 You can [download the plugin](https://teamcity.jetbrains.com/guestAuth/app/rest/builds/buildType:TestDrive_TeamCityAmazonEcsPlugin_Build,tags:release/artifacts/content/aws-ecs.zip) and install it as an [additional TeamCity plugin](https://confluence.jetbrains.com/display/TCDL/Installing+Additional+Plugins).
 
-## Configuration
+## Plugin Configuration
 
 Configure Amazon ECS [Cloud Profile](https://confluence.jetbrains.com/display/TCD10/Agent+Cloud+Profile#AgentCloudProfile-ConfiguringCloudProfile) for your project in the Server Administration UI.
 
@@ -38,7 +34,7 @@ Or set plugin specific [internal properties](https://confluence.jetbrains.com/di
  - teamcity.ecs.https.proxyPassword
 
 
-## IAM Role
+## Required IAM Role
 
 Allow following actions to AIM role you use in cloud profile.
 - ecs:DescribeClusters
@@ -50,6 +46,10 @@ Allow following actions to AIM role you use in cloud profile.
 - ecs:RunTask
 - ecs:StopTask
 - (optional) cloudwatch:GetMetricStatistics
+
+## ECS Cluster Setup
+
+Optionaly use [provided Terraform template](infra/README.md) to setup ECS cluster.
 
 ## License
 

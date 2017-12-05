@@ -1,5 +1,6 @@
 package jetbrains.buildServer.clouds.ecs
 
+import com.amazonaws.services.ecs.model.LaunchType
 import jetbrains.buildServer.clouds.CloudImageParameters
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import jetbrains.buildServer.util.StringUtil
@@ -13,8 +14,13 @@ class EcsCloudImageData(private val rawImageData: CloudImageParameters) {
     val agentPoolId: Int? = rawImageData.agentPoolId
     val taskGroup: String? = rawImageData.getParameter(TASK_GROUP_PARAM)
     val cluster: String? = rawImageData.getParameter(CLUSTER_PARAM)
-    val launchType: String? = rawImageData.getParameter(LAUNCH_TYPE_PARAM)!!
     val taskDefinition: String = rawImageData.getParameter(TASK_DEFINITION_PARAM)!!
+
+    val launchType: String
+        get() {
+            val parameter = rawImageData.getParameter(LAUNCH_TYPE_PARAM)
+            return if(StringUtil.isEmpty(parameter)) LaunchType.EC2.name else parameter!!
+        }
 
     val instanceLimit: Int
         get() {

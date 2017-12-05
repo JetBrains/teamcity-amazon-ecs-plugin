@@ -37,6 +37,9 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
     private val taskGroup: String?
         get() = imageData.taskGroup
 
+    private val launchType: String
+        get() = imageData.launchType
+
     private val taskDefinition: String
         get() = imageData.taskDefinition
 
@@ -95,8 +98,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
     @Synchronized
     override fun startNewInstance(tag: CloudInstanceUserData): EcsCloudInstance {
-        val launchTypeValue = imageData.launchType
-        val launchType = if (launchTypeValue != null) LaunchType.valueOf(launchTypeValue) else LaunchType.EC2
+        val launchType = LaunchType.valueOf(launchType)
         val taskDefinition = apiConnector.describeTaskDefinition(taskDefinition) ?: throw CloudException("""Task definition $taskDefinition is missing""")
         val instanceId = generateNewInstanceId(taskDefinition.family, myIdToInstanceMap.keys)
 

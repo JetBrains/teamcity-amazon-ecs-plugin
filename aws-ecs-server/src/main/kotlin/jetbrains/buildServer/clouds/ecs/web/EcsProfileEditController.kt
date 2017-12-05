@@ -1,5 +1,6 @@
 package jetbrains.buildServer.clouds.ecs.web
 
+import com.amazonaws.services.ecs.model.LaunchType
 import com.intellij.openapi.diagnostic.Logger
 import jetbrains.buildServer.BuildProject
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnectorImpl
@@ -65,6 +66,7 @@ class EcsProfileEditController(val pluginDescriptor: PluginDescriptor,
             pools.add(AgentPoolUtil.DUMMY_PROJECT_POOL)
         }
         pools.addAll(agentPoolManager.getProjectOwnedAgentPools(projectId))
+        modelAndView.model.put("launchTypes", LaunchType.values())
         modelAndView.model.put("agentPools", pools)
         modelAndView.model.put("taskDefChooserUrl", taskDefsController.url)
         modelAndView.model.put("clusterChooserUrl", clustersController.url)

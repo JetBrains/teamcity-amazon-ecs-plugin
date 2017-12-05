@@ -10,6 +10,7 @@
 
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="cons" class="jetbrains.buildServer.clouds.ecs.EcsParameterConstants"/>
+<jsp:useBean id="launchTypes" scope="request" type="java.util.Collection<com.amazonaws.services.ecs.model.LaunchType>"/>
 <jsp:useBean id="agentPools" scope="request" type="java.util.Collection<jetbrains.buildServer.serverSide.agentPools.AgentPool>"/>
 
 <jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
@@ -77,6 +78,21 @@
 <bs:dialog dialogId="EcsImageDialog" title="Add Amazon EC2 Container Service Cloud Image" closeCommand="BS.Ecs.ImageDialog.close()"
            dialogClass="EcsImageDialog" titleId="EcsImageDialogTitle">
     <table class="runnerFormTable paramsTable">
+        <tr>
+            <th>Launch Type:&nbsp;<l:star/></th>
+            <td>
+                <div style="white-space: nowrap">
+                    <select id="${cons.launchType}" data-id="${cons.launchType}" class="longField configParam">
+                        <props:option value=""><c:out value="<Please select launch type>"/></props:option>
+                        <c:forEach var="launchType" items="${launchTypes}">
+                            <props:option selected="${launchType eq propertiesBean.properties['launchType']}" value="${launchType}"><c:out value="${launchType}"/></props:option>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div class="smallNoteAttention">The launch type on which to run tasks.</div>
+                <span class="error option-error option-error_${cons.launchType}"></span>
+            </td>
+        </tr>
         <tr>
             <th>Task definition:&nbsp;<l:star/></th>
             <td>

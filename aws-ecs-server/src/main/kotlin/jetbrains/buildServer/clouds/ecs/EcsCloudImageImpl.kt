@@ -1,5 +1,6 @@
 package jetbrains.buildServer.clouds.ecs
 
+import com.amazonaws.services.ecs.model.LaunchType
 import com.intellij.openapi.diagnostic.Logger
 import jetbrains.buildServer.clouds.CloudErrorInfo
 import jetbrains.buildServer.clouds.CloudException
@@ -94,6 +95,8 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
     @Synchronized
     override fun startNewInstance(tag: CloudInstanceUserData): EcsCloudInstance {
+        val launchTypeValue = imageData.launchType
+        val launchType = if (launchTypeValue != null) LaunchType.valueOf(launchTypeValue) else LaunchType.EC2
         val taskDefinition = apiConnector.describeTaskDefinition(taskDefinition) ?: throw CloudException("""Task definition $taskDefinition is missing""")
         val instanceId = generateNewInstanceId(taskDefinition.family, myIdToInstanceMap.keys)
 
@@ -106,7 +109,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         additionalEnvironment.put(INSTANCE_ID_ECS_ENV, instanceId)
         additionalEnvironment.put(AGENT_NAME_ECS_ENV, generateAgentName(instanceId))
 
-        val tasks = apiConnector.runTask(taskDefinition, cluster, taskGroup, additionalEnvironment, startedByTeamCity(serverUUID))
+        val tasks = apiConnector.runTask(launchType, taskDefinition, cluster, taskGroup, additionalEnvironment, startedByTeamCity(serverUUID))
         val newInstance = CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, tasks[0], apiConnector), cache)
         populateInstances()
         return newInstance

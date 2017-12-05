@@ -1,5 +1,7 @@
 package jetbrains.buildServer.clouds.ecs.apiConnector
 
+import com.amazonaws.services.ecs.model.LaunchType
+
 /**
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 19.09.17.
  */
@@ -7,7 +9,7 @@ interface EcsApiConnector {
     fun listTaskDefinitions(): List<String> //list of task definition arns
     fun describeTaskDefinition(taskDefinitionArn: String): EcsTaskDefinition?
 
-    fun runTask(taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, additionalEnvironment: Map<String, String>, startedBy: String?): List<EcsTask>
+    fun runTask(launchType: LaunchType, taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, additionalEnvironment: Map<String, String>, startedBy: String?): List<EcsTask>
     fun stopTask(task: String, cluster: String?, reason: String?)
 
     fun listRunningTasks(cluster: String?, startedBy: String?): List<String> //list of task arns

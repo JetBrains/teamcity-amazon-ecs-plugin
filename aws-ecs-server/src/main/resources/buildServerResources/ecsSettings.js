@@ -5,10 +5,11 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
 
     testConnectionUrl: '',
 
-    _dataKeys: [ 'taskDefinition', 'agentNamePrefix', 'cluster', 'taskGroup', 'maxInstances', 'cpuReservationLimit', 'agent_pool_id'],
+    _dataKeys: [ 'launchType', 'taskDefinition', 'agentNamePrefix', 'cluster', 'taskGroup', 'maxInstances', 'cpuReservationLimit', 'agent_pool_id'],
 
     templates: {
         imagesTableRow: $j('<tr class="imagesTableRow">\
+<td class="launchType highlight"></td>\
 <td class="taskDefinition highlight"></td>\
 <td class="cluster highlight"></td>\
 <td class="taskGroup highlight"></td>\
@@ -25,6 +26,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
     },
 
     defaults: {
+        launchType: '!SHOULD_NOT_BE_EMPTY!',
         taskDefinition: '!SHOULD_NOT_BE_EMPTY!',
         cluster: '<Default>',
         taskGroup: 'family:<Task Definition Name>',
@@ -55,6 +57,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$deleteImageButton = $j('#ecsDeleteImageButton');
         this.$cancelDeleteImageButton = $j('#ecsCancelDeleteImageButton');
 
+        this.$launchType = $j('#launchType');
         this.$taskDefinition = $j('#taskDefinition');
         this.$agentNamePrefix = $j('#agentNamePrefix');
         this.$taskGroup = $j('#taskGroup');
@@ -107,6 +110,11 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
             }
             return false;
         });
+
+        this.$launchType.on('change', function (e, value) {
+            if(value !== undefined) this.$launchType.val(value);
+            this._image['launchType'] = this.$launchType.val();
+        }.bind(this));
 
         this.$taskDefinition.on('change', function (e, value) {
             if(value !== undefined) this.$taskDefinition.val(value);
@@ -249,6 +257,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
 
         var image = this._image;
 
+        this.$launchType.trigger('change', image['launchType'] || '');
         this.selectTaskDef(image['taskDefinition'] || '');
         this.$agentNamePrefix.trigger('change', image['agentNamePrefix'] || '');
         this.$taskGroup.trigger('change', image['taskGroup'] || '');
@@ -263,6 +272,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
     _resetDataAndDialog: function () {
         this._image = {};
 
+        this.$launchType.trigger('change', '');
         this.selectTaskDef('');
         this.$agentNamePrefix.trigger('change', '');
         this.$taskGroup.trigger('change', '');

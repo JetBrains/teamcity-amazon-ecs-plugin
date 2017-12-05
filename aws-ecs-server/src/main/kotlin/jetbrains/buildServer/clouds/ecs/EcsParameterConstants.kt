@@ -9,6 +9,7 @@ import jetbrains.buildServer.clouds.CloudImageParameters
 val PROFILE_INSTANCE_LIMIT_PARAM = "profileInstanceLimit"
 val IMAGE_INSTANCE_LIMIT_PARAM = "maxInstances"
 val CPU_RESERVATION_LIMIT_PARAM = "cpuReservationLimit"
+val LAUNCH_TYPE_PARAM = "launchType"
 val TASK_DEFINITION_PARAM = "taskDefinition"
 val TASK_GROUP_PARAM = "taskGroup"
 val CLUSTER_PARAM = "cluster"
@@ -16,6 +17,7 @@ val AGENT_NAME_PREFIX = "agentNamePrefix"
 
 class EcsParameterConstants{
     val agentNamePrefix: String = AGENT_NAME_PREFIX
+    val launchType: String = LAUNCH_TYPE_PARAM
     val taskDefinition: String = TASK_DEFINITION_PARAM
     val cluster: String = CLUSTER_PARAM
     val taskGroup: String = TASK_GROUP_PARAM

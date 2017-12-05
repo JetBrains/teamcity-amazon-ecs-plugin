@@ -24,6 +24,7 @@ class EcsTaskDefinitionChooserController(private val pluginDescriptor: PluginDes
     }
 
     override fun doHandle(request: HttpServletRequest, response: HttpServletResponse): ModelAndView? {
+        val launchType = request.getParameter("launchType")
         val propsBean = BasePropertiesBean(null)
         PluginPropertiesUtil.bindPropertiesFromRequest(request, propsBean, true)
         val props = propsBean.properties
@@ -33,6 +34,7 @@ class EcsTaskDefinitionChooserController(private val pluginDescriptor: PluginDes
             val api = EcsApiConnectorImpl(props.toAwsCredentials(), AWSCommonParams.getRegionName(props))
             val sortedTasDefs = api.listTaskDefinitions()
                     .mapNotNull { taskDefArn -> api.describeTaskDefinition(taskDefArn) }
+                    .filter { taskDef -> taskDef.isCompatibleWithLaunchType(launchType) }
                     .sortedBy { taskDef -> taskDef.displayName }
             modelAndView.model["taskDefs"] = sortedTasDefs
             modelAndView.model["error"] = ""

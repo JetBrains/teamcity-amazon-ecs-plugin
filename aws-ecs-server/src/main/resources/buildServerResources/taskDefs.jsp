@@ -20,7 +20,10 @@
             <c:otherwise>
                 <ul class="chooser">
                     <c:forEach var="taskDef" items="${taskDefs}">
-                        <li value="${taskDef.arn}"><a style="cursor:pointer;" onclick="BS.Ecs.TaskDefChooser.selectTaskDef('${taskDef.displayName}')"><c:out value="${taskDef.displayName}"/></a></li>
+                        <li value="${taskDef.arn}">
+                            <a style="cursor:pointer;" onclick="BS.Ecs.TaskDefChooser.selectTaskDef('${taskDef.displayName}')"><c:out value="${taskDef.displayName}"/></a>
+                            <i><c:out value="${taskDef.requiresCompatibilitiesString}"/></i>
+                        </li>
                     </c:forEach>
                 </ul>
             </c:otherwise>

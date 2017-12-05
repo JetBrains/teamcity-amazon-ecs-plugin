@@ -495,8 +495,10 @@ if(!BS.Ecs.TaskDefChooser){
     });
 
     BS.Ecs.TaskDefChooser.showPopup = function(nearestElement, dataLoadUrl){
+        var serializeParameters = BS.Clouds.Admin.CreateProfileForm.serializeParameters();
+        serializeParameters += "&launchType=" + BS.Ecs.ProfileSettingsForm.$launchType.val();
         this.showPopupNearElement(nearestElement, {
-            parameters: BS.Clouds.Admin.CreateProfileForm.serializeParameters(),
+            parameters: serializeParameters,
             url: dataLoadUrl,
             shift:{x:15,y:15}
         });

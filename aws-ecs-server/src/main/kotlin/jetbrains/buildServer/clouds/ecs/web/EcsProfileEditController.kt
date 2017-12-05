@@ -17,7 +17,6 @@ import jetbrains.buildServer.web.openapi.PluginDescriptor
 import jetbrains.buildServer.web.openapi.WebControllerManager
 import org.jdom.Element
 import org.springframework.web.servlet.ModelAndView
-import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -66,7 +65,7 @@ class EcsProfileEditController(val pluginDescriptor: PluginDescriptor,
             pools.add(AgentPoolUtil.DUMMY_PROJECT_POOL)
         }
         pools.addAll(agentPoolManager.getProjectOwnedAgentPools(projectId))
-        modelAndView.model.put("launchTypes", LaunchType.values())
+        modelAndView.model.put("launchTypes", ArrayList<LaunchType>(LaunchType.values().toMutableList()))
         modelAndView.model.put("agentPools", pools)
         modelAndView.model.put("taskDefChooserUrl", taskDefsController.url)
         modelAndView.model.put("clusterChooserUrl", clustersController.url)

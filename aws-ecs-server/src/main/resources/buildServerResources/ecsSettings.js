@@ -114,6 +114,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$launchType.on('change', function (e, value) {
             if(value !== undefined) this.$launchType.val(value);
             this._image['launchType'] = this.$launchType.val();
+            this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
         this.$taskDefinition.on('change', function (e, value) {
@@ -286,6 +287,13 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         var isValid = true;
 
         var validators = {
+            launchType : function () {
+                var launchType = this._image['launchType'];
+                if (!launchType || launchType === '' || launchType === undefined) {
+                    this.addOptionError('notSelected', 'launchType');
+                    isValid = false;
+                }
+            }.bind(this),
 
             taskDefinition : function () {
                 if (!this._image['taskDefinition']) {

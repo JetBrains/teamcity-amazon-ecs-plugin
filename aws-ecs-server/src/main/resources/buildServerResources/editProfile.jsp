@@ -76,7 +76,7 @@
     <div id="testConnectionDetails" class="mono"></div>
 </bs:dialog>
 
-<bs:dialog dialogId="EcsImageDialog" title="Add Amazon EC2 Container Service Cloud Image" closeCommand="BS.Ecs.ImageDialog.close()"
+<bs:dialog dialogId="EcsImageDialog" title="Add Amazon Elastic Container Service Cloud Image" closeCommand="BS.Ecs.ImageDialog.close()"
            dialogClass="EcsImageDialog" titleId="EcsImageDialogTitle">
     <table class="runnerFormTable paramsTable">
         <tr>

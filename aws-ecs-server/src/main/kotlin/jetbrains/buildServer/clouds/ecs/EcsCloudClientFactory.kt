@@ -39,7 +39,7 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
     }
 
     override fun getDisplayName(): String {
-        return "Amazon EC2 Container Service"
+        return "Amazon Elastic Container Service"
     }
 
     override fun getEditProfileUrl(): String? {

@@ -233,7 +233,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
     },
 
     showAddImageDialog: function () {
-        $j('#EcsImageDialogTitle').text('Add Amazon EC2 Container Service Cloud Image');
+        $j('#EcsImageDialogTitle').text('Add Amazon Elastic Container Service Cloud Image');
 
         BS.Hider.addHideFunction('EcsImageDialog', this._resetDataAndDialog.bind(this));
         this.$addImageButton.val('Add').data('image-id', 'undefined');
@@ -246,7 +246,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
     showEditImageDialog: function ($elem) {
         var imageId = $elem.parents(this.selectors.imagesTableRow).data('image-id');
 
-        $j('#EcsImageDialogTitle').text('Edit Amazon EC2 Container Service Cloud Image');
+        $j('#EcsImageDialogTitle').text('Edit Amazon Elastic Container Service Cloud Image');
 
         BS.Hider.addHideFunction('EcsImageDialog', this._resetDataAndDialog.bind(this));
 

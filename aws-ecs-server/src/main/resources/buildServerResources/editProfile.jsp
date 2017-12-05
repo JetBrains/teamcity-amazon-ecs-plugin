@@ -53,6 +53,7 @@
         <table id="ecsImagesTable" class="settings imagesTable hidden">
             <tbody>
             <tr>
+                <th class="name">Launch type</th>
                 <th class="name">Task definition</th>
                 <th class="name">Cluster</th>
                 <th class="name">Task group</th>
@@ -79,7 +80,7 @@
            dialogClass="EcsImageDialog" titleId="EcsImageDialogTitle">
     <table class="runnerFormTable paramsTable">
         <tr>
-            <th>Launch Type:&nbsp;<l:star/></th>
+            <th>Launch type:&nbsp;<l:star/></th>
             <td>
                 <div style="white-space: nowrap">
                     <select id="${cons.launchType}" data-id="${cons.launchType}" class="longField configParam">
@@ -149,8 +150,8 @@
                 <span class="error option-error option-error_${cons.cpuReservationLimit}"></span>
             </td>
         </tr>
-        <tr class="advancedSetting">
-            <th><label for="${cons.agentPoolIdField}">Agent pool:</label></th>
+        <tr>
+            <th><label for="${cons.agentPoolIdField}">Agent pool:&nbsp;<l:star/></label></th>
             <td>
                 <select id="${cons.agentPoolIdField}" data-id="${cons.agentPoolIdField}" class="longField configParam">
                     <props:option value=""><c:out value="<Please select agent pool>"/></props:option>

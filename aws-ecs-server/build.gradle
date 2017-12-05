@@ -8,7 +8,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.11.199'
+        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.11.242'
     }
 }
 
@@ -32,8 +32,8 @@ teamcity {
 }
 
 dependencies {
-    compile 'com.amazonaws:aws-java-sdk-ecs:1.11.199'
-    compile 'com.amazonaws:aws-java-sdk-cloudwatch:1.11.199'
+    compile 'com.amazonaws:aws-java-sdk-ecs:1.11.242'
+    compile 'com.amazonaws:aws-java-sdk-cloudwatch:1.11.242'
 
     compile project(':aws-ecs-common')
     agent project(path: ':aws-ecs-agent', configuration: 'plugin')

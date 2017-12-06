@@ -5,7 +5,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
 
     testConnectionUrl: '',
 
-    _dataKeys: [ 'launchType', 'taskDefinition', 'agentNamePrefix', 'cluster', 'taskGroup', 'maxInstances', 'cpuReservationLimit', 'agent_pool_id'],
+    _dataKeys: [ 'launchType', 'taskDefinition', 'agentNamePrefix', 'cluster', 'taskGroup', 'subnets', 'maxInstances', 'cpuReservationLimit', 'agent_pool_id'],
 
     templates: {
         imagesTableRow: $j('<tr class="imagesTableRow">\
@@ -37,6 +37,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
     _errors: {
         badParam: 'Bad parameter',
         required: 'This field cannot be blank',
+        requiredForFargate: 'This field is required when using FARGATE launch type',
         notSelected: 'Something should be selected',
         nonNegative: 'Must be non-negative number',
         nonPercentile: 'Must be a number from range 1..100'
@@ -61,6 +62,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$taskDefinition = $j('#taskDefinition');
         this.$agentNamePrefix = $j('#agentNamePrefix');
         this.$taskGroup = $j('#taskGroup');
+        this.$subnets = $j('#subnets');
         this.$cluster = $j('#cluster');
         this.$maxInstances = $j('#maxInstances');
         this.$cpuReservationLimit = $j('#cpuReservationLimit');
@@ -140,6 +142,13 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
             this._image['taskGroup'] = this.$taskGroup.val();
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
+
+        this.$subnets.on('change', function (e, value) {
+            if(value !== undefined) this.$subnets.val(value);
+            this._image['subnets'] = this.$subnets.val();
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
+
 
         this.$maxInstances.on('change', function (e, value) {
             if(value !== undefined) this.$maxInstances.val(value);
@@ -262,6 +271,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.selectTaskDef(image['taskDefinition'] || '');
         this.$agentNamePrefix.trigger('change', image['agentNamePrefix'] || '');
         this.$taskGroup.trigger('change', image['taskGroup'] || '');
+        this.$subnets.trigger('change', image['subnets'] || '');
         this.selectCluster(image['cluster'] || '');
         this.$maxInstances.trigger('change', image['maxInstances'] || '');
         this.$cpuReservationLimit.trigger('change', image['cpuReservationLimit'] || '');
@@ -277,6 +287,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.selectTaskDef('');
         this.$agentNamePrefix.trigger('change', '');
         this.$taskGroup.trigger('change', '');
+        this.$subnets.trigger('change', '');
         this.selectCluster('');
         this.$maxInstances.trigger('change', '');
         this.$cpuReservationLimit.trigger('change', '');
@@ -298,6 +309,14 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
             taskDefinition : function () {
                 if (!this._image['taskDefinition']) {
                     this.addOptionError('required', 'taskDefinition');
+                    isValid = false;
+                }
+            }.bind(this),
+
+            subnets : function () {
+                var launchType = this._image['launchType'];
+                if (launchType === 'FARGATE' && !this._image['subnets']) {
+                    this.addOptionError('requiredForFargate', 'subnets');
                     isValid = false;
                 }
             }.bind(this),

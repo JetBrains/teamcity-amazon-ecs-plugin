@@ -79,7 +79,7 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
         cloudWatch = cloudWatchBuilder.build()
     }
 
-    override fun runTask(launchType: LaunchType, taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, additionalEnvironment: Map<String, String>, startedBy: String?): List<EcsTask> {
+    override fun runTask(launchType: LaunchType, taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, subnets:Collection<String>, additionalEnvironment: Map<String, String>, startedBy: String?): List<EcsTask> {
         val containerOverrides = taskDefinition.containers.map {
             containerName -> ContainerOverride()
                                 .withName(containerName)
@@ -93,6 +93,7 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
                 .withStartedBy(startedBy)
         if(cluster != null && !cluster.isEmpty()) request = request.withCluster(cluster)
         if(taskGroup != null && !taskGroup.isEmpty()) request = request.withGroup(taskGroup)
+        if(!subnets.isEmpty()) request = request.withNetworkConfiguration(NetworkConfiguration().withAwsvpcConfiguration(AwsVpcConfiguration().withSubnets(subnets)))
 
         val runTaskResult = ecs.runTask(request)
         if (!runTaskResult.failures.isEmpty())

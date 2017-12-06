@@ -12,6 +12,7 @@ val CPU_RESERVATION_LIMIT_PARAM = "cpuReservationLimit"
 val LAUNCH_TYPE_PARAM = "launchType"
 val TASK_DEFINITION_PARAM = "taskDefinition"
 val TASK_GROUP_PARAM = "taskGroup"
+val SUBNETS_PARAM = "subnets"
 val CLUSTER_PARAM = "cluster"
 val AGENT_NAME_PREFIX = "agentNamePrefix"
 
@@ -21,6 +22,7 @@ class EcsParameterConstants{
     val taskDefinition: String = TASK_DEFINITION_PARAM
     val cluster: String = CLUSTER_PARAM
     val taskGroup: String = TASK_GROUP_PARAM
+    val subnets: String = SUBNETS_PARAM
     val maxInstances: String = IMAGE_INSTANCE_LIMIT_PARAM
     val agentPoolIdField: String = CloudImageParameters.AGENT_POOL_ID_FIELD
     val profileInstanceLimit: String = PROFILE_INSTANCE_LIMIT_PARAM

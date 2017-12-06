@@ -15,3 +15,8 @@ ul.chooser {
     margin: 0;
     padding: 0;
 }
+
+textarea .subnetList {
+    width: 100%;
+    height: 30em;
+}

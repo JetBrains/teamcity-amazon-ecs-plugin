@@ -13,6 +13,7 @@ class EcsCloudImageData(private val rawImageData: CloudImageParameters) {
     val id: String = rawImageData.id!!
     val agentPoolId: Int? = rawImageData.agentPoolId
     val taskGroup: String? = rawImageData.getParameter(TASK_GROUP_PARAM)
+    val subnets: String? = rawImageData.getParameter(SUBNETS_PARAM)
     val cluster: String? = rawImageData.getParameter(CLUSTER_PARAM)
     val taskDefinition: String = rawImageData.getParameter(TASK_DEFINITION_PARAM)!!
 

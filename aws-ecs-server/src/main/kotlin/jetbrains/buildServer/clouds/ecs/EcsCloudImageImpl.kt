@@ -37,6 +37,12 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
     private val taskGroup: String?
         get() = imageData.taskGroup
 
+    private val subnets: Collection<String>
+        get() {
+            val rawSubnetsString = imageData.subnets
+            return if(rawSubnetsString == null) emptyList() else rawSubnetsString.lines()
+        }
+
     private val launchType: String
         get() = imageData.launchType
 
@@ -111,7 +117,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         additionalEnvironment.put(INSTANCE_ID_ECS_ENV, instanceId)
         additionalEnvironment.put(AGENT_NAME_ECS_ENV, generateAgentName(instanceId))
 
-        val tasks = apiConnector.runTask(launchType, taskDefinition, cluster, taskGroup, additionalEnvironment, startedByTeamCity(serverUUID))
+        val tasks = apiConnector.runTask(launchType, taskDefinition, cluster, taskGroup, subnets, additionalEnvironment, startedByTeamCity(serverUUID))
         val newInstance = CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, tasks[0], apiConnector), cache)
         populateInstances()
         return newInstance

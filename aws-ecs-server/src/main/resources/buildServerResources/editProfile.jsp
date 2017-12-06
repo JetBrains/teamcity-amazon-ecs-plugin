@@ -134,6 +134,14 @@
             </td>
         </tr>
         <tr class="advancedSetting">
+            <th>Subnets:</th>
+            <td>
+                <textarea id="${cons.subnets}" wrap="off" class="subnetList" data-id="${cons.subnets}" data-err-id="${cons.subnets}"></textarea>
+                <div class="smallNoteAttention">New line delimited list of subnet ARNs in cluster VPC that TeamCity should consider for task placement.</div>
+                <span class="error option-error option-error_${cons.subnets}"></span>
+            </td>
+        </tr>
+        <tr class="advancedSetting">
             <th>Max number of instances:</th>
             <td>
                 <div>

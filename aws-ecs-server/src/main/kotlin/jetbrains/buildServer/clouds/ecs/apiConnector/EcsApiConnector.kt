@@ -9,7 +9,7 @@ interface EcsApiConnector {
     fun listTaskDefinitions(): List<String> //list of task definition arns
     fun describeTaskDefinition(taskDefinitionArn: String): EcsTaskDefinition?
 
-    fun runTask(launchType: LaunchType, taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, additionalEnvironment: Map<String, String>, startedBy: String?): List<EcsTask>
+    fun runTask(launchType: LaunchType, taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, subnets: Collection<String>, additionalEnvironment: Map<String, String>, startedBy: String?): List<EcsTask>
     fun stopTask(task: String, cluster: String?, reason: String?)
 
     fun listRunningTasks(cluster: String?, startedBy: String?): List<String> //list of task arns

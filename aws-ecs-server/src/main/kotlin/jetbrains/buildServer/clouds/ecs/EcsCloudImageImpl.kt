@@ -39,8 +39,8 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
     private val subnets: Collection<String>
         get() {
-            val rawSubnetsString = imageData.subnets
-            return if(rawSubnetsString == null) emptyList() else rawSubnetsString.lines()
+            val rawSubnetsString = imageData.subnets?.trim()
+            return if(rawSubnetsString.isNullOrEmpty()) emptyList() else rawSubnetsString!!.lines()
         }
 
     private val launchType: String

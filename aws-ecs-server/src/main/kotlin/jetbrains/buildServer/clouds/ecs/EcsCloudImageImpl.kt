@@ -12,7 +12,7 @@ import jetbrains.buildServer.serverSide.TeamCityProperties
 class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                         private val apiConnector: EcsApiConnector,
                         private val cache: EcsDataCache,
-                        private val serverUUID: String) : EcsCloudImage {
+                        private val serverUUID: String, private val profileId: String) : EcsCloudImage {
 
     override fun canStartNewInstance(): Boolean {
         if(instanceLimit in 1..runningInstanceCount) return false
@@ -85,12 +85,16 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
             synchronized(myIdToInstanceMap, {
                 myIdToInstanceMap.clear()
                 for (task in runningTasks.union(stoppedTasks)) {
-                    val instanceId = task.getOverridenContainerEnv(INSTANCE_ID_ECS_ENV)
-                    if(instanceId == null){
-                        LOG.warn("Can't resolve cloud instance id of ecs task ${task.arn}")
-                    } else {
-                        cache.cleanInstanceStatus(task.arn)
-                        myIdToInstanceMap.put(instanceId, CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, task, apiConnector), cache))
+                    val taskProfileId = task.getOverridenContainerEnv(PROFILE_ID_ECS_ENV)
+                    val taskImageId = task.getOverridenContainerEnv(IMAGE_ID_ECS_ENV)
+                    if(profileId.equals(taskProfileId) && taskImageId.equals(id)){
+                        val instanceId = task.getOverridenContainerEnv(INSTANCE_ID_ECS_ENV)
+                        if(instanceId == null){
+                            LOG.warn("Can't resolve cloud instance id of ecs task ${task.arn}")
+                        } else {
+                            cache.cleanInstanceStatus(task.arn)
+                            myIdToInstanceMap.put(instanceId, CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, task, apiConnector), cache))
+                        }
                     }
                 }
                 myCurrentError = null

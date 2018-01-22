@@ -21,6 +21,13 @@ teamcity {
     }
 
     environments {
+        Tc20172 {
+            version = '2017.2'
+            homeDir = file("/home/user/projects/teamcity/trunk/buildserver/.idea_artifacts/dist-teamcity-tomcat")
+            dataDir = file("$rootDir/teamcity/data/2017.2")
+            javaHome = file('/usr/lib/jvm/java-8-openjdk-amd64')
+            serverOptions '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=10111'
+        }
         Tc20171 {
             version = '2017.1'
             homeDir = file("/home/lodkin/teamcity/2017.1.x/buildserver/.idea_artifacts/dist-teamcity-tomcat")

@@ -16,7 +16,7 @@ ext {
     def correctVersion = project.hasProperty('versionNumber') && property('versionNumber') ==~ /\d+\.\d+\.\d+.*/
     versionNumber = correctVersion ? property('versionNumber') : 'SNAPSHOT-' + new Date().format('yyyyMMddHHmmss')
     projectIds = ['group': 'teamcity-aws-ecs-plugin', 'version': versionNumber]
-    teamcityVersion = project.hasProperty('teamcityVersion') ? project.getProperty('teamcityVersion') : '2017.1.5'
+    teamcityVersion = project.hasProperty('teamcityVersion') ? project.getProperty('teamcityVersion') : '2017.2'
 }
 
 allprojects {

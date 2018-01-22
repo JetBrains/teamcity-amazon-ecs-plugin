@@ -3,6 +3,7 @@ package jetbrains.buildServer.clouds.ecs
 import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.clouds.CloudClientParameters
 import jetbrains.buildServer.clouds.CloudImage
+import jetbrains.buildServer.clouds.CloudImageParameters
 import jetbrains.buildServer.clouds.InstanceStatus
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import org.jmock.Expectations
@@ -53,7 +54,7 @@ class EcsCloudClientTest : BaseTestCase() {
     }
 
     private fun createClient(images: List<EcsCloudImage>): EcsCloudClient {
-        return createClient(images, CloudClientParameters())
+        return createClient(images, MockCloudClientParameters(mapOf()))
     }
 
     private fun createClient(images: List<EcsCloudImage>, cloudClientParameters: CloudClientParameters): EcsCloudClient {
@@ -107,8 +108,7 @@ class EcsCloudClientTest : BaseTestCase() {
             }
         })
         val images = listOf(image)
-        val cloudClientParameters = CloudClientParameters()
-        cloudClientParameters.setParameter(PROFILE_INSTANCE_LIMIT_PARAM, "1")
+        val cloudClientParameters = MockCloudClientParameters(mapOf(Pair(PROFILE_INSTANCE_LIMIT_PARAM, "1")))
         val cloudClient = createClient(images, cloudClientParameters)
         Assert.assertFalse(cloudClient.canStartNewInstance(image))
     }
@@ -147,4 +147,27 @@ class EcsCloudClientTest : BaseTestCase() {
         })
         createClient(listOf(image1, image2))
     }
+}
+
+class MockCloudClientParameters(val params: Map<String, String>) : CloudClientParameters() {
+    override fun getParameter(name: String): String? {
+        return params.get(name)
+    }
+
+    override fun getParameters(): MutableMap<String, String> {
+        return params.toMutableMap()
+    }
+
+    override fun getProfileDescription(): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getCloudImages(): MutableCollection<CloudImageParameters> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun listParameterNames(): MutableCollection<String> {
+        return params.keys.toMutableList()
+    }
+
 }

@@ -23,8 +23,6 @@ class EcsAgentConfigurationProvider(agentEvents: EventDispatcher<AgentLifeCycleL
 
     private fun appendEcsSpecificConfiguration() {
         val env = System.getenv()
-        val providedAgentName = env[AGENT_NAME_ECS_ENV]
-        if (!StringUtil.isEmpty(providedAgentName)) agentConfigurationEx.name = providedAgentName
         val providedServerUrl = env[SERVER_URL_ECS_ENV]
         if (!StringUtil.isEmpty(providedServerUrl)) agentConfigurationEx.serverUrl = providedServerUrl
     }

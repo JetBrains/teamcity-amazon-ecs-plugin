@@ -72,7 +72,11 @@ class EcsCloudClient(images: List<EcsCloudImage>,
     }
 
     override fun generateAgentName(agent: AgentDescription): String? {
-        return (findInstanceByAgent(agent) as? EcsCloudInstance)?.generateAgentName() ?: agent.availableParameters[Constants.ENV_PREFIX + AGENT_NAME_ECS_ENV]
+        val instanceId = agent.configurationParameters.get(Constants.ENV_PREFIX + INSTANCE_ID_ECS_ENV)
+        val imageId = agent.configurationParameters.get(Constants.ENV_PREFIX + IMAGE_ID_ECS_ENV)
+        val image = myImageIdToImageMap.get(imageId)
+        if(instanceId.isNullOrEmpty() || image == null) return null;
+        return image.generateAgentName(instanceId!!);
     }
 
     override fun getImages(): MutableCollection<out CloudImage> {

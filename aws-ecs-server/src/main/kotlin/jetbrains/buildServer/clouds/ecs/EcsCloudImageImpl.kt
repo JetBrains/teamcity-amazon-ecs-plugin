@@ -120,7 +120,6 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         additionalEnvironment.put(PROFILE_ID_ECS_ENV, tag.profileId)
         additionalEnvironment.put(IMAGE_ID_ECS_ENV, id)
         additionalEnvironment.put(INSTANCE_ID_ECS_ENV, instanceId)
-        additionalEnvironment.put(AGENT_NAME_ECS_ENV, generateAgentName(instanceId))
 
         val tasks = apiConnector.runTask(launchType, taskDefinition, cluster, taskGroup, subnets, additionalEnvironment, startedByTeamCity(serverUUID))
         val newInstance = CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, tasks[0], apiConnector), cache)

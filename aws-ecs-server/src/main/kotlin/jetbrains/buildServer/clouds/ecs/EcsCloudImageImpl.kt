@@ -8,6 +8,7 @@ import jetbrains.buildServer.clouds.CloudInstance
 import jetbrains.buildServer.clouds.CloudInstanceUserData
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import jetbrains.buildServer.serverSide.TeamCityProperties
+import java.util.*
 
 class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                         private val apiConnector: EcsApiConnector,
@@ -110,7 +111,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
     override fun startNewInstance(tag: CloudInstanceUserData): EcsCloudInstance {
         val launchType = LaunchType.valueOf(launchType)
         val taskDefinition = apiConnector.describeTaskDefinition(taskDefinition) ?: throw CloudException("""Task definition $taskDefinition is missing""")
-        val instanceId = generateNewInstanceId(taskDefinition.family, myIdToInstanceMap.keys)
+        val instanceId = generateNewInstanceId()
 
         val additionalEnvironment = HashMap<String, String>()
         additionalEnvironment.put(SERVER_UUID_ECS_ENV, serverUUID)
@@ -131,13 +132,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         return imageData.agentNamePrefix + instanceId
     }
 
-    private fun generateNewInstanceId(prefix: String, currentIds: Collection<String>): String {
-        var counter = 1
-        var newId = "$prefix-${counter}"
-        while (currentIds.contains(newId)){
-            counter++
-            newId = "$prefix-${counter}"
-        }
-        return newId
+    private fun generateNewInstanceId(): String {
+        return UUID.randomUUID().toString()
     }
 }

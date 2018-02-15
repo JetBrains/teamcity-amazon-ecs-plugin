@@ -57,7 +57,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
             return newInstance
         } catch (ex: Exception){
             LOG.debug("Failed to start cloud instance", ex)
-            myCurrentError = CloudErrorInfo("Failed to start cloud instance", ex.localizedMessage, ex)
+            myCurrentError = CloudErrorInfo("Failed to start cloud instance." + ex.localizedMessage)
             throw ex
         }
     }

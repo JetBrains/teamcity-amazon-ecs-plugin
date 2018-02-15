@@ -28,11 +28,14 @@ class EcsAgentConfigurationProvider(agentEvents: EventDispatcher<AgentLifeCycleL
         val providedServerUrl = environment[SERVER_URL_ECS_ENV]
         if (!StringUtil.isEmpty(providedServerUrl)) agentConfigurationEx.serverUrl = providedServerUrl
 
+        val profileId = environment[PROFILE_ID_ECS_ENV]
+        if (!StringUtil.isEmpty(profileId)) agentConfigurationEx.addSystemProperty(REQUIRED_PROFILE_ID_SYS_PROP, profileId!!)
+
         environment.entries.forEach { entry ->
             val key = entry.key
             val value = entry.value
-            if (key.startsWith(TEAMCITY_ECS_PREFIX)){
-                val parameterName = key.removePrefix(TEAMCITY_ECS_PREFIX)
+            if (key.startsWith(TEAMCITY_ECS_PROVIDED_PREFIX)){
+                val parameterName = key.removePrefix(TEAMCITY_ECS_PROVIDED_PREFIX)
                 when {
                     parameterName.startsWith(SYSTEM_PREFIX) -> agentConfigurationEx.addSystemProperty(parameterName.removePrefix(SYSTEM_PREFIX), value)
                     parameterName.startsWith(ENV_PREFIX) -> agentConfigurationEx.addEnvironmentVariable(parameterName.removePrefix(ENV_PREFIX), value)

@@ -122,7 +122,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         additionalEnvironment.put(INSTANCE_ID_ECS_ENV, instanceId)
 
         for (pair in tag.customAgentConfigurationParameters){
-            additionalEnvironment.put(TEAMCITY_ECS_PREFIX + pair.key, pair.value)
+            additionalEnvironment.put(TEAMCITY_ECS_PROVIDED_PREFIX + pair.key, pair.value)
         }
 
         val tasks = apiConnector.runTask(launchType, taskDefinition, cluster, taskGroup, subnets, additionalEnvironment, startedByTeamCity(serverUUID))

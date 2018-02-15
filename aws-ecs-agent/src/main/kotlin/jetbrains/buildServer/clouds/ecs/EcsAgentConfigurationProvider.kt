@@ -26,6 +26,9 @@ class EcsAgentConfigurationProvider(agentEvents: EventDispatcher<AgentLifeCycleL
         val providedServerUrl = environment[SERVER_URL_ECS_ENV]
         if (!StringUtil.isEmpty(providedServerUrl)) agentConfigurationEx.serverUrl = providedServerUrl
 
+        val profileId = environment[PROFILE_ID_ECS_ENV]
+        if (!StringUtil.isEmpty(profileId)) agentConfigurationEx.addConfigurationParameter(REQUIRED_PROFILE_ID_CONFIG_PARAM, profileId!!)
+
         environment.entries.forEach { entry ->
             val key = entry.key
             val value = entry.value

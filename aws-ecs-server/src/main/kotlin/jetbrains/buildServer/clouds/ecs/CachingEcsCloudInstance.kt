@@ -18,10 +18,6 @@ class CachingEcsCloudInstance(val inner: EcsCloudInstance, val cache: EcsDataCac
         cache.cleanInstanceStatus(taskArn)
     }
 
-    override fun generateAgentName(): String {
-        return inner.generateAgentName()
-    }
-
     override fun getStatus(): InstanceStatus {
         return cache.getInstanceStatus(inner.taskArn, { inner.status })
     }

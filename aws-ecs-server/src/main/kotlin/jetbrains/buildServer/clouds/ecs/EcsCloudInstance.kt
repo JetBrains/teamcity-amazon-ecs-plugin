@@ -5,5 +5,4 @@ import jetbrains.buildServer.clouds.CloudInstance
 interface EcsCloudInstance : CloudInstance {
     val taskArn: String
     fun terminate()
-    fun generateAgentName(): String
 }

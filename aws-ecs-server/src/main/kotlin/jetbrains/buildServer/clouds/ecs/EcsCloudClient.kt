@@ -15,7 +15,6 @@ class EcsCloudClient(images: List<EcsCloudImage>,
                      private val cloudProfileId: String) : CloudClientEx {
     private val LOG = Logger.getInstance(EcsCloudClient::class.java.getName())
 
-    private var myCurrentError: CloudErrorInfo? = null
     private var myImageIdToImageMap: ConcurrentHashMap<String, EcsCloudImage> = ConcurrentHashMap(Maps.uniqueIndex(images, { it?.id }))
 
     init {
@@ -33,7 +32,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
     }
 
     override fun getErrorInfo(): CloudErrorInfo? {
-        return myCurrentError
+        return null
     }
 
     override fun canStartNewInstance(image: CloudImage): Boolean {
@@ -52,12 +51,9 @@ class EcsCloudClient(images: List<EcsCloudImage>,
 
     override fun startNewInstance(image: CloudImage, tag: CloudInstanceUserData): CloudInstance {
         try{
-            val newInstance = (image as EcsCloudImage).startNewInstance(tag)
-            myCurrentError = null
-            return newInstance
+            return (image as EcsCloudImage).startNewInstance(tag)
         } catch (ex: Exception){
             LOG.debug("Failed to start cloud instance", ex)
-            myCurrentError = CloudErrorInfo("Failed to start cloud instance." + ex.localizedMessage)
             throw ex
         }
     }

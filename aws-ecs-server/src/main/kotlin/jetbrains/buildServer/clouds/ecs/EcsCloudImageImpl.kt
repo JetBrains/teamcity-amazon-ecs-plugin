@@ -109,24 +109,31 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
     @Synchronized
     override fun startNewInstance(tag: CloudInstanceUserData): EcsCloudInstance {
-        val launchType = LaunchType.valueOf(launchType)
-        val taskDefinition = apiConnector.describeTaskDefinition(taskDefinition) ?: throw CloudException("""Task definition $taskDefinition is missing""")
-        val instanceId = generateNewInstanceId()
+        val newInstance: CachingEcsCloudInstance
+        try {
+            val launchType = LaunchType.valueOf(launchType)
+            val taskDefinition = apiConnector.describeTaskDefinition(taskDefinition) ?: throw CloudException("""Task definition $taskDefinition is missing""")
+            val instanceId = generateNewInstanceId()
 
-        val additionalEnvironment = HashMap<String, String>()
-        additionalEnvironment.put(SERVER_UUID_ECS_ENV, serverUUID)
-        additionalEnvironment.put(SERVER_URL_ECS_ENV, tag.serverAddress)
-        additionalEnvironment.put(OFFICIAL_IMAGE_SERVER_URL_ECS_ENV, tag.serverAddress)
-        additionalEnvironment.put(PROFILE_ID_ECS_ENV, tag.profileId)
-        additionalEnvironment.put(IMAGE_ID_ECS_ENV, id)
-        additionalEnvironment.put(INSTANCE_ID_ECS_ENV, instanceId)
+            val additionalEnvironment = HashMap<String, String>()
+            additionalEnvironment.put(SERVER_UUID_ECS_ENV, serverUUID)
+            additionalEnvironment.put(SERVER_URL_ECS_ENV, tag.serverAddress)
+            additionalEnvironment.put(OFFICIAL_IMAGE_SERVER_URL_ECS_ENV, tag.serverAddress)
+            additionalEnvironment.put(PROFILE_ID_ECS_ENV, tag.profileId)
+            additionalEnvironment.put(IMAGE_ID_ECS_ENV, id)
+            additionalEnvironment.put(INSTANCE_ID_ECS_ENV, instanceId)
 
-        for (pair in tag.customAgentConfigurationParameters){
-            additionalEnvironment.put(TEAMCITY_ECS_PROVIDED_PREFIX + pair.key, pair.value)
+            for (pair in tag.customAgentConfigurationParameters){
+                additionalEnvironment.put(TEAMCITY_ECS_PROVIDED_PREFIX + pair.key, pair.value)
+            }
+
+            val tasks = apiConnector.runTask(launchType, taskDefinition, cluster, taskGroup, subnets, additionalEnvironment, startedByTeamCity(serverUUID))
+
+            newInstance = CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, tasks[0], apiConnector), cache)
+        } catch (ex: Throwable){
+            myCurrentError = CloudErrorInfo("Failed start new instance", ex.message.toString(), ex)
+            throw ex
         }
-
-        val tasks = apiConnector.runTask(launchType, taskDefinition, cluster, taskGroup, subnets, additionalEnvironment, startedByTeamCity(serverUUID))
-        val newInstance = CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, tasks[0], apiConnector), cache)
         populateInstances()
         return newInstance
     }

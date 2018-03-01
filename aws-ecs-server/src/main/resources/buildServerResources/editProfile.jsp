@@ -142,6 +142,14 @@
             </td>
         </tr>
         <tr class="advancedSetting">
+            <th>Assign public IP:</th>
+            <td>
+                <input type="checkbox" id="${cons.assignPublicIp}" wrap="off" data-id="${cons.assignPublicIp}" data-err-id="${cons.assignPublicIp}"/>
+                <div class="smallNoteAttention">Enable or disable auto-assign public IP.</div>
+                <span class="error option-error option-error_${cons.assignPublicIp}"></span>
+            </td>
+        </tr>
+        <tr class="advancedSetting">
             <th>Max number of instances:</th>
             <td>
                 <div>

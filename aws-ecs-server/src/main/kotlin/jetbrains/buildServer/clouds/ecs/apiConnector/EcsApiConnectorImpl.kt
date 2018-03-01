@@ -79,7 +79,7 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
         cloudWatch = cloudWatchBuilder.build()
     }
 
-    override fun runTask(launchType: LaunchType, taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, subnets:Collection<String>, additionalEnvironment: Map<String, String>, startedBy: String?): List<EcsTask> {
+    override fun runTask(launchType: LaunchType, taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, subnets: Collection<String>, assignPublicIp: Boolean, additionalEnvironment: Map<String, String>, startedBy: String?): List<EcsTask> {
         val containerOverrides = taskDefinition.containers.map {
             containerName -> ContainerOverride()
                                 .withName(containerName)
@@ -93,7 +93,12 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
                 .withStartedBy(startedBy)
         if(cluster != null && !cluster.isEmpty()) request = request.withCluster(cluster)
         if(taskGroup != null && !taskGroup.isEmpty()) request = request.withGroup(taskGroup)
-        if(!subnets.isEmpty()) request = request.withNetworkConfiguration(NetworkConfiguration().withAwsvpcConfiguration(AwsVpcConfiguration().withSubnets(subnets)))
+        var awsVpcConfiguration = AwsVpcConfiguration()
+        if(!subnets.isEmpty()) {
+            awsVpcConfiguration = awsVpcConfiguration.withSubnets(subnets)
+        }
+        awsVpcConfiguration = awsVpcConfiguration.withAssignPublicIp(if(assignPublicIp) AssignPublicIp.ENABLED else AssignPublicIp.DISABLED)
+        request = request.withNetworkConfiguration(NetworkConfiguration().withAwsvpcConfiguration(awsVpcConfiguration))
 
         val runTaskResult = ecs.runTask(request)
         if (!runTaskResult.failures.isEmpty())
@@ -103,7 +108,7 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
     }
 
     override fun listTaskDefinitions(): List<String> {
-        var taskDefArns:List<String> = ArrayList<String>()
+        var taskDefArns:List<String> = ArrayList()
         var nextToken: String? = null;
         do{
             var request = ListTaskDefinitionsRequest()

@@ -41,4 +41,7 @@ class EcsCloudImageData(private val rawImageData: CloudImageParameters) {
             if(prefix == null || prefix.isEmpty()) return "ecs:"
             else return prefix
         }
+
+    val assignPublicIp: Boolean
+        get() = rawImageData.getParameter(ASSIGN_PUBLIC_IP_PARAM)?.toBoolean() ?: false
 }

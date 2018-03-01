@@ -44,6 +44,9 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
             return if(rawSubnetsString.isNullOrEmpty()) emptyList() else rawSubnetsString!!.lines()
         }
 
+    private val assignPublicIp: Boolean
+        get() = imageData.assignPublicIp
+
     private val launchType: String
         get() = imageData.launchType
 
@@ -127,7 +130,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                 additionalEnvironment.put(TEAMCITY_ECS_PROVIDED_PREFIX + pair.key, pair.value)
             }
 
-            val tasks = apiConnector.runTask(launchType, taskDefinition, cluster, taskGroup, subnets, additionalEnvironment, startedByTeamCity(serverUUID))
+            val tasks = apiConnector.runTask(launchType, taskDefinition, cluster, taskGroup, subnets, assignPublicIp, additionalEnvironment, startedByTeamCity(serverUUID))
 
             newInstance = CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, tasks[0], apiConnector), cache)
         } catch (ex: Throwable){

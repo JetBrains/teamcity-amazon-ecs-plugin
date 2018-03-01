@@ -150,10 +150,8 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
-        this.$assignPublicIp.on('change', function (e, value) {
-            if(value !== undefined) this.$assignPublicIp.val(value);
-            this._image['assignPublicIp'] = this.$assignPublicIp.val();
-            this.validateOptions(e.target.getAttribute('data-id'));
+        this.$assignPublicIp.click(function() {
+            this._image['assignPublicIp'] = this.$assignPublicIp.prop('checked');
         }.bind(this));
 
         this.$maxInstances.on('change', function (e, value) {
@@ -278,7 +276,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$agentNamePrefix.trigger('change', image['agentNamePrefix'] || '');
         this.$taskGroup.trigger('change', image['taskGroup'] || '');
         this.$subnets.trigger('change', image['subnets'] || '');
-        this.$assignPublicIp.trigger('change', image['assignPublicIp'] || '');
+        this.$assignPublicIp.prop('checked', image['assignPublicIp'] === 'true' ? image['assignPublicIp'] : '');
         this.selectCluster(image['cluster'] || '');
         this.$maxInstances.trigger('change', image['maxInstances'] || '');
         this.$cpuReservationLimit.trigger('change', image['cpuReservationLimit'] || '');
@@ -295,7 +293,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$agentNamePrefix.trigger('change', '');
         this.$taskGroup.trigger('change', '');
         this.$subnets.trigger('change', '');
-        this.$assignPublicIp.trigger('change', '');
+        this.$assignPublicIp.prop('checked', '');
         this.selectCluster('');
         this.$maxInstances.trigger('change', '');
         this.$cpuReservationLimit.trigger('change', '');

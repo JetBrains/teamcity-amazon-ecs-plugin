@@ -93,12 +93,11 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
                 .withStartedBy(startedBy)
         if(cluster != null && !cluster.isEmpty()) request = request.withCluster(cluster)
         if(taskGroup != null && !taskGroup.isEmpty()) request = request.withGroup(taskGroup)
-        var awsVpcConfiguration = AwsVpcConfiguration()
-        if(!subnets.isEmpty()) {
-            awsVpcConfiguration = awsVpcConfiguration.withSubnets(subnets)
-        }
-        awsVpcConfiguration = awsVpcConfiguration.withAssignPublicIp(if(assignPublicIp) AssignPublicIp.ENABLED else AssignPublicIp.DISABLED)
-        request = request.withNetworkConfiguration(NetworkConfiguration().withAwsvpcConfiguration(awsVpcConfiguration))
+        if(!subnets.isEmpty()) request = request.withNetworkConfiguration(
+                NetworkConfiguration().withAwsvpcConfiguration(
+                        AwsVpcConfiguration()
+                                .withSubnets(subnets)
+                                .withAssignPublicIp(if(assignPublicIp) AssignPublicIp.ENABLED else AssignPublicIp.DISABLED)))
 
         val runTaskResult = ecs.runTask(request)
         if (!runTaskResult.failures.isEmpty())

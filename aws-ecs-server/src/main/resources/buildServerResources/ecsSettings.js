@@ -118,6 +118,22 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
             if(value !== undefined) this.$launchType.val(value);
             this._image['launchType'] = this.$launchType.val();
             this.validateOptions(e.target.getAttribute('data-id'));
+            var closestTr = this.$subnets.closest('tr');
+            if(closestTr){
+                if(this.$launchType.val() === 'FARGATE'){
+                    closestTr.removeClass("advancedSetting");
+                    closestTr.removeClass("advancedSettingHighlight");
+                    closestTr.removeClass("advanced_hidden");
+                } else {
+                    closestTr.addClass("advancedSetting");
+                    if($j("tr[class*='advancedSettingHighlight']")) {
+                        closestTr.addClass("advancedSettingHighlight");
+                    }
+                    if($j("tr[class*='advanced_hidden']")) {
+                        closestTr.addClass("advanced_hidden");
+                    }
+                }
+            }
         }.bind(this));
 
         this.$taskDefinition.on('change', function (e, value) {

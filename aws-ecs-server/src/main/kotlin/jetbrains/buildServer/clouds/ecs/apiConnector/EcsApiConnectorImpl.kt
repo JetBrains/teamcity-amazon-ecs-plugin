@@ -11,6 +11,7 @@ import com.amazonaws.services.cloudwatch.model.Statistic
 import com.amazonaws.services.ecs.AmazonECS
 import com.amazonaws.services.ecs.AmazonECSClientBuilder
 import com.amazonaws.services.ecs.model.*
+import com.intellij.openapi.diagnostic.Logger
 import jetbrains.buildServer.serverSide.TeamCityProperties
 import jetbrains.buildServer.version.ServerVersionHolder
 import java.util.*
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit
 
 
 class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) : EcsApiConnector {
+    private val LOG = Logger.getInstance(EcsApiConnectorImpl::class.java.getName())
     private val ecs: AmazonECS
     private val cloudWatch: AmazonCloudWatch
 
@@ -28,6 +30,8 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
         val httpProxyPort = TeamCityProperties.getInteger("teamcity.ecs.https.proxyPort", TeamCityProperties.getInteger("teamcity.https.proxyPort", -1))
         val httpProxyUser = TeamCityProperties.getProperty("teamcity.ecs.https.proxyLogin", TeamCityProperties.getProperty("teamcity.https.proxyLogin"))
         val httpProxyPassword = TeamCityProperties.getProperty("teamcity.ecs.https.proxyPassword", TeamCityProperties.getProperty("teamcity.https.proxyPassword"))
+
+        LOG.debug(String.format("ECS client proxy settings: proxy - %s, port - %d, user - %s", httpProxy, httpProxyPort, httpProxyUser, httpProxyPassword))
 
         if (!httpProxy.isEmpty()){
            clientConfig.setProxyHost(httpProxy)

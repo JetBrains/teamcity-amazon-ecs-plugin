@@ -9,6 +9,7 @@ import jetbrains.buildServer.clouds.CloudInstanceUserData
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import jetbrains.buildServer.serverSide.TeamCityProperties
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                         private val apiConnector: EcsApiConnector,
@@ -23,7 +24,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
     private val LOG = Logger.getInstance(EcsCloudImageImpl::class.java.getName())
 
-    private val myIdToInstanceMap = HashMap<String, EcsCloudInstance>()
+    private val myIdToInstanceMap = ConcurrentHashMap<String, EcsCloudInstance>()
     private var myCurrentError: CloudErrorInfo? = null
 
     private val instanceLimit: Int

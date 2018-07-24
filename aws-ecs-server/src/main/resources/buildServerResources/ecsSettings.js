@@ -5,7 +5,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
 
     testConnectionUrl: '',
 
-    _dataKeys: [ 'launchType', 'taskDefinition', 'agentNamePrefix', 'cluster', 'taskGroup', 'subnets', 'assignPublicIp', 'maxInstances', 'cpuReservationLimit', 'agent_pool_id'],
+    _dataKeys: [ 'launchType', 'taskDefinition', 'agentNamePrefix', 'cluster', 'taskGroup', 'subnets', 'securityGroups', 'assignPublicIp', 'maxInstances', 'cpuReservationLimit', 'agent_pool_id'],
 
     templates: {
         imagesTableRow: $j('<tr class="imagesTableRow">\
@@ -63,6 +63,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$agentNamePrefix = $j('#agentNamePrefix');
         this.$taskGroup = $j('#taskGroup');
         this.$subnets = $j('#subnets');
+        this.$securityGroups = $j('#securityGroups');
         this.$assignPublicIp = $j('#assignPublicIp');
         this.$cluster = $j('#cluster');
         this.$maxInstances = $j('#maxInstances');
@@ -163,6 +164,12 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$subnets.on('change', function (e, value) {
             if(value !== undefined) this.$subnets.val(value);
             this._image['subnets'] = this.$subnets.val();
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
+
+        this.$securityGroups.on('change', function (e, value) {
+            if(value !== undefined) this.$securityGroups.val(value);
+            this._image['securityGroups'] = this.$securityGroups.val();
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
@@ -292,6 +299,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$agentNamePrefix.trigger('change', image['agentNamePrefix'] || '');
         this.$taskGroup.trigger('change', image['taskGroup'] || '');
         this.$subnets.trigger('change', image['subnets'] || '');
+        this.$securityGroups.trigger('change', image['securityGroups'] || '');
         this.$assignPublicIp.prop('checked', image['assignPublicIp'] === 'true' ? image['assignPublicIp'] : '');
         this.selectCluster(image['cluster'] || '');
         this.$maxInstances.trigger('change', image['maxInstances'] || '');
@@ -309,6 +317,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$agentNamePrefix.trigger('change', '');
         this.$taskGroup.trigger('change', '');
         this.$subnets.trigger('change', '');
+        this.$securityGroups.trigger('change', '');
         this.$assignPublicIp.prop('checked', '');
         this.selectCluster('');
         this.$maxInstances.trigger('change', '');

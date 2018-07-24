@@ -14,6 +14,7 @@ interface EcsApiConnector {
                 cluster: String?,
                 taskGroup: String?,
                 subnets: Collection<String>,
+                securityGroups: Collection<String>,
                 assignPublicIp: Boolean,
                 additionalEnvironment: Map<String, String>,
                 startedBy: String?): List<EcsTask>

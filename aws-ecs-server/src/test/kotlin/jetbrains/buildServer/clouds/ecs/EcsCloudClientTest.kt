@@ -3,6 +3,7 @@ package jetbrains.buildServer.clouds.ecs
 import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.clouds.CloudClientParameters
 import jetbrains.buildServer.clouds.CloudImage
+import jetbrains.buildServer.clouds.CloudImageParameters
 import jetbrains.buildServer.clouds.InstanceStatus
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import org.jmock.Expectations
@@ -53,7 +54,30 @@ class EcsCloudClientTest : BaseTestCase() {
     }
 
     private fun createClient(images: List<EcsCloudImage>): EcsCloudClient {
-        return createClient(images, CloudClientParameters())
+        return createClient(images, object: CloudClientParameters() {
+            val map = hashMapOf<String, String>()
+
+            override fun getParameter(name: String): String? {
+                return map[name]
+            }
+
+            override fun getParameters(): MutableMap<String, String> {
+                return map
+            }
+
+            override fun getProfileDescription(): String {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun getCloudImages(): MutableCollection<CloudImageParameters> {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun listParameterNames(): MutableCollection<String> {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+        })
     }
 
     private fun createClient(images: List<EcsCloudImage>, cloudClientParameters: CloudClientParameters): EcsCloudClient {
@@ -107,8 +131,30 @@ class EcsCloudClientTest : BaseTestCase() {
             }
         })
         val images = listOf(image)
-        val cloudClientParameters = CloudClientParameters()
-        cloudClientParameters.setParameter(PROFILE_INSTANCE_LIMIT_PARAM, "1")
+        val cloudClientParameters = object : CloudClientParameters(){
+            val map = hashMapOf(Pair(PROFILE_INSTANCE_LIMIT_PARAM, "1"))
+
+            override fun getParameter(name: String): String? {
+                return map[name]
+            }
+
+            override fun getParameters(): MutableMap<String, String> {
+                return map
+            }
+
+            override fun getProfileDescription(): String {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun getCloudImages(): MutableCollection<CloudImageParameters> {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun listParameterNames(): MutableCollection<String> {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+        }
         val cloudClient = createClient(images, cloudClientParameters)
         Assert.assertFalse(cloudClient.canStartNewInstance(image))
     }

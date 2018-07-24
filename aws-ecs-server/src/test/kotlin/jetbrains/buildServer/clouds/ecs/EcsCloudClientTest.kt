@@ -150,6 +150,10 @@ class EcsCloudClientTest : BaseTestCase() {
 }
 
 class MockCloudClientParameters(val params: Map<String, String>) : CloudClientParameters() {
+    override fun getProfileId(): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun getParameter(name: String): String? {
         return params.get(name)
     }

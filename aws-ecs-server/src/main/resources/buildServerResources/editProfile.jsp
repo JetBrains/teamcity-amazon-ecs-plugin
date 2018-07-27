@@ -145,7 +145,7 @@
             <th>Security Groups:</th>
             <td>
                 <textarea id="${cons.securityGroups}" wrap="off" class="securityGroupList" data-id="${cons.securityGroups}" data-err-id="${cons.securityGroups}"></textarea>
-                <div class="smallNoteAttention">Optional new line delimited list of security group IDs in cluster VPC that TeamCity should apply to the task if run with the networking mode awsvpc. If left blank, the default VPC security group will be used.</div>
+                <div class="smallNoteAttention">New line delimited list of security group IDs in cluster VPC that TeamCity should apply to the task if run with the networking mode awsvpc. If left blank, the default VPC security group will be used.</div>
                 <span class="error option-error option-error_${cons.securityGroups}"></span>
             </td>
         </tr>

@@ -344,14 +344,6 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
                 }
             }.bind(this),
 
-            subnets : function () {
-                var launchType = this._image['launchType'];
-                if (launchType === 'FARGATE' && !this._image['subnets']) {
-                    this.addOptionError('requiredForFargate', 'subnets');
-                    isValid = false;
-                }
-            }.bind(this),
-
             maxInstances: function () {
                 var maxInstances = this._image['maxInstances'];
                 if (maxInstances && (!$j.isNumeric(maxInstances) || maxInstances < 0 )) {

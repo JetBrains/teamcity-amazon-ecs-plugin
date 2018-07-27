@@ -20,3 +20,8 @@ textarea .subnetList {
     width: 100%;
     height: 30em;
 }
+
+textarea .securityGroupList {
+    width: 100%;
+    height: 30em;
+}

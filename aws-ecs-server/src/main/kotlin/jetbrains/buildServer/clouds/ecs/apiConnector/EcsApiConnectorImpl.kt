@@ -83,7 +83,7 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
         cloudWatch = cloudWatchBuilder.build()
     }
 
-    override fun runTask(launchType: LaunchType, taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, subnets: Collection<String>, assignPublicIp: Boolean, additionalEnvironment: Map<String, String>, startedBy: String?): List<EcsTask> {
+    override fun runTask(launchType: LaunchType, taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, subnets: Collection<String>, securityGroups: Collection<String>, assignPublicIp: Boolean, additionalEnvironment: Map<String, String>, startedBy: String?): List<EcsTask> {
         val containerOverrides = taskDefinition.containers.map {
             containerName -> ContainerOverride()
                                 .withName(containerName)
@@ -97,11 +97,11 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
                 .withStartedBy(startedBy)
         if(cluster != null && !cluster.isEmpty()) request = request.withCluster(cluster)
         if(taskGroup != null && !taskGroup.isEmpty()) request = request.withGroup(taskGroup)
-        if(!subnets.isEmpty()) request = request.withNetworkConfiguration(
+        if(!subnets.isEmpty() || !securityGroups.isEmpty()) request = request.withNetworkConfiguration(
                 NetworkConfiguration().withAwsvpcConfiguration(
                         AwsVpcConfiguration()
-                                .withSubnets(subnets)
-                                .withAssignPublicIp(if(assignPublicIp) AssignPublicIp.ENABLED else AssignPublicIp.DISABLED)))
+                                .let { if (subnets.isNotEmpty()) it.withSubnets(subnets).withAssignPublicIp(if(assignPublicIp) AssignPublicIp.ENABLED else AssignPublicIp.DISABLED) else it }
+                                .let { if (securityGroups.isNotEmpty()) it.withSecurityGroups(securityGroups) else it }))
 
         val runTaskResult = ecs.runTask(request)
         if (!runTaskResult.failures.isEmpty())

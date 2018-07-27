@@ -13,6 +13,7 @@ val LAUNCH_TYPE_PARAM = "launchType"
 val TASK_DEFINITION_PARAM = "taskDefinition"
 val TASK_GROUP_PARAM = "taskGroup"
 val SUBNETS_PARAM = "subnets"
+val SECURITY_GROUPS_PARAM = "securityGroups"
 val ASSIGN_PUBLIC_IP_PARAM = "assignPublicIp"
 val CLUSTER_PARAM = "cluster"
 val AGENT_NAME_PREFIX = "agentNamePrefix"
@@ -24,6 +25,7 @@ class EcsParameterConstants{
     val cluster: String = CLUSTER_PARAM
     val taskGroup: String = TASK_GROUP_PARAM
     val subnets: String = SUBNETS_PARAM
+    val securityGroups: String = SECURITY_GROUPS_PARAM
     val assignPublicIp: String = ASSIGN_PUBLIC_IP_PARAM
     val maxInstances: String = IMAGE_INSTANCE_LIMIT_PARAM
     val agentPoolIdField: String = CloudImageParameters.AGENT_POOL_ID_FIELD

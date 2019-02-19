@@ -8,7 +8,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.11.242'
+        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.11.501'
     }
 }
 
@@ -19,35 +19,11 @@ teamcity {
         descriptor = rootProject.file('teamcity-plugin.xml')
         tokens = [Plugin_Version: project.version]
     }
-
-    environments {
-        TcTrunk {
-            version = '2018.1'
-            homeDir = file("/home/user/projects/teamcity/trunk/buildserver/.idea_artifacts/dist-teamcity-tomcat")
-            dataDir = file("$rootDir/teamcity/data/trunk")
-            javaHome = file('/usr/lib/jvm/java-8-openjdk-amd64')
-            serverOptions '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=10111'
-        }
-        Tc20172 {
-            version = '2017.2'
-            homeDir = file("/home/user/projects/teamcity/2017.2.x/buildserver/.idea_artifacts/dist-teamcity-tomcat")
-            dataDir = file("$rootDir/teamcity/data/2017.2")
-            javaHome = file('/usr/lib/jvm/java-8-openjdk-amd64')
-            serverOptions '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=10111'
-        }
-        Tc20171 {
-            version = '2017.1'
-            homeDir = file("/home/lodkin/teamcity/2017.1.x/buildserver/.idea_artifacts/dist-teamcity-tomcat")
-            dataDir = file("$rootDir/teamcity/data/2017.1")
-            javaHome = file('/usr/lib/jvm/java-8-openjdk-amd64')
-            serverOptions '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=10111'
-        }
-    }
 }
 
 dependencies {
-    compile 'com.amazonaws:aws-java-sdk-ecs:1.11.242'
-    compile 'com.amazonaws:aws-java-sdk-cloudwatch:1.11.242'
+    compile 'com.amazonaws:aws-java-sdk-ecs:1.11.501'
+    compile 'com.amazonaws:aws-java-sdk-cloudwatch:1.11.501'
 
     compile project(':aws-ecs-common')
     agent project(path: ':aws-ecs-agent', configuration: 'plugin')

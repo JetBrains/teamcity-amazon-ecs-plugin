@@ -111,8 +111,9 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                 myCurrentError = null
             })
         } catch (ex: Throwable) {
-            myCurrentError = CloudErrorInfo("Failed populate instances", ex.message.toString(), ex)
-            throw ex
+            val msg = "Unable to populate instances for ${imageData.id}"
+            LOG.warnAndDebugDetails(msg, ex)
+            myCurrentError = CloudErrorInfo(msg, ex.message.toString(), ex)
         }
     }
 

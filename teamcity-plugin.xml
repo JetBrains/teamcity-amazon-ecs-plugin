@@ -7,7 +7,7 @@
         <description>Allows running TeamCity build agents on Amazon Elastic Container Service</description>
         <vendor>
             <name>JetBrains, s.r.o.</name>
-            <url>http://www.jetbrains.com</url>
+            <url>https://www.jetbrains.com</url>
         </vendor>
     </info>
     <deployment use-separate-classloader="true"/>

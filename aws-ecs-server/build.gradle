@@ -3,7 +3,7 @@ plugins {
 }
 
 repositories {
-    maven { url "http://jcenter.bintray.com" }
+    maven { url "https://jcenter.bintray.com" }
 }
 
 dependencyManagement {

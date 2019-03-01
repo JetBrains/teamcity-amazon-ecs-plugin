@@ -1,5 +1,5 @@
 # TeamCity Amazon ECS plugin
-[![official JetBrains project](http://jb.gg/badges/official.svg)](https://plugins.jetbrains.com/plugin/10067-amazon-ecs-support) 
+[![official JetBrains project](https://jb.gg/badges/official.svg)](https://plugins.jetbrains.com/plugin/10067-amazon-ecs-support) 
 [![plugin status]( 
 https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:TestDrive_TeamCityAmazonEcsPlugin_Build)/statusIcon.svg)](https://teamcity.jetbrains.com/viewType.html?buildTypeId=TestDrive_TeamCityAmazonEcsPlugin_Build&guest=1)
 

@@ -82,6 +82,9 @@ class EcsCloudInstanceImpl(private val instanceId: String, val cloudImage: EcsCl
     }
 
     override fun containsAgent(agent: AgentDescription): Boolean {
+        if (agent.configurationParameters.get(REQUIRED_PROFILE_ID_CONFIG_PARAM) == null)
+            return false
+
         return instanceId == agent.configurationParameters.get(Constants.ENV_PREFIX + INSTANCE_ID_ECS_ENV)
     }
 

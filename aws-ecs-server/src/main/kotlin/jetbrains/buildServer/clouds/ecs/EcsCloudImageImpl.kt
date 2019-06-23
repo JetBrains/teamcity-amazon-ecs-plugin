@@ -2,6 +2,7 @@ package jetbrains.buildServer.clouds.ecs
 
 import com.amazonaws.services.ecs.model.LaunchType
 import com.intellij.openapi.diagnostic.Logger
+import jetbrains.buildServer.agent.AgentRuntimeProperties.AGENT_NAME
 import jetbrains.buildServer.clouds.CloudErrorInfo
 import jetbrains.buildServer.clouds.CloudException
 import jetbrains.buildServer.clouds.CloudInstance

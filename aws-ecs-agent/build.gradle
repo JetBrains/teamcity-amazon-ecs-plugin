@@ -18,6 +18,7 @@ dependencies {
     compile project(':aws-ecs-common')
     provided "org.jetbrains.teamcity.internal:agent:$teamcityVersion"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.json:json:20180813"
     testCompile 'org.testng:testng:6.8'
     testCompile 'org.jmock:jmock:2.5.1'
 }

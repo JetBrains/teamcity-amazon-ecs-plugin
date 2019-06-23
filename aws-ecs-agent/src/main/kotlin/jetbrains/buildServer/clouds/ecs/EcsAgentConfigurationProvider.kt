@@ -18,7 +18,7 @@ import java.lang.RuntimeException
  */
 class EcsAgentConfigurationProvider(agentEvents: EventDispatcher<AgentLifeCycleListener>,
                                     private val agentConfigurationEx: BuildAgentConfigurationEx) {
-    private val REGEX = Regex("arn:aws:ecs:[^:]+:\\d+:task\\/(\\w+\\/\\w+)")
+    private val REGEX = Regex("arn:aws:ecs:[^:]+:\\d+:task\\/(.+)")
 
     init {
         agentEvents.addListener(object : AgentLifeCycleAdapter() {
@@ -29,16 +29,27 @@ class EcsAgentConfigurationProvider(agentEvents: EventDispatcher<AgentLifeCycleL
         })
     }
 
-    private fun readMetaDataV2(): String?{
+    private fun readMetaDatFromUrl(metaDataUrl: String): String?{
         val client = HttpUtil.createHttpClient(5)
-        val uri = "http://169.254.170.2/v2/metadata"
-        val get = GetMethod(uri)
-        client.executeMethod(get)
-        if (get.statusCode != HttpStatus.SC_OK) {
-            throw RuntimeException("Server returned [" + get.statusCode + "] " + get.statusText + " for " + uri)
+//        val uri = "http://169.254.170.2/v2/metadata"
+        val get = GetMethod(metaDataUrl + "/task")
+        try {
+            client.executeMethod(get)
+            if (get.statusCode != HttpStatus.SC_OK) {
+                throw RuntimeException("Server returned [" + get.statusCode + "] " + get.statusText + " for " + metaDataUrl)
+            }
+            val response = get.responseBodyAsString
+            val obj = JSONObject(response)
+            val taskArn = obj.getString("TaskARN")
+            val find = REGEX.find(taskArn)
+            return find?.groups?.get(1)?.value
+        } finally {
+            get.releaseConnection()
         }
-        val response = get.responseBodyAsString
-        val obj = JSONObject(response)
+    }
+
+    private fun readMetaDataFile(metadataFilePath: String): String? {
+        val obj = JSONObject(File(metadataFilePath).readText())
         val taskArn = obj.getString("TaskARN")
         val find = REGEX.find(taskArn)
         return find?.groups?.get(1)?.value
@@ -52,7 +63,12 @@ class EcsAgentConfigurationProvider(agentEvents: EventDispatcher<AgentLifeCycleL
         val profileId = environment[PROFILE_ID_ECS_ENV]
         if (!StringUtil.isEmpty(profileId)) agentConfigurationEx.addConfigurationParameter(REQUIRED_PROFILE_ID_CONFIG_PARAM, profileId!!)
         if (environment[ECS_CONTAINER_METADATA_URI] != null){
-            val data = readMetaDataV2()
+            val data = readMetaDatFromUrl(environment[ECS_CONTAINER_METADATA_URI]!!)
+            if (data != null) {
+                agentConfigurationEx.name = data
+            }
+        } else if (environment[ECS_CONTAINER_METADATA_FILE] != null) {
+            val data = readMetaDataFile(environment[ECS_CONTAINER_METADATA_FILE]!!)
             if (data != null) {
                 agentConfigurationEx.name = data
             }
@@ -66,13 +82,4 @@ class EcsAgentConfigurationProvider(agentEvents: EventDispatcher<AgentLifeCycleL
             }
         }
     }
-}
-
-fun main(args: Array<String>) {
-    val obj = JSONObject(File("/Users/sergeypak/projects/Plugins/teamcity-amazon-ecs-plugin/data.json").readText())
-    val taskArn = obj.getString("TaskARN")
-    val REGEX = Regex("arn:aws:ecs:[^:]+:\\d+:task\\/(\\w+\\/\\w+)")
-    val find = REGEX.find(taskArn)
-    println(find?.groups?.get(1)?.value)
-
 }

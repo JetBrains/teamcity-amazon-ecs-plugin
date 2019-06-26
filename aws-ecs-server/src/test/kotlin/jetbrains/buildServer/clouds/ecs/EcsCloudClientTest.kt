@@ -62,7 +62,7 @@ class EcsCloudClientTest : BaseTestCase() {
     }
 
     private fun createClient(serverUuid: String, profileId: String, images: List<EcsCloudImage>, cloudClientParameters: CloudClientParameters): EcsCloudClient {
-        return EcsCloudClient(images, updater, EcsCloudClientParametersImpl(cloudClientParameters), serverUuid, profileId)
+        return EcsCloudClient(images, updater, EcsCloudClientParametersImpl(cloudClientParameters), serverUuid, createTempDir(), profileId)
     }
 
     @Test

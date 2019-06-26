@@ -8,14 +8,63 @@ import jetbrains.buildServer.clouds.CloudException
 import jetbrains.buildServer.clouds.CloudInstance
 import jetbrains.buildServer.clouds.CloudInstanceUserData
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
+import jetbrains.buildServer.messages.serviceMessages.MapSerializerUtil
 import jetbrains.buildServer.serverSide.TeamCityProperties
+import jetbrains.buildServer.util.FileUtil
+import jetbrains.buildServer.util.StringUtil
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import java.io.ByteArrayInputStream
+import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                         private val apiConnector: EcsApiConnector,
                         private val cache: EcsDataCache,
-                        private val serverUUID: String, private val profileId: String) : EcsCloudImage {
+                        private val serverUUID: String,
+                        idxStorage: File,
+                        private val profileId: String) : EcsCloudImage {
+    private val idxFile = File(idxStorage, imageName4File() + ".idx")
+    private val idxCounter = AtomicInteger(0)
+    private val idxTouched = AtomicBoolean(false)
+    private val mutex = Mutex()
+    private val LOG = Logger.getInstance(EcsCloudImageImpl::class.java.getName())
+    private val counterContext = newSingleThreadContext("IdxContext")
+
+
+    init{
+        try {
+            if (!idxFile.exists()) {
+                idxCounter.set(1)
+                idxTouched.set(true)
+                storeIdx()
+            } else {
+                runBlocking {
+                    mutex.withLock {
+                        idxCounter.set(Integer.parseInt(FileUtil.readText(idxFile)))
+                    }
+                }
+            }
+        } catch (ex: Exception) {
+            LOG.warnAndDebugDetails("Unable to process idx file '${idxFile.absolutePath}'. Will reset the index for ${imageData.taskDefinition}", ex)
+            idxCounter.set(1)
+        }
+
+        GlobalScope.async{
+            while (true) {
+                try {
+                    storeIdx()
+                    delay(1000)
+                } catch (ex: Exception){
+
+                }
+            }
+        }
+    }
 
     override fun canStartNewInstance(): Boolean {
         if(instanceLimit in 1..runningInstanceCount) return false
@@ -23,7 +72,6 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         return cpuReservalionLimit <= 0 || apiConnector.getMaxCPUReservation(cluster, monitoringPeriod) < cpuReservalionLimit
     }
 
-    private val LOG = Logger.getInstance(EcsCloudImageImpl::class.java.getName())
 
     private val myIdToInstanceMap = ConcurrentHashMap<String, EcsCloudInstance>()
     private var myCurrentError: CloudErrorInfo? = null
@@ -134,6 +182,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
             additionalEnvironment.put(PROFILE_ID_ECS_ENV, tag.profileId)
             additionalEnvironment.put(IMAGE_ID_ECS_ENV, id)
             additionalEnvironment.put(INSTANCE_ID_ECS_ENV, instanceId)
+            additionalEnvironment.put(AGENT_NAME_ECS_ENV, generateAgentName(instanceId))
 
             for (pair in tag.customAgentConfigurationParameters){
                 additionalEnvironment.put(TEAMCITY_ECS_PROVIDED_PREFIX + pair.key, pair.value)
@@ -155,6 +204,24 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
     }
 
     private fun generateNewInstanceId(): String {
-        return UUID.randomUUID().toString()
+        lateinit var retval : String
+        do{
+            retval = String.format("${imageData.taskDefinition}-${idxCounter.getAndIncrement()}")
+        } while (myIdToInstanceMap.containsKey(retval))
+        LOG.info("Will create a new instance with name $retval")
+        return retval
+    }
+
+    private fun imageName4File():String {
+        return StringUtil.replaceNonAlphaNumericChars(imageData.taskDefinition, '_')
+    }
+
+    private fun storeIdx() = runBlocking {
+        if (idxTouched.compareAndSet(true, false)){
+            mutex.withLock {
+                FileUtil.writeViaTmpFile(idxFile, ByteArrayInputStream(idxCounter.get().toString().toByteArray()),
+                        FileUtil.IOAction.DO_NOTHING)
+            }
+        }
     }
 }

@@ -4,10 +4,14 @@ import com.amazonaws.services.ecs.model.LaunchType
 import jetbrains.buildServer.clouds.CloudImageParameters
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import jetbrains.buildServer.util.StringUtil
+import java.io.File
 
 fun EcsCloudImageData.toImage(apiConnector: EcsApiConnector,
                               cache: EcsDataCache,
-                              serverUUID: String, profileId: String): EcsCloudImage  = EcsCloudImageImpl(this, apiConnector, cache, serverUUID, profileId)
+                              serverUUID: String,
+                              idxStorage: File,
+                              profileId: String): EcsCloudImage
+        = EcsCloudImageImpl(this, apiConnector, cache, serverUUID, idxStorage, profileId)
 
 class EcsCloudImageData(private val rawImageData: CloudImageParameters) {
     val id: String = rawImageData.id!!

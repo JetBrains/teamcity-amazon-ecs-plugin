@@ -28,10 +28,10 @@ dependencies {
     compile project(':aws-ecs-common')
     agent project(path: ':aws-ecs-agent', configuration: 'plugin')
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.2"
 
 
-    compile 'jetbrains.buildServer.util:amazon-util:11'
+    compile 'jetbrains.buildServer.util:amazon-util:32'
     provided "org.jetbrains.teamcity:cloud-interface:$teamcityVersion"
     provided "org.jetbrains.teamcity:cloud-shared:$teamcityVersion"
     provided "org.jetbrains.teamcity:cloud-server-api:$teamcityVersion"

@@ -62,7 +62,9 @@ class EcsAgentConfigurationProvider(agentEvents: EventDispatcher<AgentLifeCycleL
 
         val profileId = environment[PROFILE_ID_ECS_ENV]
         if (!StringUtil.isEmpty(profileId)) agentConfigurationEx.addConfigurationParameter(REQUIRED_PROFILE_ID_CONFIG_PARAM, profileId!!)
-        if (environment[ECS_CONTAINER_METADATA_URI] != null){
+        if (environment[AGENT_NAME_ECS_ENV] != null) {
+            agentConfigurationEx.name = environment[AGENT_NAME_ECS_ENV]
+        } else if (environment[ECS_CONTAINER_METADATA_URI] != null){
             val data = readMetaDatFromUrl(environment[ECS_CONTAINER_METADATA_URI]!!)
             if (data != null) {
                 agentConfigurationEx.name = data

@@ -160,11 +160,16 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
     }
 
     override fun describeTask(taskArn: String, cluster: String?): EcsTask? {
-        val tasksResult = ecs.describeTasks(DescribeTasksRequest().withTasks(taskArn).withCluster(cluster))
-        if (!tasksResult.failures.isEmpty())
-            throw EcsApiCallFailureException(tasksResult.failures)
+        try {
+            val tasksResult = ecs.describeTasks(DescribeTasksRequest().withTasks(taskArn).withCluster(cluster))
+            if (!tasksResult.failures.isEmpty())
+                throw EcsApiCallFailureException(tasksResult.failures)
 
-        return tasksResult.tasks[0]?.wrap()
+            return tasksResult.tasks[0]?.wrap()
+        } catch (ex:Throwable){
+            LOG.warnAndDebugDetails("Unable find task $taskArn in cluster $cluster", ex)
+            return null
+        }
     }
 
     override fun listClusters(): List<String> {

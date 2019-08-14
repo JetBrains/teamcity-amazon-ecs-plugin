@@ -25,7 +25,7 @@ dependencies {
     compile 'com.amazonaws:aws-java-sdk-ecs:1.11.501'
     compile 'com.amazonaws:aws-java-sdk-cloudwatch:1.11.501'
 
-    compile project(':aws-ecs-common')
+    compile project(path: ':aws-ecs-common', configuration:'default')
     agent project(path: ':aws-ecs-agent', configuration: 'plugin')
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.2"

@@ -15,7 +15,7 @@ teamcity {
 }
 
 dependencies {
-    compile project(':aws-ecs-common')
+    compile project(path: ':aws-ecs-common', configuration:'default')
     provided "org.jetbrains.teamcity.internal:agent:$teamcityVersion"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.json:json:20180813"

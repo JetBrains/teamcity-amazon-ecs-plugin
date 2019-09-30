@@ -2,13 +2,11 @@ package jetbrains.buildServer.clouds.ecs
 
 import com.amazonaws.services.ecs.model.LaunchType
 import com.intellij.openapi.diagnostic.Logger
-import jetbrains.buildServer.agent.AgentRuntimeProperties.AGENT_NAME
 import jetbrains.buildServer.clouds.CloudErrorInfo
 import jetbrains.buildServer.clouds.CloudException
 import jetbrains.buildServer.clouds.CloudInstance
 import jetbrains.buildServer.clouds.CloudInstanceUserData
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
-import jetbrains.buildServer.messages.serviceMessages.MapSerializerUtil
 import jetbrains.buildServer.serverSide.TeamCityProperties
 import jetbrains.buildServer.util.FileUtil
 import jetbrains.buildServer.util.StringUtil
@@ -21,6 +19,8 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
+
 
 class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                         private val apiConnector: EcsApiConnector,
@@ -28,12 +28,18 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                         private val serverUUID: String,
                         idxStorage: File,
                         private val profileId: String) : EcsCloudImage {
+
+    private val LOG = Logger.getInstance(EcsCloudImageImpl::class.java.getName())
+    private val ERROR_INSTANCES_TIMEOUT: Long = 60*1000
+
     private val idxFile = File(idxStorage, imageName4File() + ".idx")
     private val idxCounter = AtomicInteger(0)
     private val idxTouched = AtomicBoolean(false)
-    private val mutex = Mutex()
-    private val LOG = Logger.getInstance(EcsCloudImageImpl::class.java.getName())
+    private val idxMutex = Mutex()
     private val counterContext = newSingleThreadContext("IdxContext")
+    private val errorInstances= ConcurrentHashMap<String, Pair<EcsCloudInstance, Long>>()
+
+    private val muteTime = AtomicLong(0)
 
 
     init{
@@ -44,7 +50,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                 storeIdx()
             } else {
                 runBlocking {
-                    mutex.withLock {
+                    idxMutex.withLock {
                         idxCounter.set(Integer.parseInt(FileUtil.readText(idxFile)))
                     }
                 }
@@ -58,15 +64,18 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
             while (true) {
                 try {
                     storeIdx()
+                    expireErrorInstances()
                     delay(1000)
                 } catch (ex: Exception){
-
+                    LOG.warnAndDebugDetails("An error occurred during processing of periodic tasks", ex)
                 }
             }
         }
     }
 
     override fun canStartNewInstance(): Boolean {
+        if (System.currentTimeMillis() < muteTime.get())
+            return false
         if(instanceLimit in 1..runningInstanceCount) return false
         val monitoringPeriod = TeamCityProperties.getInteger(ECS_METRICS_MONITORING_PERIOD, 1)
         return cpuReservalionLimit <= 0 || apiConnector.getMaxCPUReservation(cluster, monitoringPeriod) < cpuReservalionLimit
@@ -139,10 +148,11 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
     override fun populateInstances() {
         try {
             val startedBy = startedByTeamCity(serverUUID)
+
             val runningTasks = apiConnector.listRunningTasks(cluster, startedBy).mapNotNull { taskArn -> apiConnector.describeTask(taskArn, cluster) }
             val stoppedTasks = apiConnector.listStoppedTasks(cluster, startedBy).mapNotNull { taskArn -> apiConnector.describeTask(taskArn, cluster) }
 
-            synchronized(myIdToInstanceMap, {
+            synchronized(myIdToInstanceMap) {
                 myIdToInstanceMap.clear()
                 for (task in runningTasks.union(stoppedTasks)) {
                     val taskProfileId = task.getOverridenContainerEnv(PROFILE_ID_ECS_ENV)
@@ -157,8 +167,11 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                         }
                     }
                 }
+                errorInstances.forEach{
+                    myIdToInstanceMap[it.key] = it.value.first
+                }
                 myCurrentError = null
-            })
+            }
         } catch (ex: Throwable) {
             val msg = "Unable to populate instances for ${imageData.id}"
             LOG.warnAndDebugDetails(msg, ex)
@@ -169,11 +182,11 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
     @Synchronized
     override fun startNewInstance(tag: CloudInstanceUserData): EcsCloudInstance {
-        val newInstance: CachingEcsCloudInstance
+        var newInstance: EcsCloudInstance
+        val launchType = LaunchType.valueOf(launchType)
+        val instanceId = generateNewInstanceId()
         try {
-            val launchType = LaunchType.valueOf(launchType)
             val taskDefinition = apiConnector.describeTaskDefinition(taskDefinition) ?: throw CloudException("""Task definition $taskDefinition is missing""")
-            val instanceId = generateNewInstanceId()
 
             val additionalEnvironment = HashMap<String, String>()
             additionalEnvironment.put(SERVER_UUID_ECS_ENV, serverUUID)
@@ -192,8 +205,9 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
             newInstance = CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, tasks[0], apiConnector), cache)
         } catch (ex: Throwable){
-            myCurrentError = CloudErrorInfo("Failed start new instance", ex.message.toString(), ex)
-            throw ex
+            newInstance = BrokenEcsCloudInstance(instanceId, this, CloudErrorInfo(ex.message.toString(), ex.message.toString(), ex))
+            errorInstances[instanceId] = Pair(newInstance, System.currentTimeMillis() + ERROR_INSTANCES_TIMEOUT)
+            muteTime.set(System.currentTimeMillis() + ERROR_INSTANCES_TIMEOUT)
         }
         populateInstances()
         return newInstance
@@ -218,9 +232,17 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
     private fun storeIdx() = runBlocking {
         if (idxTouched.compareAndSet(true, false)){
-            mutex.withLock {
+            idxMutex.withLock {
                 FileUtil.writeViaTmpFile(idxFile, ByteArrayInputStream(idxCounter.get().toString().toByteArray()),
                         FileUtil.IOAction.DO_NOTHING)
+            }
+        }
+    }
+
+    private fun expireErrorInstances() =  runBlocking {
+        errorInstances.forEach{
+            if (it.value.second < System.currentTimeMillis()) {
+                errorInstances.remove(it.key)
             }
         }
     }

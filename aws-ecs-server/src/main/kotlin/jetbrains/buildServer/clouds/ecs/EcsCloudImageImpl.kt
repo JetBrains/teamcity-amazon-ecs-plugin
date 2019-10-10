@@ -35,7 +35,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
             return false
         if(instanceLimit in 1..runningInstanceCount) return false
         val monitoringPeriod = TeamCityProperties.getInteger(ECS_METRICS_MONITORING_PERIOD, 1)
-        return cpuReservalionLimit <= 0 || apiConnector.getMaxCPUReservation(cluster, monitoringPeriod) < cpuReservalionLimit
+        return cpuReservationLimit <= 0 || apiConnector.getMaxCPUReservation(cluster, monitoringPeriod) < cpuReservationLimit
     }
 
 
@@ -45,8 +45,8 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
     private val instanceLimit: Int
         get() = imageData.instanceLimit
 
-    private val cpuReservalionLimit: Int
-        get() = imageData.cpuReservalionLimit
+    private val cpuReservationLimit: Int
+        get() = imageData.cpuReservationLimit
 
     private val cluster: String?
         get() = imageData.cluster

@@ -5,7 +5,6 @@ import com.intellij.openapi.diagnostic.Logger
 import jetbrains.buildServer.agent.Constants
 import jetbrains.buildServer.clouds.*
 import jetbrains.buildServer.serverSide.AgentDescription
-import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -13,7 +12,6 @@ class EcsCloudClient(images: List<EcsCloudImage>,
                      private val updater: EcsInstancesUpdater,
                      private val ecsClientParams: EcsCloudClientParameters,
                      private val serverUuid: String,
-                     private val idxStorage: File,
                      private val cloudProfileId: String) : CloudClientEx {
     private val LOG = Logger.getInstance(EcsCloudClient::class.java.getName())
 

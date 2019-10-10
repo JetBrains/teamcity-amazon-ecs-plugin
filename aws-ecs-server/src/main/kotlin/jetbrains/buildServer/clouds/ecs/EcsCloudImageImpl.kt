@@ -8,17 +8,11 @@ import jetbrains.buildServer.clouds.CloudInstance
 import jetbrains.buildServer.clouds.CloudInstanceUserData
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import jetbrains.buildServer.serverSide.TeamCityProperties
-import jetbrains.buildServer.util.FileUtil
-import jetbrains.buildServer.util.StringUtil
 import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
 
@@ -26,52 +20,15 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                         private val apiConnector: EcsApiConnector,
                         private val cache: EcsDataCache,
                         private val serverUUID: String,
-                        idxStorage: File,
                         private val profileId: String) : EcsCloudImage {
 
     private val LOG = Logger.getInstance(EcsCloudImageImpl::class.java.getName())
     private val ERROR_INSTANCES_TIMEOUT: Long = 60*1000
 
-    private val idxFile = File(idxStorage, imageName4File() + ".idx")
-    private val idxCounter = AtomicInteger(0)
-    private val idxTouched = AtomicBoolean(false)
-    private val idxMutex = Mutex()
-    private val counterContext = newSingleThreadContext("IdxContext")
-    private val errorInstances= ConcurrentHashMap<String, Pair<EcsCloudInstance, Long>>()
+    private val errorInstances = ConcurrentHashMap<String, Pair<EcsCloudInstance, Long>>()
 
     private val muteTime = AtomicLong(0)
 
-
-    init{
-        try {
-            if (!idxFile.exists()) {
-                idxCounter.set(1)
-                idxTouched.set(true)
-                storeIdx()
-            } else {
-                runBlocking {
-                    idxMutex.withLock {
-                        idxCounter.set(Integer.parseInt(FileUtil.readText(idxFile)))
-                    }
-                }
-            }
-        } catch (ex: Exception) {
-            LOG.warnAndDebugDetails("Unable to process idx file '${idxFile.absolutePath}'. Will reset the index for ${imageData.taskDefinition}", ex)
-            idxCounter.set(1)
-        }
-
-        GlobalScope.async{
-            while (true) {
-                try {
-                    storeIdx()
-                    expireErrorInstances()
-                    delay(1000)
-                } catch (ex: Exception){
-                    LOG.warnAndDebugDetails("An error occurred during processing of periodic tasks", ex)
-                }
-            }
-        }
-    }
 
     override fun canStartNewInstance(): Boolean {
         if (System.currentTimeMillis() < muteTime.get())
@@ -172,6 +129,8 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                 }
                 myCurrentError = null
             }
+
+            expireErrorInstances()
         } catch (ex: Throwable) {
             val msg = "Unable to populate instances for ${imageData.id}"
             LOG.warnAndDebugDetails(msg, ex)
@@ -218,25 +177,8 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
     }
 
     private fun generateNewInstanceId(): String {
-        lateinit var retval : String
-        do{
-            retval = String.format("${imageData.taskDefinition}-${idxCounter.getAndIncrement()}")
-        } while (myIdToInstanceMap.containsKey(retval))
-        LOG.info("Will create a new instance with name $retval")
-        return retval
-    }
-
-    private fun imageName4File():String {
-        return StringUtil.replaceNonAlphaNumericChars(imageData.taskDefinition, '_')
-    }
-
-    private fun storeIdx() = runBlocking {
-        if (idxTouched.compareAndSet(true, false)){
-            idxMutex.withLock {
-                FileUtil.writeViaTmpFile(idxFile, ByteArrayInputStream(idxCounter.get().toString().toByteArray()),
-                        FileUtil.IOAction.DO_NOTHING)
-            }
-        }
+        val uniq = UUID.randomUUID().toString()
+        return String.format("${imageData.taskDefinition}-${uniq}")
     }
 
     private fun expireErrorInstances() =  runBlocking {

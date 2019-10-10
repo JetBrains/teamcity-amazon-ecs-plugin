@@ -26,10 +26,7 @@
 
 <table class="runnerFormTable">
 
-<jsp:include page="editAWSCommonParams.jsp">
-    <jsp:param name="requireRegion" value="${true}"/>
-    <jsp:param name="requireEnvironment" value="${false}"/>
-</jsp:include>
+<jsp:include page="editAWSCommonParams.jsp" />
 
     <tr>
         <th class="noBorder"></th>

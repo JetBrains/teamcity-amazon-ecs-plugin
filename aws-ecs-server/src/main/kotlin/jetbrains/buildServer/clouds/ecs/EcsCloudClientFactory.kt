@@ -7,7 +7,6 @@ import jetbrains.buildServer.clouds.ecs.web.EDIT_ECS_HTML
 import jetbrains.buildServer.serverSide.*
 import jetbrains.buildServer.util.amazon.AWSCommonParams
 import jetbrains.buildServer.web.openapi.PluginDescriptor
-import java.io.File
 import java.util.*
 
 fun startedByTeamCity(serverUUID: String?): String {
@@ -28,13 +27,9 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
                             private val cache: EcsDataCache,
                             private val instanceUpdater: EcsInstancesUpdater) : CloudClientFactory {
     private val editUrl = pluginDescriptor.getPluginResourcesPath(EDIT_ECS_HTML)
-    private val idxStorage = File(serverPaths.pluginDataDirectory, "ecsCloudIdx")
 
     init {
         cloudRegister.registerCloudFactory(this)
-        if (!idxStorage.exists()){
-            idxStorage.mkdirs()
-        }
     }
 
     override fun getCloudCode(): String {
@@ -62,11 +57,11 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
         val apiConnector = EcsApiConnectorImpl(ecsParams.awsCredentials, ecsParams.region)
         val serverUUID = serverSettings.serverUUID!!
         val images = ecsParams.imagesData.map{
-            val image = it.toImage(apiConnector, cache, serverUUID, idxStorage, state.profileId)
+            val image = it.toImage(apiConnector, cache, serverUUID, state.profileId)
             image.populateInstances()
             image
         }
-        return EcsCloudClient(images, instanceUpdater, ecsParams, serverUUID, idxStorage, state.profileId)
+        return EcsCloudClient(images, instanceUpdater, ecsParams, serverUUID, state.profileId)
     }
 
     override fun getInitialParameterValues(): MutableMap<String, String> {

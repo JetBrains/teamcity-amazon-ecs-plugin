@@ -31,7 +31,7 @@ dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.2"
 
 
-    compile 'jetbrains.buildServer.util:amazon-util:39'
+    compile 'jetbrains.buildServer.util:amazon-util:32'
     provided "org.jetbrains.teamcity:cloud-interface:$teamcityVersion"
     provided "org.jetbrains.teamcity:cloud-shared:$teamcityVersion"
     provided "org.jetbrains.teamcity:cloud-server-api:$teamcityVersion"

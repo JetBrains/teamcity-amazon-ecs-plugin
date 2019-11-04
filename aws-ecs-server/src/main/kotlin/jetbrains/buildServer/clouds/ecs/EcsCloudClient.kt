@@ -45,7 +45,8 @@ class EcsCloudClient(images: List<EcsCloudImage>,
             return false
         }
 
-        if (ecsClientParams.instanceLimit in 1..images.sumBy { image.runningInstanceCount })
+
+        if (ecsClientParams.instanceLimit in 1..images.sumBy{(it as EcsCloudImage).runningInstanceCount})
             return false
 
         return kubeCloudImage.canStartNewInstance()

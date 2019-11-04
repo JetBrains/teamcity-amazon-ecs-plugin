@@ -6,6 +6,7 @@ import jetbrains.buildServer.clouds.CloudImage
 import jetbrains.buildServer.clouds.CloudImageParameters
 import jetbrains.buildServer.clouds.InstanceStatus
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
+import jetbrains.buildServer.util.TestFor
 import org.jmock.Expectations
 import org.jmock.Mockery
 import org.junit.Assert
@@ -54,11 +55,11 @@ class EcsCloudClientTest : BaseTestCase() {
     }
 
     private fun createClient(images: List<EcsCloudImage>): EcsCloudClient {
-        return createClient(images, MockCloudClientParameters(mapOf()))
+        return createClient(images, mapOf())
     }
 
-    private fun createClient(images: List<EcsCloudImage>, cloudClientParameters: CloudClientParameters): EcsCloudClient {
-        return createClient("server-uuid", "profile-id", images, cloudClientParameters)
+    private fun createClient(images: List<EcsCloudImage>, params: Map<String, String>): EcsCloudClient {
+        return createClient("server-uuid", "profile-id", images, MockCloudClientParameters(params))
     }
 
     private fun createClient(serverUuid: String, profileId: String, images: List<EcsCloudImage>, cloudClientParameters: CloudClientParameters): EcsCloudClient {
@@ -108,8 +109,8 @@ class EcsCloudClientTest : BaseTestCase() {
             }
         })
         val images = listOf(image)
-        val cloudClientParameters = MockCloudClientParameters(mapOf(Pair(PROFILE_INSTANCE_LIMIT_PARAM, "1")))
-        val cloudClient = createClient(images, cloudClientParameters)
+        val paramsMap = mapOf(Pair(PROFILE_INSTANCE_LIMIT_PARAM, "1"))
+        val cloudClient = createClient(images, paramsMap)
         Assert.assertFalse(cloudClient.canStartNewInstance(image))
     }
 
@@ -146,6 +147,33 @@ class EcsCloudClientTest : BaseTestCase() {
             }
         })
         createClient(listOf(image1, image2))
+    }
+
+    @Test
+    @TestFor(issues= ["TW-62422"])
+    fun testStartNewInstanceManyImages(){
+        val imageCount = 4
+        val imagesList = arrayListOf<EcsCloudImage>()
+        for (i in 1..imageCount){
+            imagesList.add(m.mock(EcsCloudImage::class.java, "image-$i"))
+        }
+        m.checking(object : Expectations() {
+            init {
+                var idx = 0
+                for (image in imagesList) {
+                    idx++;
+                    allowing(image).name; will(Expectations.returnValue("image-$idx-name"))
+                    allowing(image).id; will(Expectations.returnValue("image-$idx-id"))
+                    allowing(image).runningInstanceCount; will(Expectations.returnValue(idx-1))
+                    allowing(image).canStartNewInstance(); will(returnValue(idx%2==0))
+                }
+            }
+        })
+        val cloudClient = createClient(imagesList, mapOf(Pair(PROFILE_INSTANCE_LIMIT_PARAM, "8")))
+        Assert.assertTrue(cloudClient.canStartNewInstance(imagesList[3]))
+        Assert.assertFalse(cloudClient.canStartNewInstance(imagesList[2]))
+        Assert.assertTrue(cloudClient.canStartNewInstance(imagesList[1]))
+        Assert.assertFalse(cloudClient.canStartNewInstance(imagesList[0]))
     }
 }
 

@@ -62,7 +62,7 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
         val apiConnector = EcsApiConnectorImpl(ecsParams.awsCredentials, ecsParams.region)
         val serverUUID = serverSettings.serverUUID!!
         val images = ecsParams.imagesData.map{
-            val image = it.toImage(apiConnector, cache, serverUUID, idxStorage, state.profileId)
+            val image = it.toImage(apiConnector, serverUUID, idxStorage, state.profileId)
             image.populateInstances()
             image
         }

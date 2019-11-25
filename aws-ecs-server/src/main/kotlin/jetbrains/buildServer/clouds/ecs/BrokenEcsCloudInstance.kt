@@ -2,12 +2,16 @@ package jetbrains.buildServer.clouds.ecs
 
 import jetbrains.buildServer.clouds.CloudErrorInfo
 import jetbrains.buildServer.clouds.InstanceStatus
+import jetbrains.buildServer.clouds.ecs.apiConnector.EcsTask
 import jetbrains.buildServer.serverSide.AgentDescription
 import java.util.*
 
 class BrokenEcsCloudInstance(private val instanceId: String,
                              private val cloudImage: EcsCloudImage,
                              private val errorInfo: CloudErrorInfo) : EcsCloudInstance {
+    override fun update(task: EcsTask) {
+        // do nothing
+    }
 
     override val taskArn: String
         get() = ""

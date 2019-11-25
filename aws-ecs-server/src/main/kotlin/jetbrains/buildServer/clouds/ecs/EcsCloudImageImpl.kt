@@ -7,6 +7,7 @@ import jetbrains.buildServer.clouds.CloudException
 import jetbrains.buildServer.clouds.CloudInstance
 import jetbrains.buildServer.clouds.CloudInstanceUserData
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
+import jetbrains.buildServer.clouds.ecs.apiConnector.EcsTask
 import jetbrains.buildServer.serverSide.TeamCityProperties
 import jetbrains.buildServer.util.FileUtil
 import jetbrains.buildServer.util.StringUtil
@@ -20,11 +21,12 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
+import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 
 class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                         private val apiConnector: EcsApiConnector,
-                        private val cache: EcsDataCache,
                         private val serverUUID: String,
                         idxStorage: File,
                         private val profileId: String) : EcsCloudImage {
@@ -153,22 +155,42 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
             val stoppedTasks = apiConnector.listStoppedTasks(cluster, startedBy).mapNotNull { taskArn -> apiConnector.describeTask(taskArn, cluster) }
 
             synchronized(myIdToInstanceMap) {
-                myIdToInstanceMap.clear()
+                val keySet = HashSet(myIdToInstanceMap.keys)
+                val newTasks = ArrayList<EcsTask>()
                 for (task in runningTasks.union(stoppedTasks)) {
                     val taskProfileId = task.getOverridenContainerEnv(PROFILE_ID_ECS_ENV)
                     val taskImageId = task.getOverridenContainerEnv(IMAGE_ID_ECS_ENV)
-                    if(profileId.equals(taskProfileId) && taskImageId.equals(id)){
+                    if(profileId == taskProfileId && taskImageId == id){
                         val instanceId = task.getOverridenContainerEnv(INSTANCE_ID_ECS_ENV)
-                        if(instanceId == null){
+                        if(instanceId == null) {
                             LOG.warn("Can't resolve cloud instance id of ecs task ${task.arn}")
+                            continue
+                        }
+                        if (keySet.remove(instanceId)) {
+                            val instance = myIdToInstanceMap[instanceId]
+                            if (instance == null) {
+                                LOG.warn("Unable to find instance with id '$instanceId'. Was it removed?")
+                                continue
+                            }
+                            instance.update(task)
                         } else {
-                            cache.cleanInstanceStatus(task.arn)
-                            myIdToInstanceMap.put(instanceId, CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, task, apiConnector), cache))
+                            newTasks.add(task)
                         }
                     }
                 }
-                errorInstances.forEach{
-                    myIdToInstanceMap[it.key] = it.value.first
+                //remove absent instances
+                keySet.forEach {
+                    LOG.info("Instance '$it' is no longer available")
+                    myIdToInstanceMap.remove(it)
+                }
+                newTasks.forEach{
+                    val instanceId = it.getOverridenContainerEnv(INSTANCE_ID_ECS_ENV)
+                    if (instanceId != null) {
+                        LOG.info("Found new instance '$instanceId'")
+                        myIdToInstanceMap[instanceId] = EcsCloudInstanceImpl(instanceId, this, it, apiConnector)
+                    } else {
+                        LOG.info("Found no instance id for task with arn '${it.arn}'")
+                    }
                 }
                 myCurrentError = null
             }
@@ -203,13 +225,13 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
             val tasks = apiConnector.runTask(launchType, taskDefinition, cluster, taskGroup, subnets, securityGroups, assignPublicIp, additionalEnvironment, startedByTeamCity(serverUUID))
 
-            newInstance = CachingEcsCloudInstance(EcsCloudInstanceImpl(instanceId, this, tasks[0], apiConnector), cache)
+            newInstance = EcsCloudInstanceImpl(instanceId, this, tasks[0], apiConnector)
         } catch (ex: Throwable){
             newInstance = BrokenEcsCloudInstance(instanceId, this, CloudErrorInfo(ex.message.toString(), ex.message.toString(), ex))
             errorInstances[instanceId] = Pair(newInstance, System.currentTimeMillis() + ERROR_INSTANCES_TIMEOUT)
             muteTime.set(System.currentTimeMillis() + ERROR_INSTANCES_TIMEOUT)
         }
-        populateInstances()
+        myIdToInstanceMap[instanceId] = newInstance
         return newInstance
     }
 

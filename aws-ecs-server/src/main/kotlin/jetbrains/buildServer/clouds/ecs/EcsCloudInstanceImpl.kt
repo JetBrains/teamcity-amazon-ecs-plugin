@@ -5,7 +5,6 @@ import jetbrains.buildServer.agent.Constants
 import jetbrains.buildServer.clouds.CloudErrorInfo
 import jetbrains.buildServer.clouds.CloudImage
 import jetbrains.buildServer.clouds.InstanceStatus
-import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiCallFailureException
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsTask
 import jetbrains.buildServer.serverSide.AgentDescription
@@ -14,21 +13,14 @@ import java.util.*
 class EcsCloudInstanceImpl(private val instanceId: String, val cloudImage: EcsCloudImage, val ecsTask: EcsTask, val apiConnector: EcsApiConnector) : EcsCloudInstance {
     private val LOG = Logger.getInstance(EcsCloudInstanceImpl::class.java.getName())
     private var myCurrentError: CloudErrorInfo? = null
+    private var myTask: EcsTask = ecsTask
 
     override val taskArn: String
         get() = ecsTask.arn
 
     override fun getStatus(): InstanceStatus {
-        val task: EcsTask?
-        try{
-            task = apiConnector.describeTask(ecsTask.arn, ecsTask.clusterArn)
-        } catch (ex: EcsApiCallFailureException){
-            return InstanceStatus.UNKNOWN
-        }
-        if(task == null) return InstanceStatus.UNKNOWN
-        val lastStatus = task.lastStatus
-        val desiredStatus = task.desiredStatus
-        when (desiredStatus) {
+        val lastStatus = myTask.lastStatus
+        when (myTask.desiredStatus) {
             "RUNNING" -> {
                 when(lastStatus){
                     "PENDING" -> return InstanceStatus.STARTING
@@ -82,10 +74,10 @@ class EcsCloudInstanceImpl(private val instanceId: String, val cloudImage: EcsCl
     }
 
     override fun containsAgent(agent: AgentDescription): Boolean {
-        if (agent.configurationParameters.get(REQUIRED_PROFILE_ID_CONFIG_PARAM) == null)
+        if (agent.configurationParameters[REQUIRED_PROFILE_ID_CONFIG_PARAM] == null)
             return false
 
-        return instanceId == agent.configurationParameters.get(Constants.ENV_PREFIX + INSTANCE_ID_ECS_ENV)
+        return instanceId == agent.configurationParameters[Constants.ENV_PREFIX + INSTANCE_ID_ECS_ENV]
     }
 
     override fun terminate() {
@@ -98,5 +90,9 @@ class EcsCloudInstanceImpl(private val instanceId: String, val cloudImage: EcsCl
             myCurrentError = CloudErrorInfo(msg)
         }
         cloudImage.populateInstances()
+    }
+
+    override fun update(task: EcsTask) {
+        myTask = task
     }
 }

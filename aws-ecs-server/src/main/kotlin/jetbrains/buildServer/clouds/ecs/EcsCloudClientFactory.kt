@@ -25,7 +25,6 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
                             pluginDescriptor: PluginDescriptor,
                             serverPaths: ServerPaths,
                             private val serverSettings: ServerSettings,
-                            private val cache: EcsDataCache,
                             private val instanceUpdater: EcsInstancesUpdater) : CloudClientFactory {
     private val editUrl = pluginDescriptor.getPluginResourcesPath(EDIT_ECS_HTML)
     private val idxStorage = File(serverPaths.pluginDataDirectory, "ecsCloudIdx")

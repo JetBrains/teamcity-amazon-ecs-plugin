@@ -1,7 +1,6 @@
 plugins {
     id 'com.github.rodm.teamcity-server' version "1.0"
 }
-def aws_sdk_version = '1.11.688'
 
 repositories {
     maven { url "https://jcenter.bintray.com" }
@@ -9,7 +8,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom 'com.amazonaws:aws-java-sdk-bom:$aws_sdk_version'
+        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.11.688'
     }
 }
 
@@ -23,8 +22,8 @@ teamcity {
 }
 
 dependencies {
-    compile 'com.amazonaws:aws-java-sdk-ecs:$aws_sdk_version'
-    compile 'com.amazonaws:aws-java-sdk-cloudwatch:$aws_sdk_version'
+    compile 'com.amazonaws:aws-java-sdk-ecs:1.11.688'
+    compile 'com.amazonaws:aws-java-sdk-cloudwatch:1.11.688'
 
     compile project(path: ':aws-ecs-common', configuration:'default')
     agent project(path: ':aws-ecs-agent', configuration: 'plugin')

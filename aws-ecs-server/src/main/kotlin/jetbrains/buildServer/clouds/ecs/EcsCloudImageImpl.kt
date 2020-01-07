@@ -148,11 +148,13 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
     }
 
     override fun populateInstances() {
+        LOG.debug("Populating instances for $name")
         try {
             val startedBy = startedByTeamCity(serverUUID)
 
             val runningTasks = apiConnector.listRunningTasks(cluster, startedBy).mapNotNull { taskArn -> apiConnector.describeTask(taskArn, cluster) }
             val stoppedTasks = apiConnector.listStoppedTasks(cluster, startedBy).mapNotNull { taskArn -> apiConnector.describeTask(taskArn, cluster) }
+            LOG.debug("Will process ${runningTasks.size} running and ${stoppedTasks.size} stopped tasks")
 
             synchronized(myIdToInstanceMap) {
                 val keySet = HashSet(myIdToInstanceMap.keys)

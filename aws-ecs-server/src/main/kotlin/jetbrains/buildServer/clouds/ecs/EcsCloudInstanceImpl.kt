@@ -93,6 +93,7 @@ class EcsCloudInstanceImpl(private val instanceId: String, val cloudImage: EcsCl
     }
 
     override fun update(task: EcsTask) {
+        LOG.debug("Updating task '${task.id}:${task.arn}', status: ${task.lastStatus} -> ${task.desiredStatus}")
         myTask = task
     }
 }

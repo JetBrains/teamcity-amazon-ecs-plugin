@@ -25,7 +25,7 @@ interface EcsApiConnector {
     fun listTaskDefinitions(): List<String> //list of task definition arns
     fun describeTaskDefinition(taskDefinitionArn: String): EcsTaskDefinition?
 
-    fun runTask(launchType: LaunchType,
+    fun runTask(launchType: LaunchType?,
                 taskDefinition: EcsTaskDefinition,
                 cluster: String?,
                 taskGroup: String?,
@@ -33,7 +33,8 @@ interface EcsApiConnector {
                 securityGroups: Collection<String>,
                 assignPublicIp: Boolean,
                 additionalEnvironment: Map<String, String>,
-                startedBy: String?): List<EcsTask>
+                startedBy: String?,
+                fargatePlatformVersion: String?): List<EcsTask>
 
     fun stopTask(task: String, cluster: String?, reason: String?)
 

@@ -53,7 +53,7 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
            clientConfig.setProxyHost(httpProxy)
         }
 
-        if (httpProxyPort <= 0){
+        if (httpProxyPort >= 0){
             clientConfig.setProxyPort(httpProxyPort)
         }
 
@@ -99,7 +99,18 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
         cloudWatch = cloudWatchBuilder.build()
     }
 
-    override fun runTask(launchType: LaunchType, taskDefinition: EcsTaskDefinition, cluster: String?, taskGroup: String?, subnets: Collection<String>, securityGroups: Collection<String>, assignPublicIp: Boolean, additionalEnvironment: Map<String, String>, startedBy: String?): List<EcsTask> {
+    override fun runTask(
+            launchType: LaunchType?,
+            taskDefinition: EcsTaskDefinition,
+            cluster: String?,
+            taskGroup: String?,
+            subnets: Collection<String>,
+            securityGroups: Collection<String>,
+            assignPublicIp: Boolean,
+            additionalEnvironment: Map<String, String>,
+            startedBy: String?,
+            fargatePlatformVersion: String?
+    ): List<EcsTask> {
         val containerOverrides = taskDefinition.containers.map {
             containerName -> ContainerOverride()
                                 .withName(containerName)
@@ -107,10 +118,15 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
         }
 
         var request = RunTaskRequest()
-                .withLaunchType(launchType)
                 .withTaskDefinition(taskDefinition.arn)
                 .withOverrides(TaskOverride().withContainerOverrides(containerOverrides))
                 .withStartedBy(startedBy)
+        if (launchType != null){
+            request.withLaunchType(launchType)
+        }
+        if (launchType != LaunchType.EC2 && fargatePlatformVersion != null){
+            request.withPlatformVersion(fargatePlatformVersion)
+        }
         if(cluster != null && !cluster.isEmpty()) request = request.withCluster(cluster)
         if(taskGroup != null && !taskGroup.isEmpty()) request = request.withGroup(taskGroup)
         if(!subnets.isEmpty() || !securityGroups.isEmpty()) request = request.withNetworkConfiguration(

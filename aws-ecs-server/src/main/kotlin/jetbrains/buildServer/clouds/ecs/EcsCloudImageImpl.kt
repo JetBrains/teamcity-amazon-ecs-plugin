@@ -130,8 +130,23 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
     private val assignPublicIp: Boolean
         get() = imageData.assignPublicIp
 
-    private val launchType: String
-        get() = imageData.launchType
+    private val launchType: LaunchType?
+        get() {
+            return try {
+                LaunchType.fromValue(imageData.launchType)
+            } catch (ex:Exception)  {
+                null
+            }
+        }
+
+    private val fargatePlatformVersion: String?
+        get() {
+            if (launchType != LaunchType.EC2){
+                return imageData.fargatePlatformVersion
+            } else {
+                return null
+            }
+        }
 
     private val taskDefinition: String
         get() = imageData.taskDefinition
@@ -223,7 +238,6 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
     @Synchronized
     override fun startNewInstance(tag: CloudInstanceUserData): EcsCloudInstance {
         var newInstance: EcsCloudInstance
-        val launchType = LaunchType.valueOf(launchType)
         val instanceId = generateNewInstanceId()
         try {
             val taskDefinition = apiConnector.describeTaskDefinition(taskDefinition) ?: throw CloudException("""Task definition $taskDefinition is missing""")
@@ -241,7 +255,8 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
                 additionalEnvironment.put(TEAMCITY_ECS_PROVIDED_PREFIX + pair.key, pair.value)
             }
 
-            val tasks = apiConnector.runTask(launchType, taskDefinition, cluster, taskGroup, subnets, securityGroups, assignPublicIp, additionalEnvironment, startedByTeamCity(serverUUID))
+            val tasks = apiConnector.runTask(launchType, taskDefinition, cluster, taskGroup, subnets, securityGroups,
+                    assignPublicIp, additionalEnvironment, startedByTeamCity(serverUUID), fargatePlatformVersion)
 
             newInstance = EcsCloudInstanceImpl(instanceId, this, tasks[0], apiConnector)
         } catch (ex: Throwable){

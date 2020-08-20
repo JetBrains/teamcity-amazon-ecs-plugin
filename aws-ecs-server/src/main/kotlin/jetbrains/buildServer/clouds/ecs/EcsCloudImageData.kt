@@ -36,11 +36,12 @@ class EcsCloudImageData(private val rawImageData: CloudImageParameters) {
     val securityGroups: String? = rawImageData.getParameter(SECURITY_GROUPS_PARAM)
     val cluster: String? = rawImageData.getParameter(CLUSTER_PARAM)
     val taskDefinition: String = rawImageData.getParameter(TASK_DEFINITION_PARAM)!!
+    val fargatePlatformVersion: String? = rawImageData.getParameter(FARGATE_PLATFORM_VERSION)
 
-    val launchType: String
+    val launchType: String?
         get() {
             val parameter = rawImageData.getParameter(LAUNCH_TYPE_PARAM)
-            return if(StringUtil.isEmpty(parameter)) LaunchType.EC2.name else parameter!!
+            return if(parameter.isNullOrEmpty()) null else parameter
         }
 
     val instanceLimit: Int

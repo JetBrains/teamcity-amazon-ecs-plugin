@@ -19,6 +19,7 @@ package jetbrains.buildServer.clouds.ecs.web
 import com.amazonaws.services.ecs.model.LaunchType
 import com.intellij.openapi.diagnostic.Logger
 import jetbrains.buildServer.BuildProject
+import jetbrains.buildServer.clouds.ecs.EcsParameterConstants
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnectorImpl
 import jetbrains.buildServer.clouds.ecs.toAwsCredentials
 import jetbrains.buildServer.controllers.ActionErrors
@@ -74,19 +75,20 @@ class EcsProfileEditController(val pluginDescriptor: PluginDescriptor,
     }
 
     override fun doGet(request: HttpServletRequest, response: HttpServletResponse): ModelAndView {
-        val modelAndView = ModelAndView(pluginDescriptor.getPluginResourcesPath("editProfile.jsp"))
+        val mv = ModelAndView(pluginDescriptor.getPluginResourcesPath("editProfile.jsp"))
         val projectId = request.getParameter("projectId")
         val pools = ArrayList<AgentPool>()
         if (BuildProject.ROOT_PROJECT_ID != projectId) {
             pools.add(AgentPoolUtil.DUMMY_PROJECT_POOL)
         }
         pools.addAll(agentPoolManager.getProjectOwnedAgentPools(projectId))
-        modelAndView.model.put("launchTypes", ArrayList<LaunchType>(LaunchType.values().toMutableList()))
-        modelAndView.model.put("agentPools", pools)
-        modelAndView.model.put("taskDefChooserUrl", taskDefsController.url)
-        modelAndView.model.put("clusterChooserUrl", clustersController.url)
-        modelAndView.model.put("deleteImageUrl", deleteImageDialogController.url)
-        modelAndView.model.put("testConnectionUrl", url + "?testConnection=true")
-        return modelAndView
+        mv.model.put("launchTypes", LaunchType.values().toMutableList())
+        mv.model["fargateVersions"] = EcsParameterConstants.FARGATE_VERSIONS.toMutableList()
+        mv.model.put("agentPools", pools)
+        mv.model.put("taskDefChooserUrl", taskDefsController.url)
+        mv.model.put("clusterChooserUrl", clustersController.url)
+        mv.model.put("deleteImageUrl", deleteImageDialogController.url)
+        mv.model.put("testConnectionUrl", url + "?testConnection=true")
+        return mv
     }
 }

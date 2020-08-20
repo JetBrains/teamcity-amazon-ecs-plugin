@@ -21,7 +21,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
 
     testConnectionUrl: '',
 
-    _dataKeys: [ 'launchType', 'taskDefinition', 'agentNamePrefix', 'cluster', 'taskGroup', 'subnets', 'securityGroups', 'assignPublicIp', 'maxInstances', 'cpuReservationLimit', 'agent_pool_id'],
+    _dataKeys: [ 'launchType', 'taskDefinition', 'agentNamePrefix', 'cluster', 'taskGroup', 'subnets', 'fargatePlatformVersion', 'securityGroups', 'assignPublicIp', 'maxInstances', 'cpuReservationLimit', 'agent_pool_id'],
 
     templates: {
         imagesTableRow: $j('<tr class="imagesTableRow">\
@@ -79,6 +79,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$agentNamePrefix = $j('#agentNamePrefix');
         this.$taskGroup = $j('#taskGroup');
         this.$subnets = $j('#subnets');
+        this.$fargatePlatformVersion = $j('#fargatePlatformVersion');
         this.$securityGroups = $j('#securityGroups');
         this.$assignPublicIp = $j('#assignPublicIp');
         this.$cluster = $j('#cluster');
@@ -135,21 +136,23 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
             if(value !== undefined) this.$launchType.val(value);
             this._image['launchType'] = this.$launchType.val();
             this.validateOptions(e.target.getAttribute('data-id'));
-            var closestTr = this.$subnets.closest('tr');
-            if(closestTr){
-                if(this.$launchType.val() === 'FARGATE'){
-                    closestTr.removeClass("advancedSetting");
-                    closestTr.removeClass("advancedSettingHighlight");
-                    closestTr.removeClass("advanced_hidden");
-                } else {
-                    closestTr.addClass("advancedSetting");
+            var subnetsTr = $j('.fargate-only');
+            if(this.$launchType.val() === 'FARGATE'){
+                subnetsTr.each(function(){
+                    $j(this).removeClass("advancedSetting");
+                    $j(this).removeClass("advancedSettingHighlight");
+                    $j(this).removeClass("advanced_hidden");
+                })
+            } else {
+                subnetsTr.each(function(){
+                    $j(this).addClass("advancedSetting");
                     if($j("tr[class*='advancedSettingHighlight']")) {
-                        closestTr.addClass("advancedSettingHighlight");
+                        $j(this).addClass("advancedSettingHighlight");
                     }
                     if($j("tr[class*='advanced_hidden']")) {
-                        closestTr.addClass("advanced_hidden");
+                        $j(this).addClass("advanced_hidden");
                     }
-                }
+                })
             }
         }.bind(this));
 
@@ -180,6 +183,12 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$subnets.on('change', function (e, value) {
             if(value !== undefined) this.$subnets.val(value);
             this._image['subnets'] = this.$subnets.val();
+            this.validateOptions(e.target.getAttribute('data-id'));
+        }.bind(this));
+
+        this.$fargatePlatformVersion.on('change', function (e, value) {
+            if(value !== undefined) this.$fargatePlatformVersion.val(value);
+            this._image['fargatePlatformVersion'] = this.$fargatePlatformVersion.val();
             this.validateOptions(e.target.getAttribute('data-id'));
         }.bind(this));
 
@@ -315,6 +324,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$agentNamePrefix.trigger('change', image['agentNamePrefix'] || '');
         this.$taskGroup.trigger('change', image['taskGroup'] || '');
         this.$subnets.trigger('change', image['subnets'] || '');
+        this.$fargatePlatformVersion.trigger('change', image['fargatePlatformVersion'] || '');
         this.$securityGroups.trigger('change', image['securityGroups'] || '');
         this.$assignPublicIp.prop('checked', image['assignPublicIp'] === 'true' ? image['assignPublicIp'] : '');
         this.selectCluster(image['cluster'] || '');
@@ -333,6 +343,7 @@ if(!BS.Ecs.ProfileSettingsForm) BS.Ecs.ProfileSettingsForm = OO.extend(BS.Plugin
         this.$agentNamePrefix.trigger('change', '');
         this.$taskGroup.trigger('change', '');
         this.$subnets.trigger('change', '');
+        this.$fargatePlatformVersion.trigger('change', 'LATEST');
         this.$securityGroups.trigger('change', '');
         this.$assignPublicIp.prop('checked', '');
         this.selectCluster('');

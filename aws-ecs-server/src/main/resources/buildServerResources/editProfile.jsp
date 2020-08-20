@@ -27,6 +27,7 @@
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 <jsp:useBean id="cons" class="jetbrains.buildServer.clouds.ecs.EcsParameterConstants"/>
 <jsp:useBean id="launchTypes" scope="request" type="java.util.Collection<com.amazonaws.services.ecs.model.LaunchType>"/>
+<jsp:useBean id="fargateVersions" scope="request" type="java.util.Collection<java.lang.String>"/>
 <jsp:useBean id="agentPools" scope="request" type="java.util.Collection<jetbrains.buildServer.serverSide.agentPools.AgentPool>"/>
 
 <jsp:useBean id="testConnectionUrl" class="java.lang.String" scope="request"/>
@@ -104,6 +105,7 @@
                 <div style="white-space: nowrap">
                     <select id="${cons.launchType}" data-id="${cons.launchType}" class="longField configParam">
                         <props:option value=""><c:out value="<Please select launch type>"/></props:option>
+                        <props:option selected="${'DEFAULT' eq propertiesBean.properties['launchType']}" value="DEFAULT"><c:out value="Default capacity provider (if exists)"/></props:option>
                         <c:forEach var="launchType" items="${launchTypes}">
                             <props:option selected="${launchType eq propertiesBean.properties['launchType']}" value="${launchType}"><c:out value="${launchType}"/></props:option>
                         </c:forEach>
@@ -111,6 +113,17 @@
                 </div>
                 <div class="smallNoteAttention">The launch type on which to run tasks.</div>
                 <span class="error option-error option-error_${cons.launchType}"></span>
+            </td>
+        </tr>
+        <tr class="fargate-only advancedSetting">
+            <th><label for="${cons.fargatePlatformVersion}">Fargate Platform Version:&nbsp;<l:star/></label></th>
+            <td>
+                <select id="${cons.fargatePlatformVersion}" data-id="${cons.fargatePlatformVersion}" class="longField configParam">
+                    <c:forEach var="fv" items="${fargateVersions}">
+                        <props:option selected="${fv eq propertiesBean.properties['fargatePlatformVersion']}" value="${fv}"><c:out value="${fv}"/></props:option>
+                    </c:forEach>
+                </select>
+                <span class="error option-error option-error_${cons.agentPoolIdField}"></span>
             </td>
         </tr>
         <tr>
@@ -152,7 +165,7 @@
                 </div>
             </td>
         </tr>
-        <tr class="advancedSetting">
+        <tr class="fargate-only advancedSetting">
             <th>Subnets:</th>
             <td>
                 <textarea id="${cons.subnets}" wrap="off" class="subnetList" data-id="${cons.subnets}" data-err-id="${cons.subnets}"></textarea>

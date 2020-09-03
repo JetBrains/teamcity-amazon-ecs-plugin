@@ -124,7 +124,7 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
         if (launchType != null){
             request.withLaunchType(launchType)
         }
-        if (launchType != LaunchType.EC2 && fargatePlatformVersion != null){
+        if (launchType == LaunchType.FARGATE && fargatePlatformVersion != null){
             request.withPlatformVersion(fargatePlatformVersion)
         }
         if(cluster != null && !cluster.isEmpty()) request = request.withCluster(cluster)

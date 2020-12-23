@@ -1,6 +1,6 @@
 # AWS ECS Terraform example
 
-This is a Terraform example which creates an [ECS cluster](modules/ecs) over the [EC2 AutoScalling group](modules/ec2) for TeamCity agents.
+This is a Terraform example which creates an [ECS cluster](modules/ecs) over the [EC2 AutoScaling group](modules/ec2) for TeamCity agents.
 
 ## Description
 
@@ -25,7 +25,7 @@ Scaling-out is much simpler than scaling-in.
 
 All instances have Scale-In protection, and AutoScaler always tries to make a Scale-In.
 [CloudWatch](modules/lambda/main.tf#L64-L82) monitors ECS events and runs the [Lambda unprotect function](modules/lambda/ecs-unprotect-lambda/index.py).
-This function removes the Scale-In protection from instances without ECS tasks, but keeps the number of instances equal to the minimum number of instances in the AutoScalling group. Thus, we remove unused instances and keep some instances for future.
+This function removes the Scale-In protection from instances without ECS tasks, but keeps the number of instances equal to the minimum number of instances in the AutoScaling group. Thus, we remove unused instances and keep some instances for future.
 
 You can customize the retain number in [Lambda module](modules/lambda/main.tf#L59).
 

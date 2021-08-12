@@ -18,7 +18,7 @@ package jetbrains.buildServer.clouds.ecs.web
 
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnectorImpl
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsTaskDefinition
-import jetbrains.buildServer.clouds.ecs.toAwsCredentials
+import jetbrains.buildServer.clouds.ecs.toAwsCredentialsProvider
 import jetbrains.buildServer.controllers.BaseController
 import jetbrains.buildServer.controllers.BasePropertiesBean
 import jetbrains.buildServer.internal.PluginPropertiesUtil
@@ -47,7 +47,7 @@ class EcsTaskDefinitionChooserController(private val pluginDescriptor: PluginDes
 
         val modelAndView = ModelAndView(pluginDescriptor.getPluginResourcesPath("taskDefs.jsp"))
         try {
-            val api = EcsApiConnectorImpl(props.toAwsCredentials(), AWSCommonParams.getRegionName(props))
+            val api = EcsApiConnectorImpl(props.toAwsCredentialsProvider(), AWSCommonParams.getRegionName(props))
             val sortedTasDefs = api.listTaskDefinitions()
                     .mapNotNull { taskDefArn -> api.describeTaskDefinition(taskDefArn) }
                     .filter { taskDef -> taskDef.isCompatibleWithLaunchType(launchType) }

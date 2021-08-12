@@ -34,7 +34,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 
-class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) : EcsApiConnector {
+class EcsApiConnectorImpl(awsCredentialsProvider: AWSCredentialsProvider, awsRegion: String?) : EcsApiConnector {
     private val LOG = Logger.getInstance(EcsApiConnectorImpl::class.java.getName())
     private val ecs: AmazonECS
     private val cloudWatch: AmazonCloudWatch
@@ -69,33 +69,13 @@ class EcsApiConnectorImpl(awsCredentials: AWSCredentials?, awsRegion: String?) :
                 .standard()
                 .withClientConfiguration(clientConfig)
                 .withRegion(awsRegion)
-        if(awsCredentials != null){
-            ecsBuilder.withCredentials(object: AWSCredentialsProvider{
-                override fun getCredentials(): AWSCredentials {
-                    return awsCredentials
-                }
-
-                override fun refresh() {
-                    //no-op
-                }
-            })
-        }
+        ecsBuilder.withCredentials(awsCredentialsProvider)
         ecs = ecsBuilder.build()
 
         var cloudWatchBuilder = AmazonCloudWatchClientBuilder.standard()
                 .withClientConfiguration(clientConfig)
                 .withRegion(awsRegion)
-        if(awsCredentials != null){
-            cloudWatchBuilder.withCredentials(object: AWSCredentialsProvider{
-                override fun getCredentials(): AWSCredentials {
-                    return awsCredentials
-                }
-
-                override fun refresh() {
-                    //no-op
-                }
-            })
-        }
+        cloudWatchBuilder.withCredentials(awsCredentialsProvider)
         cloudWatch = cloudWatchBuilder.build()
     }
 

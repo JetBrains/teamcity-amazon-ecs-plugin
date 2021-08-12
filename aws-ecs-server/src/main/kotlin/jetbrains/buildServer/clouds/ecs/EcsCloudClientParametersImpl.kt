@@ -17,6 +17,7 @@
 package jetbrains.buildServer.clouds.ecs
 
 import com.amazonaws.auth.AWSCredentials
+import com.amazonaws.auth.AWSCredentialsProvider
 import jetbrains.buildServer.clouds.CloudClientParameters
 import jetbrains.buildServer.util.StringUtil
 import jetbrains.buildServer.util.amazon.AWSCommonParams
@@ -39,13 +40,10 @@ class EcsCloudClientParametersImpl(private val genericParams: CloudClientParamet
 
     //NOTE: copy pasted from jetbrains.buildServer.util.amazon.AWSCommonParams
 
-    override val awsCredentials: AWSCredentials?
+    override val awsCredentialsProvider: AWSCredentialsProvider
         get() {
-            return genericParams.parameters.toAwsCredentials()
+            return genericParams.parameters.toAwsCredentialsProvider()
         }
 }
 
-fun Map<String, String>.toAwsCredentials(): AWSCredentials? {
-    val provider = getCredentialsProvider(this)
-    return provider.credentials
-}
+fun Map<String, String>.toAwsCredentialsProvider(): AWSCredentialsProvider = getCredentialsProvider(this)

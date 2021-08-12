@@ -18,7 +18,7 @@ package jetbrains.buildServer.clouds.ecs.web
 
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnectorImpl
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsCluster
-import jetbrains.buildServer.clouds.ecs.toAwsCredentials
+import jetbrains.buildServer.clouds.ecs.toAwsCredentialsProvider
 import jetbrains.buildServer.controllers.BaseController
 import jetbrains.buildServer.controllers.BasePropertiesBean
 import jetbrains.buildServer.internal.PluginPropertiesUtil
@@ -46,7 +46,7 @@ class EcsClusterChooserController(private val pluginDescriptor: PluginDescriptor
 
         val modelAndView = ModelAndView(pluginDescriptor.getPluginResourcesPath("clusters.jsp"))
         try {
-            val api = EcsApiConnectorImpl(props.toAwsCredentials(), AWSCommonParams.getRegionName(props))
+            val api = EcsApiConnectorImpl(props.toAwsCredentialsProvider(), AWSCommonParams.getRegionName(props))
             modelAndView.model["clusters"] = api.listClusters()
                     .mapNotNull { clusterArn -> api.describeCluster(clusterArn) }
                     .sortedBy { cluster -> cluster.name }

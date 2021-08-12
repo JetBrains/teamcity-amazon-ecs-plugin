@@ -21,7 +21,7 @@ import com.intellij.openapi.diagnostic.Logger
 import jetbrains.buildServer.BuildProject
 import jetbrains.buildServer.clouds.ecs.EcsParameterConstants
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnectorImpl
-import jetbrains.buildServer.clouds.ecs.toAwsCredentials
+import jetbrains.buildServer.clouds.ecs.toAwsCredentialsProvider
 import jetbrains.buildServer.controllers.ActionErrors
 import jetbrains.buildServer.controllers.BaseFormXmlController
 import jetbrains.buildServer.controllers.BasePropertiesBean
@@ -58,7 +58,7 @@ class EcsProfileEditController(val pluginDescriptor: PluginDescriptor,
             PluginPropertiesUtil.bindPropertiesFromRequest(request, propsBean, true)
             val props = propsBean.properties
             try {
-                val api = EcsApiConnectorImpl(props.toAwsCredentials(), AWSCommonParams.getRegionName(props))
+                val api = EcsApiConnectorImpl(props.toAwsCredentialsProvider(), AWSCommonParams.getRegionName(props))
                 val testConnectionResult = api.testConnection()
                 if (!testConnectionResult.success) {
                     val errors = ActionErrors()

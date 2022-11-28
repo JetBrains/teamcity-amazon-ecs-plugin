@@ -237,35 +237,42 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
     @Synchronized
     override fun startNewInstance(tag: CloudInstanceUserData): EcsCloudInstance {
-        var newInstance: EcsCloudInstance
         val instanceId = generateNewInstanceId()
+        val startingInstance = StartingEcsCloudInstance(instanceId, this)
+        myIdToInstanceMap[instanceId] = startingInstance
+        LOG.debug("attempting to start new ECS instance with generated instanceId: $instanceId")
         try {
             val taskDefinition = apiConnector.describeTaskDefinition(taskDefinition) ?: throw CloudException("""Task definition $taskDefinition is missing""")
 
             val additionalEnvironment = HashMap<String, String>()
-            additionalEnvironment.put(SERVER_UUID_ECS_ENV, serverUUID)
-            additionalEnvironment.put(SERVER_URL_ECS_ENV, tag.serverAddress)
-            additionalEnvironment.put(OFFICIAL_IMAGE_SERVER_URL_ECS_ENV, tag.serverAddress)
-            additionalEnvironment.put(PROFILE_ID_ECS_ENV, tag.profileId)
-            additionalEnvironment.put(IMAGE_ID_ECS_ENV, id)
-            additionalEnvironment.put(INSTANCE_ID_ECS_ENV, instanceId)
-            additionalEnvironment.put(AGENT_NAME_ECS_ENV, generateAgentName(instanceId))
+            additionalEnvironment[SERVER_UUID_ECS_ENV] = serverUUID
+            additionalEnvironment[SERVER_URL_ECS_ENV] = tag.serverAddress
+            additionalEnvironment[OFFICIAL_IMAGE_SERVER_URL_ECS_ENV] = tag.serverAddress
+            additionalEnvironment[PROFILE_ID_ECS_ENV] = tag.profileId
+            additionalEnvironment[IMAGE_ID_ECS_ENV] = id
+            additionalEnvironment[INSTANCE_ID_ECS_ENV] = instanceId
+            additionalEnvironment[AGENT_NAME_ECS_ENV] = generateAgentName(instanceId)
 
             for (pair in tag.customAgentConfigurationParameters){
-                additionalEnvironment.put(TEAMCITY_ECS_PROVIDED_PREFIX + pair.key, pair.value)
+                additionalEnvironment[TEAMCITY_ECS_PROVIDED_PREFIX + pair.key] = pair.value
             }
 
             val tasks = apiConnector.runTask(launchType, taskDefinition, cluster, taskGroup, subnets, securityGroups,
                     assignPublicIp, additionalEnvironment, startedByTeamCity(serverUUID), fargatePlatformVersion)
-
-            newInstance = EcsCloudInstanceImpl(instanceId, this, tasks[0], apiConnector)
+            LOG.info("Started ECS instance ${tasks[0].id}, generatedInstanceId: $instanceId")
+            val startedInstance = EcsCloudInstanceImpl(instanceId, this, tasks[0], apiConnector)
+            myIdToInstanceMap[instanceId] = startedInstance
+            if (startingInstance.terminateRequested){
+                startedInstance.terminate()
+            }
+            return startedInstance
         } catch (ex: Throwable){
-            newInstance = BrokenEcsCloudInstance(instanceId, this, CloudErrorInfo(ex.message.toString(), ex.message.toString(), ex))
-            errorInstances[instanceId] = Pair(newInstance, System.currentTimeMillis() + ERROR_INSTANCES_TIMEOUT)
+            val errInstance = BrokenEcsCloudInstance(instanceId, this, CloudErrorInfo(ex.message.toString(), ex.message.toString(), ex))
+            myIdToInstanceMap[instanceId] = errInstance
+            errorInstances[instanceId] = Pair(errInstance, System.currentTimeMillis() + ERROR_INSTANCES_TIMEOUT)
             muteTime.set(System.currentTimeMillis() + ERROR_INSTANCES_TIMEOUT)
+            return errInstance
         }
-        myIdToInstanceMap[instanceId] = newInstance
-        return newInstance
     }
 
     override fun generateAgentName(instanceId: String): String {

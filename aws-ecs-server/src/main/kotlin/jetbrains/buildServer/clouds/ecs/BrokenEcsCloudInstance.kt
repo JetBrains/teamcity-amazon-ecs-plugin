@@ -29,9 +29,6 @@ class BrokenEcsCloudInstance(private val instanceId: String,
         // do nothing
     }
 
-    override val taskArn: String
-        get() = ""
-
     private val startTime = Date()
 
     override fun terminate() {

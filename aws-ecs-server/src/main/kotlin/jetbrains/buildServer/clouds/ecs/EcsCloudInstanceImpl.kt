@@ -31,9 +31,6 @@ class EcsCloudInstanceImpl(private val instanceId: String, val cloudImage: EcsCl
     private var myCurrentError: CloudErrorInfo? = null
     private var myTask: EcsTask = ecsTask
 
-    override val taskArn: String
-        get() = ecsTask.arn
-
     override fun getStatus(): InstanceStatus {
         val lastStatus = myTask.lastStatus
         when (myTask.desiredStatus) {

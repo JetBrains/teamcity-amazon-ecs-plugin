@@ -20,7 +20,6 @@ import jetbrains.buildServer.BaseTestCase
 import jetbrains.buildServer.clouds.CloudClientParameters
 import jetbrains.buildServer.clouds.CloudImage
 import jetbrains.buildServer.clouds.CloudImageParameters
-import jetbrains.buildServer.clouds.InstanceStatus
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import jetbrains.buildServer.util.TestFor
 import org.jmock.Expectations
@@ -96,7 +95,7 @@ class EcsCloudClientTest : BaseTestCase() {
                 allowing(image).name; will(returnValue("image-1-name"))
                 allowing(image).id; will(returnValue("image-1-id"))
                 allowing(image).runningInstanceCount; will(returnValue(0))
-                allowing(image).canStartNewInstance(); will(returnValue(true))
+                allowing(image).canStartNewInstanceWithDetails(); will(returnValue(true))
             }
         })
         val images = listOf(image)
@@ -112,7 +111,7 @@ class EcsCloudClientTest : BaseTestCase() {
             init {
                 allowing(image).id; will(Expectations.returnValue("image-1-id"))
                 allowing(image).runningInstanceCount; will(Expectations.returnValue(1))
-                allowing(image).canStartNewInstance(); will(returnValue(true))
+                allowing(image).canStartNewInstanceWithDetails(); will(returnValue(true))
             }
         })
         val images = listOf(image)
@@ -130,7 +129,7 @@ class EcsCloudClientTest : BaseTestCase() {
                 allowing(image).name; will(Expectations.returnValue("image-1-name"))
                 allowing(image).id; will(Expectations.returnValue("image-1-id"))
                 allowing(image).runningInstanceCount; will(Expectations.returnValue(1))
-                allowing(image).canStartNewInstance(); will(returnValue(false))
+                allowing(image).canStartNewInstanceWithDetails(); will(returnValue(false))
             }
         })
         val images = listOf(image)
@@ -172,7 +171,7 @@ class EcsCloudClientTest : BaseTestCase() {
                     allowing(image).name; will(Expectations.returnValue("image-$idx-name"))
                     allowing(image).id; will(Expectations.returnValue("image-$idx-id"))
                     allowing(image).runningInstanceCount; will(Expectations.returnValue(idx-1))
-                    allowing(image).canStartNewInstance(); will(returnValue(idx%2==0))
+                    allowing(image).canStartNewInstanceWithDetails(); will(returnValue(idx%2==0))
                 }
             }
         })

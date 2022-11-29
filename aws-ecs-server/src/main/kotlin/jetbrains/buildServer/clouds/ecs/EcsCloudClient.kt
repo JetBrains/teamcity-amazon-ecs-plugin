@@ -53,19 +53,19 @@ class EcsCloudClient(images: List<EcsCloudImage>,
         return null
     }
 
-    override fun canStartNewInstance(image: CloudImage): Boolean {
-        val kubeCloudImage = image as EcsCloudImage
-        val kubeCloudImageId = kubeCloudImage.getId()
-        if (!myImageIdToImageMap.containsKey(kubeCloudImageId)) {
-            LOG.debug("Can't start instance of unknown cloud image with id " + kubeCloudImageId)
-            return false
+    override fun canStartNewInstanceWithDetails(image: CloudImage): CanStartNewInstanceResult {
+        val ecsImage = image as EcsCloudImage
+        if (!myImageIdToImageMap.containsKey(ecsImage.id)) {
+            LOG.debug("Can't start instance of unknown cloud image with id ${ecsImage.id}")
+            return CanStartNewInstanceResult.no("unknown ECS image ${ecsImage.id}")
         }
 
 
-        if (ecsClientParams.instanceLimit in 1..images.sumBy{(it as EcsCloudImage).runningInstanceCount})
-            return false
+        if (ecsClientParams.instanceLimit in 1..images.sumBy{(it as EcsCloudImage).runningInstanceCount}) {
+            return CanStartNewInstanceResult.no("Profile running instances limit reached")
+        }
 
-        return kubeCloudImage.canStartNewInstance()
+        return ecsImage.canStartNewInstanceWithDetails()
     }
 
     override fun startNewInstance(image: CloudImage, tag: CloudInstanceUserData): CloudInstance {

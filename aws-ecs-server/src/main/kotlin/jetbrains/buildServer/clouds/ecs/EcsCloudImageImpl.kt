@@ -18,10 +18,7 @@ package jetbrains.buildServer.clouds.ecs
 
 import com.amazonaws.services.ecs.model.LaunchType
 import com.intellij.openapi.diagnostic.Logger
-import jetbrains.buildServer.clouds.CloudErrorInfo
-import jetbrains.buildServer.clouds.CloudException
-import jetbrains.buildServer.clouds.CloudInstance
-import jetbrains.buildServer.clouds.CloudInstanceUserData
+import jetbrains.buildServer.clouds.*
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsTask
 import jetbrains.buildServer.serverSide.TeamCityProperties
@@ -91,12 +88,20 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         }
     }
 
-    override fun canStartNewInstance(): Boolean {
+    override fun canStartNewInstanceWithDetails(): CanStartNewInstanceResult {
         if (System.currentTimeMillis() < muteTime.get())
-            return false
-        if(instanceLimit in 1..runningInstanceCount) return false
-        val monitoringPeriod = TeamCityProperties.getInteger(ECS_METRICS_MONITORING_PERIOD, 1)
-        return cpuReservalionLimit <= 0 || apiConnector.getMaxCPUReservation(cluster, monitoringPeriod) < cpuReservalionLimit
+            return CanStartNewInstanceResult.no("image is still muted")
+
+        if(instanceLimit in 1..runningInstanceCount)
+            return CanStartNewInstanceResult.no("image's running instances limit reached")
+
+        if (cpuReservalionLimit > 0) {
+            val monitoringPeriod = TeamCityProperties.getInteger(ECS_METRICS_MONITORING_PERIOD, 1)
+            if (apiConnector.getMaxCPUReservation(cluster, monitoringPeriod) > cpuReservalionLimit){
+                return CanStartNewInstanceResult.no("CPU reservation limit reached")
+            }
+        }
+        return CanStartNewInstanceResult.yes()
     }
 
 
@@ -237,6 +242,9 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
     @Synchronized
     override fun startNewInstance(tag: CloudInstanceUserData): EcsCloudInstance {
+        if (!canStartNewInstanceWithDetails().isPositive) {
+            return BrokenEcsCloudInstance("cantStart", this, CloudErrorInfo("limit reached"))
+        }
         val instanceId = generateNewInstanceId()
         val startingInstance = StartingEcsCloudInstance(instanceId, this)
         myIdToInstanceMap[instanceId] = startingInstance

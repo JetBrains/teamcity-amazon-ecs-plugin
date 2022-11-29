@@ -61,7 +61,7 @@ class EcsCloudClient(images: List<EcsCloudImage>,
         }
 
 
-        if (ecsClientParams.instanceLimit in 1..images.sumBy{(it as EcsCloudImage).runningInstanceCount}) {
+        if (ecsClientParams.instanceLimit in 0..images.sumBy{(it as EcsCloudImage).runningInstanceCount}) {
             return CanStartNewInstanceResult.no("Profile running instances limit reached")
         }
 

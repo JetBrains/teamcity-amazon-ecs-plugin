@@ -92,7 +92,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
         if (System.currentTimeMillis() < muteTime.get())
             return CanStartNewInstanceResult.no("image is still muted")
 
-        if(instanceLimit in 1..runningInstanceCount)
+        if(instanceLimit in 0..runningInstanceCount)
             return CanStartNewInstanceResult.no("image's running instances limit reached")
 
         if (cpuReservalionLimit > 0) {

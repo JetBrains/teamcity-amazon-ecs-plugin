@@ -17,11 +17,13 @@
 package jetbrains.buildServer.clouds.ecs
 
 import jetbrains.buildServer.BaseTestCase
+import jetbrains.buildServer.clouds.CanStartNewInstanceResult
 import jetbrains.buildServer.clouds.CloudClientParameters
 import jetbrains.buildServer.clouds.CloudImage
 import jetbrains.buildServer.clouds.CloudImageParameters
 import jetbrains.buildServer.clouds.ecs.apiConnector.EcsApiConnector
 import jetbrains.buildServer.util.TestFor
+import org.assertj.core.api.BDDAssertions.then
 import org.jmock.Expectations
 import org.jmock.Mockery
 import org.junit.Assert
@@ -95,12 +97,12 @@ class EcsCloudClientTest : BaseTestCase() {
                 allowing(image).name; will(returnValue("image-1-name"))
                 allowing(image).id; will(returnValue("image-1-id"))
                 allowing(image).runningInstanceCount; will(returnValue(0))
-                allowing(image).canStartNewInstanceWithDetails(); will(returnValue(true))
+                allowing(image).canStartNewInstanceWithDetails(); will(returnValue(CanStartNewInstanceResult.yes()))
             }
         })
         val images = listOf(image)
         val cloudClient = createClient(images)
-        Assert.assertTrue(cloudClient.canStartNewInstance(image))
+        Assert.assertTrue(cloudClient.canStartNewInstanceWithDetails(image).isPositive)
     }
 
     @Test
@@ -117,7 +119,9 @@ class EcsCloudClientTest : BaseTestCase() {
         val images = listOf(image)
         val paramsMap = mapOf(Pair(PROFILE_INSTANCE_LIMIT_PARAM, "1"))
         val cloudClient = createClient(images, paramsMap)
-        Assert.assertFalse(cloudClient.canStartNewInstance(image))
+        val canStartResult = cloudClient.canStartNewInstanceWithDetails(image)
+        Assert.assertFalse(canStartResult.isPositive)
+        then(canStartResult.reason).isEqualTo("Profile running instances limit reached")
     }
 
     @Test
@@ -129,12 +133,14 @@ class EcsCloudClientTest : BaseTestCase() {
                 allowing(image).name; will(Expectations.returnValue("image-1-name"))
                 allowing(image).id; will(Expectations.returnValue("image-1-id"))
                 allowing(image).runningInstanceCount; will(Expectations.returnValue(1))
-                allowing(image).canStartNewInstanceWithDetails(); will(returnValue(false))
+                allowing(image).canStartNewInstanceWithDetails(); will(returnValue(CanStartNewInstanceResult.no("Kann nicht")))
             }
         })
         val images = listOf(image)
         val cloudClient = createClient(images)
-        Assert.assertFalse(cloudClient.canStartNewInstance(image))
+        val canStartResult = cloudClient.canStartNewInstanceWithDetails(image)
+        Assert.assertFalse(canStartResult.isPositive)
+        then(canStartResult.reason).isEqualTo("Kann nicht")
     }
 
     @Test
@@ -171,15 +177,18 @@ class EcsCloudClientTest : BaseTestCase() {
                     allowing(image).name; will(Expectations.returnValue("image-$idx-name"))
                     allowing(image).id; will(Expectations.returnValue("image-$idx-id"))
                     allowing(image).runningInstanceCount; will(Expectations.returnValue(idx-1))
-                    allowing(image).canStartNewInstanceWithDetails(); will(returnValue(idx%2==0))
+
+                    allowing(image).canStartNewInstanceWithDetails(); will(returnValue(
+                        if (idx%2==0) CanStartNewInstanceResult.yes() else CanStartNewInstanceResult.no("odd reason")
+                    ))
                 }
             }
         })
         val cloudClient = createClient(imagesList, mapOf(Pair(PROFILE_INSTANCE_LIMIT_PARAM, "8")))
-        Assert.assertTrue(cloudClient.canStartNewInstance(imagesList[3]))
-        Assert.assertFalse(cloudClient.canStartNewInstance(imagesList[2]))
-        Assert.assertTrue(cloudClient.canStartNewInstance(imagesList[1]))
-        Assert.assertFalse(cloudClient.canStartNewInstance(imagesList[0]))
+        Assert.assertTrue(cloudClient.canStartNewInstanceWithDetails(imagesList[3]).isPositive)
+        Assert.assertFalse(cloudClient.canStartNewInstanceWithDetails(imagesList[2]).isPositive)
+        Assert.assertTrue(cloudClient.canStartNewInstanceWithDetails(imagesList[1]).isPositive)
+        Assert.assertFalse(cloudClient.canStartNewInstanceWithDetails(imagesList[0]).isPositive)
     }
 }
 

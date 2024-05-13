@@ -78,6 +78,10 @@ class EcsAgentConfigurationProvider(agentEvents: EventDispatcher<AgentLifeCycleL
             }
         }
 
+        if (environment[STARTING_INSTANCE_ID_ECS_ENV] != null) {
+            agentConfigurationEx.addConfigurationParameter(STARTING_INSTANCE_ID_CONFIG_PARAM, environment[STARTING_INSTANCE_ID_ECS_ENV].toString());
+        }
+
         environment.entries.forEach { entry ->
             val key = entry.key
             val value = entry.value

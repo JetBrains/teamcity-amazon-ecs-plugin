@@ -227,7 +227,7 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
 
     @Synchronized
-    override fun startNewInstance(tag: CloudInstanceUserData): EcsCloudInstance {
+    override fun startNewInstance(userData: CloudInstanceUserData): EcsCloudInstance {
         if (!canStartNewInstanceWithDetails().isPositive) {
             return BrokenEcsCloudInstance("cantStart", this, CloudErrorInfo("limit reached"))
         }
@@ -240,15 +240,19 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
             val additionalEnvironment = HashMap<String, String>()
             additionalEnvironment[SERVER_UUID_ECS_ENV] = serverUUID
-            additionalEnvironment[SERVER_URL_ECS_ENV] = tag.serverAddress
-            additionalEnvironment[OFFICIAL_IMAGE_SERVER_URL_ECS_ENV] = tag.serverAddress
-            additionalEnvironment[PROFILE_ID_ECS_ENV] = tag.profileId
+            additionalEnvironment[SERVER_URL_ECS_ENV] = userData.serverAddress
+            additionalEnvironment[OFFICIAL_IMAGE_SERVER_URL_ECS_ENV] = userData.serverAddress
+            additionalEnvironment[PROFILE_ID_ECS_ENV] = userData.profileId
             additionalEnvironment[IMAGE_ID_ECS_ENV] = id
             additionalEnvironment[INSTANCE_ID_ECS_ENV] = instanceId
             additionalEnvironment[AGENT_NAME_ECS_ENV] = generateAgentName(instanceId)
 
-            for (pair in tag.customAgentConfigurationParameters){
-                additionalEnvironment[TEAMCITY_ECS_PROVIDED_PREFIX + pair.key] = pair.value
+            for (pair in userData.customAgentConfigurationParameters){
+                if (pair.key.equals(STARTING_INSTANCE_ID_CONFIG_PARAM)) {
+                    additionalEnvironment[STARTING_INSTANCE_ID_ECS_ENV] = pair.value
+                } else {
+                    additionalEnvironment[TEAMCITY_ECS_PROVIDED_PREFIX + pair.key] = pair.value
+                }
             }
 
             val tasks = apiConnector.runTask(launchType, taskDefinition, cluster, taskGroup, subnets, securityGroups,

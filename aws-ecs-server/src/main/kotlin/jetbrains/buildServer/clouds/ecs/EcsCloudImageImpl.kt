@@ -42,7 +42,6 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
 
     private val muteTime = AtomicLong(0)
 
-
     init{
         try {
             if (!idxFile.exists()) {
@@ -156,6 +155,8 @@ class EcsCloudImageImpl(private val imageData: EcsCloudImageData,
     override fun getId(): String {
         return imageData.id
     }
+
+    override fun getProfileId(): String = profileId
 
     override fun getInstances(): MutableCollection<out CloudInstance> {
         return myIdToInstanceMap.values

@@ -24,7 +24,7 @@ fun startedByTeamCity(serverUUID: String?): String {
  * Created by Evgeniy Koshkin (evgeniy.koshkin@jetbrains.com) on 05.07.17.
  */
 class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
-                            pluginDescriptor: PluginDescriptor,
+                            private val pluginDescriptor: PluginDescriptor,
                             serverPaths: ServerPaths,
                             private val serverSettings: ServerSettings,
                             private val instanceUpdater: EcsInstancesUpdater) : CloudClientFactory {
@@ -49,6 +49,12 @@ class EcsCloudClientFactory(cloudRegister: CloudRegistrar,
     override fun getEditProfileUrl(): String? {
         return editUrl
     }
+
+    override fun getTypeDescription(): String = """
+        Agents are linux containers running in AWS ECS cluster. Provides a high availability of agents. Doesn't support Docker containers nor Docker compose
+    """.trimIndent()
+
+    override fun getProfileIconUrl(): String = pluginDescriptor.getPluginResourcesPath("ecs.svg")
 
     override fun canBeAgentOfType(description: AgentDescription): Boolean {
         val map = description.availableParameters

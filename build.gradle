@@ -19,7 +19,7 @@ buildscript {
 def localRepo = anyParamPath('TC_LOCAL_REPO')
 
 ext {
-    teamcityVersion = anyParam('teamcityVersion') ?: '2024.11'
+    teamcityVersion = anyParam('teamcityVersion') ?: '2024.12'
     def correctVersion = project.hasProperty('versionNumber') && property('versionNumber') ==~ /\d+\.\d+\.\d+.*/
     versionNumber = correctVersion ? property('versionNumber') : 'SNAPSHOT-' + new Date().format('yyyyMMddHHmmss')
     projectIds = ['group': 'teamcity-aws-ecs-plugin', 'version': versionNumber]
